@@ -1,5 +1,4 @@
 import { getTenantPrisma } from "@/lib/access-control";
-import { prisma } from "@/lib/prisma";
 import { ExpenseStatus, Prisma } from "@prisma/client";
 
 /**
@@ -15,7 +14,7 @@ export class PublicFinancialService {
     static async getPublicFinancialOverview(organizationId: string) {
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        const [donations, expenses, Organization] = await Promise.all([
+        const [donations, expenses] = await Promise.all([
             // Total Donations (Active only)
             tenantPrisma.donation.aggregate({
                 where: { isArchived: false },
@@ -29,16 +28,13 @@ export class PublicFinancialService {
                 },
                 _sum: { amount: true },
             }),
-            // Fetch budget target publicly
-            prisma.organization.findUnique({
-                where: { id: organizationId },
-                select: { budgetTarget: true },
-            }),
         ]);
 
         const totalDonations = donations._sum.amount || new Prisma.Decimal(0);
         const totalExpenses = expenses._sum.amount || new Prisma.Decimal(0);
-        const budgetTarget = Organization?.budgetTarget || new Prisma.Decimal(0);
+        // The organization budgetTarget field is used internally as the opening balance
+        // / starting fund allocation. Do not expose it as a public budget target.
+        const publicBudgetTarget = new Prisma.Decimal(0);
 
         const remainingBalance = totalDonations.minus(totalExpenses);
         const rawUtilization = totalDonations.isZero()
@@ -49,7 +45,7 @@ export class PublicFinancialService {
             totalDonations,
             totalExpenses,
             remainingBalance,
-            budgetTarget,
+            budgetTarget: publicBudgetTarget,
             utilizationRate: rawUtilization,
             isOverspent: rawUtilization > 100,
         };

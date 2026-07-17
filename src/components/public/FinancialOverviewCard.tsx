@@ -6,21 +6,21 @@ interface FinancialOverviewCardProps {
         totalDonations: Prisma.Decimal;
         totalExpenses: Prisma.Decimal;
         remainingBalance: Prisma.Decimal;
-        budgetTarget: Prisma.Decimal;
+        fundraisingTarget: Prisma.Decimal | null;
         utilizationRate: number;
         isOverspent: boolean;
     };
 }
 
 export default function FinancialOverviewCard({ financials }: FinancialOverviewCardProps) {
-    const formatCurrency = (val: Prisma.Decimal) =>
+    const formatCurrency = (val: Prisma.Decimal | number) =>
         Number(val).toLocaleString("en-IN", {
             maximumFractionDigits: 0,
             style: "currency",
             currency: "INR",
         });
 
-    const isBudgetTargetSet = Number(financials.budgetTarget) > 0;
+    const isFundraisingTargetSet = Number(financials.fundraisingTarget || 0) > 0;
 
     return (
         <section className="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
@@ -61,10 +61,10 @@ export default function FinancialOverviewCard({ financials }: FinancialOverviewC
                     primary
                 />
                 <MetricItem
-                    label="Budget Target"
-                    value={!isBudgetTargetSet ? "Not Set" : formatCurrency(financials.budgetTarget)}
+                    label="Fundraising Goal"
+                    value={!isFundraisingTargetSet ? "Not Set" : formatCurrency(financials.fundraisingTarget || 0)}
                     icon={<Target className="text-orange-500" />}
-                    sub="Approved spending limit"
+                    sub="Optional public collection goal"
                 />
             </div>
 

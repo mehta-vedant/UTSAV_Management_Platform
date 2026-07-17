@@ -1,5 +1,7 @@
-import { validateAccess, getTenantPrisma } from "@/lib/access-control";
-import { OrganizationRole, DonationCategory, Prisma } from "@prisma/client";
+import { validateAccess, getTenantPrisma, requirePermission } from "@/lib/access-control";
+import { DonationCategory, Prisma } from "@prisma/client";
+import { AuditService } from "@/modules/core/audit.service";
+import { ValidationAppError } from "@/lib/errors";
 
 /**
  * Enterprise-Grade Donation Service
@@ -19,24 +21,20 @@ export class DonationService {
         }
     ) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
-        const { member } = await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:create");
 
         // 2. Business Logic: Validate input
         const donorName = data.donorName?.trim();
         if (!donorName) {
-            throw new Error("Donor name is required.");
+            throw new ValidationAppError("Donor name is required.");
         }
         if (donorName.length > 100) {
-            throw new Error("Donor name is too long (max 100 characters).");
+            throw new ValidationAppError("Donor name is too long. Use 100 characters or fewer.");
         }
 
         const amount = new Prisma.Decimal(data.amount.toString());
         if (amount.lte(0)) {
-            throw new Error("Donation amount must be greater than zero.");
+            throw new ValidationAppError("Amount must be greater than zero.");
         }
 
         // 3. Get isolated Prisma client
@@ -44,7 +42,7 @@ export class DonationService {
 
         // 4. Create record 
         // Note: organizationId is automatically injected by getTenantPrisma extension
-        return await tenantPrisma.donation.create({
+        const donation = await tenantPrisma.donation.create({
             data: {
                 donorName: donorName,
                 amount: amount,
@@ -63,6 +61,21 @@ export class DonationService {
                 }
             }
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Donation",
+            entityId: donation.id,
+            action: "create",
+            after: {
+                donorName,
+                amount: amount.toString(),
+                category: data.category,
+            },
+        });
+
+        return donation;
     }
 
     /**
@@ -75,11 +88,7 @@ export class DonationService {
         }
     ) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        await requirePermission(organizationId, "finance:read");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
@@ -106,11 +115,7 @@ export class DonationService {
      */
     static async getDonationSummary(organizationId: string) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        await requirePermission(organizationId, "finance:read");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
@@ -154,35 +159,53 @@ export class DonationService {
             notes?: string;
         }
     ) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:update");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.donation.update({
+        const before = await tenantPrisma.donation.findUnique({ where: { id: donationId } });
+        const donation = await tenantPrisma.donation.update({
             where: { id: donationId },
             data: {
                 ...data,
                 amount: data.amount ? new Prisma.Decimal(data.amount.toString()) : undefined,
             }
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Donation",
+            entityId: donationId,
+            action: "update",
+            before: before ? { amount: before.amount.toString(), category: before.category } : undefined,
+            after: { amount: donation.amount.toString(), category: donation.category },
+        });
+
+        return donation;
     }
     /**
      * Archive (soft-delete) a donation
      */
     static async archiveDonation(organizationId: string, donationId: string) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:update");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.donation.update({
+        const donation = await tenantPrisma.donation.update({
             where: { id: donationId },
             data: { isArchived: true }
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Donation",
+            entityId: donationId,
+            action: "archive",
+            after: { isArchived: true },
+        });
+
+        return donation;
     }
 }

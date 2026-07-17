@@ -26,7 +26,10 @@ interface EditOrganizationModalProps {
         description: string | null;
         startDate: Date;
         endDate: Date;
-        budgetTarget: number | null;
+        openingBalance: number | null;
+        publicFundraisingTarget: number | null;
+        internalBudgetLimit: number | null;
+        type: "FESTIVAL" | "CLUB";
     };
     trigger?: React.ReactNode;
 }
@@ -69,7 +72,9 @@ export default function EditOrganizationModal({
             description: formData.get("description") as string,
             startDate: formData.get("startDate") as string,
             endDate: formData.get("endDate") as string,
-            budgetTarget: formData.get("budgetTarget") ? Number(formData.get("budgetTarget")) : undefined,
+            openingBalance: formData.get("openingBalance") ? Number(formData.get("openingBalance")) : undefined,
+            publicFundraisingTarget: formData.get("publicFundraisingTarget") ? Number(formData.get("publicFundraisingTarget")) : undefined,
+            internalBudgetLimit: formData.get("internalBudgetLimit") ? Number(formData.get("internalBudgetLimit")) : undefined,
         };
 
         const res = await updateOrganizationAction(input);
@@ -150,16 +155,44 @@ export default function EditOrganizationModal({
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Overall Budget Target (₹)</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                                    {organization.type === "FESTIVAL" ? "Opening Balance (₹)" : "Starting Allocation (₹)"}
+                                </Label>
                                 <Input
-                                    name="budgetTarget"
+                                    name="openingBalance"
                                     type="number"
                                     step="0.01"
-                                    defaultValue={organization.budgetTarget ? Number(organization.budgetTarget) : ""}
-                                    placeholder="Total allocated funds"
+                                    defaultValue={organization.openingBalance ? Number(organization.openingBalance) : ""}
+                                    placeholder="Internal starting funds"
                                     className="rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all h-12 font-medium"
                                 />
                             </div>
+
+                            {organization.type === "FESTIVAL" ? (
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Public Fundraising Goal (₹)</Label>
+                                    <Input
+                                        name="publicFundraisingTarget"
+                                        type="number"
+                                        step="0.01"
+                                        defaultValue={organization.publicFundraisingTarget ? Number(organization.publicFundraisingTarget) : ""}
+                                        placeholder="Optional public goal"
+                                        className="rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all h-12 font-medium"
+                                    />
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Internal Budget Limit (₹)</Label>
+                                    <Input
+                                        name="internalBudgetLimit"
+                                        type="number"
+                                        step="0.01"
+                                        defaultValue={organization.internalBudgetLimit ? Number(organization.internalBudgetLimit) : ""}
+                                        placeholder="Optional private cap"
+                                        className="rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all h-12 font-medium"
+                                    />
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Description</Label>

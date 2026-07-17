@@ -2,13 +2,65 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./auth";
 import { prisma } from "./prisma";
 import { OrganizationRole } from "@prisma/client";
+import { AuthenticationError, AuthorizationError, InvariantError } from "./errors";
 
-export class AuthorizationError extends Error {
-    constructor(message = "Not authorized to perform this action") {
-        super(message);
-        this.name = "AuthorizationError";
-    }
-}
+export type Permission =
+    | "finance:read"
+    | "finance:create"
+    | "finance:approve"
+    | "finance:update"
+    | "members:invite"
+    | "members:updateRole"
+    | "events:manage"
+    | "tasks:manage"
+    | "tasks:updateOwn"
+    | "public:read"
+    | "public:manage";
+
+const rolePermissions: Record<OrganizationRole, Permission[]> = {
+    [OrganizationRole.ADMIN]: [
+        "finance:read",
+        "finance:create",
+        "finance:approve",
+        "finance:update",
+        "members:invite",
+        "members:updateRole",
+        "events:manage",
+        "tasks:manage",
+        "tasks:updateOwn",
+        "public:read",
+        "public:manage",
+    ],
+    [OrganizationRole.TREASURER]: [
+        "finance:read",
+        "finance:create",
+        "finance:approve",
+        "finance:update",
+        "tasks:updateOwn",
+        "public:read",
+    ],
+    [OrganizationRole.COMMITTEE_MEMBER]: [
+        "finance:read",
+        "finance:create",
+        "events:manage",
+        "tasks:manage",
+        "tasks:updateOwn",
+        "public:read",
+    ],
+    [OrganizationRole.VOLUNTEER]: [
+        "tasks:updateOwn",
+        "public:read",
+    ],
+};
+
+const permissionMessages: Partial<Record<Permission, string>> = {
+    "finance:approve": "You do not have permission to approve expenses.",
+    "finance:update": "You do not have permission to edit financial records.",
+    "members:invite": "You do not have permission to invite members.",
+    "members:updateRole": "You do not have permission to change member roles.",
+    "events:manage": "You do not have permission to manage events.",
+    "tasks:manage": "You do not have permission to manage tasks.",
+};
 
 /**
  * Enterprise-Grade Access Validation
@@ -34,7 +86,7 @@ export async function validateAccess(
     const session = prefetchedSession || await getServerSession(authOptions);
 
     if (!session || !session.user) {
-        throw new AuthorizationError("Authentication required");
+        throw new AuthenticationError();
     }
 
     // --- Security Level 2: DB-Verified Role Check ---
@@ -54,13 +106,13 @@ export async function validateAccess(
     });
 
     if (!member) {
-        throw new AuthorizationError("You are not a member of this Organization");
+        throw new AuthorizationError("You are not a member of this organization.");
     }
 
     // Role validation
     if (requiredRoles.length > 0 && !requiredRoles.includes(member.role)) {
         throw new AuthorizationError(
-            `Required roles: ${requiredRoles.join(", ")}. Your role: ${member.role}`
+            "You do not have permission to perform this action."
         );
     }
 
@@ -71,6 +123,25 @@ export async function validateAccess(
     };
 }
 
+export async function requirePermission(
+    organizationId: string,
+    permission: Permission,
+    prefetchedSession?: any
+) {
+    const access = await validateAccess(organizationId, [], prefetchedSession);
+    const allowed = rolePermissions[access.member.role]?.includes(permission);
+
+    if (!allowed) {
+        throw new AuthorizationError(permissionMessages[permission]);
+    }
+
+    return access;
+}
+
+export function hasPermission(role: OrganizationRole, permission: Permission) {
+    return rolePermissions[role]?.includes(permission) || false;
+}
+
 
 /**
  * Tenant-Scoped Prisma Client
@@ -78,7 +149,7 @@ export async function validateAccess(
  */
 export const getTenantPrisma = (organizationId: string) => {
     if (!organizationId) {
-        throw new Error("CRITICAL: Organization context missing for database operation.");
+        throw new InvariantError("Organization context is missing for this operation.");
     }
 
     return prisma.$extends({
@@ -93,6 +164,7 @@ export const getTenantPrisma = (organizationId: string) => {
                         "Volunteer",
                         "Event",
                         "VolunteerTask",
+                        "AuditLog",
                     ];
 
                     if (tenantModels.includes(model)) {

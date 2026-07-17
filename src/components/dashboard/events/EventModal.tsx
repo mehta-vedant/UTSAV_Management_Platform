@@ -163,7 +163,7 @@ export default function EventModal({
 
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
-                                {isFestival ? "Budget Target (₹)" : "Fund Alloted (₹)"}
+                                {isFestival ? "Event Spending Limit (₹)" : "Event Allocation (₹)"}
                             </Label>
                             <Input
                                 name="budgetTarget"

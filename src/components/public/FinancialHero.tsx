@@ -21,7 +21,7 @@ interface FinancialHeroProps {
         totalDonations: Prisma.Decimal;
         totalExpenses: Prisma.Decimal;
         remainingBalance: Prisma.Decimal;
-        budgetTarget: Prisma.Decimal;
+        fundraisingTarget: Prisma.Decimal | null;
         utilizationRate: number;
         isOverspent: boolean;
     };
@@ -36,7 +36,7 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
             currency: "INR",
         });
 
-    const isBudgetTargetSet = Number(financials.budgetTarget) > 0;
+    const isFundraisingTargetSet = Number(financials.fundraisingTarget || 0) > 0;
 
     return (
         <section className="mb-12">
@@ -66,10 +66,10 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
                     delay={0.3}
                 />
                 <StatCard
-                    label="Budget Target"
-                    value={!isBudgetTargetSet ? "Not Set" : formatCurrency(financials.budgetTarget)}
+                    label="Fundraising Goal"
+                    value={!isFundraisingTargetSet ? "Not Set" : formatCurrency(financials.fundraisingTarget || 0)}
                     icon={<Target className="w-5 h-5 text-amber-600" />}
-                    description="Approved spending limit"
+                    description="Optional public collection goal"
                     delay={0.4}
                 />
             </div>

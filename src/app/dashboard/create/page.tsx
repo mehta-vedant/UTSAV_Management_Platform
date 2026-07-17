@@ -33,7 +33,9 @@ export default function CreateOrganizationPage() {
         const formData = new FormData(e.currentTarget);
         const name = formData.get("name") as string;
         const slug = formData.get("slug") as string;
-        const budgetTarget = formData.get("budgetTarget") ? Number(formData.get("budgetTarget")) : undefined;
+        const openingBalance = formData.get("openingBalance") ? Number(formData.get("openingBalance")) : undefined;
+        const publicFundraisingTarget = formData.get("publicFundraisingTarget") ? Number(formData.get("publicFundraisingTarget")) : undefined;
+        const internalBudgetLimit = formData.get("internalBudgetLimit") ? Number(formData.get("internalBudgetLimit")) : undefined;
 
         const result = await createOrganizationAction({
             name,
@@ -41,7 +43,9 @@ export default function CreateOrganizationPage() {
             type,
             startDate: new Date().toISOString(),
             endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-            budgetTarget
+            openingBalance,
+            publicFundraisingTarget,
+            internalBudgetLimit,
         });
 
         if (result.success) {
@@ -163,11 +167,11 @@ export default function CreateOrganizationPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        {type === "FESTIVAL" ? "Opening Balance (Collection Till Date)" : "Initial Fund Allotment (Optional)"}
+                                        {type === "FESTIVAL" ? "Opening Balance" : "Starting Allocation"}
                                     </label>
                                     <div className="relative">
                                         <input
-                                            name="budgetTarget"
+                                            name="openingBalance"
                                             type="number"
                                             placeholder="e.g. 50000"
                                             className="w-full bg-slate-50 border-none px-5 py-4 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:ring-2 focus:ring-slate-900 transition-all"
@@ -175,10 +179,35 @@ export default function CreateOrganizationPage() {
                                     </div>
                                     <p className="text-[10px] text-slate-400 font-medium">
                                         {type === "FESTIVAL"
-                                            ? "Funds collected manually before onboarding to UTSAV."
-                                            : "Starting capital provided by the institution."}
+                                            ? "Internal funds collected before onboarding to UTSAV. This is never shown as a public fundraising goal."
+                                            : "Starting capital provided to the club."}
                                     </p>
                                 </div>
+                                {type === "FESTIVAL" ? (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                            Public Fundraising Goal (Optional)
+                                        </label>
+                                        <input
+                                            name="publicFundraisingTarget"
+                                            type="number"
+                                            placeholder="e.g. 100000"
+                                            className="w-full bg-slate-50 border-none px-5 py-4 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:ring-2 focus:ring-slate-900 transition-all"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                            Internal Budget Limit (Optional)
+                                        </label>
+                                        <input
+                                            name="internalBudgetLimit"
+                                            type="number"
+                                            placeholder="e.g. 75000"
+                                            className="w-full bg-slate-50 border-none px-5 py-4 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:ring-2 focus:ring-slate-900 transition-all"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-4">

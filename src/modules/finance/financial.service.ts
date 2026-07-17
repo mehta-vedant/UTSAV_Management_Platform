@@ -1,6 +1,6 @@
-import { validateAccess, getTenantPrisma } from "@/lib/access-control";
+import { getTenantPrisma, requirePermission } from "@/lib/access-control";
 import { prisma } from "@/lib/prisma";
-import { ExpenseStatus, Prisma, OrganizationRole } from "@prisma/client";
+import { ExpenseStatus, Prisma } from "@prisma/client";
 
 /**
  * Enterprise-Grade Financial Service
@@ -13,11 +13,7 @@ export class FinancialService {
      */
     static async getOrganizationFinancialOverview(organizationId: string) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        await requirePermission(organizationId, "finance:read");
 
         // 2. Use isolated Prisma client
         const tenantPrisma = getTenantPrisma(organizationId);
@@ -64,10 +60,10 @@ export class FinancialService {
             tenantPrisma.bhogItem.count({
                 where: { isArchived: false, status: "PENDING" }
             }),
-            // Fetch budget target
+            // Fetch private finance settings
             prisma.organization.findUnique({
                 where: { id: organizationId },
-                select: { budgetTarget: true, type: true }
+                select: { openingBalance: true, budgetTarget: true, internalBudgetLimit: true, type: true }
             })
         ]);
 
@@ -77,7 +73,8 @@ export class FinancialService {
 
         const totalExpenses = expenses._sum.amount || new Prisma.Decimal(0);
         const totalPendingExpenses = pendingExpenses._sum.amount || new Prisma.Decimal(0);
-        const openingBalance = Organization?.budgetTarget || new Prisma.Decimal(0);
+        const openingBalance = Organization?.openingBalance || Organization?.budgetTarget || new Prisma.Decimal(0);
+        const internalBudgetLimit = Organization?.internalBudgetLimit || null;
         const isFestival = Organization?.type === "FESTIVAL";
 
         // 4. Decimal-safe calculations
@@ -116,7 +113,8 @@ export class FinancialService {
             pendingExpenseCount: pendingExpenses._count._all,
             pendingBhogCount: bhogItems,
             remainingBalance: Number(remainingBalance),
-            openingBalance: Number(openingBalance), // Mapped from budgetTarget
+            openingBalance: Number(openingBalance),
+            internalBudgetLimit: internalBudgetLimit ? Number(internalBudgetLimit) : null,
 
             utilizationRate: rawUtilization,
             isOverspent: rawUtilization > 100,

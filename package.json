@@ -7,6 +7,9 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
         "postinstall": "prisma generate"
     },
     "dependencies": {
@@ -41,16 +44,22 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
         "@types/bcryptjs": "^2.4.6",
         "@types/node": "^20.11.20",
         "@types/react": "^18.2.58",
         "@types/react-dom": "^18.2.19",
+        "@vitejs/plugin-react": "^6.0.3",
         "autoprefixer": "^10.4.17",
+        "jsdom": "^29.1.1",
         "postcss": "^8.4.35",
         "prisma": "^5.10.0",
         "tailwindcss": "^3.4.1",
         "tsx": "^4.21.0",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "vitest": "^4.1.10"
     },
     "prisma": {
         "seed": "tsx prisma/seed.ts"

@@ -15,6 +15,7 @@ import ExpenseList from "@/components/public/ExpenseList";
 import BhogSection from "@/components/public/BhogSection";
 import EventTimeline from "@/components/public/EventTimeline";
 import { ShieldCheck, Calendar as CalendarIcon, MapPin } from "lucide-react";
+import { isFestivalOrganization } from "@/lib/organization-mode";
 
 interface PublicPageProps {
     params: {
@@ -28,7 +29,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
     // 1. Resolve Organization (Cached & Memoized)
     const organization = await OrganizationService.getOrganizationBySlug(orgSlug);
 
-    if (!organization) {
+    if (!organization || !isFestivalOrganization(organization)) {
         notFound();
     }
 

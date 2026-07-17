@@ -4,6 +4,7 @@ import { z } from "zod";
 import { DonationService } from "@/modules/finance/donation.service";
 import { DonationCategory } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { actionFailure, actionSuccess } from "@/lib/action-response";
 
 const RecordDonationSchema = z.object({
     organizationId: z.string(),
@@ -20,9 +21,9 @@ export async function recordDonationAction(data: z.infer<typeof RecordDonationSc
 
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
         revalidatePath(`/`, "layout"); // Update total collection on landing if needed
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to record donation" };
+        return actionFailure(error, "Failed to record donation.");
     }
 }
 const UpdateDonationSchema = z.object({
@@ -41,9 +42,9 @@ export async function updateDonationAction(data: z.infer<typeof UpdateDonationSc
         await DonationService.updateDonation(organizationId, donationId, updateData);
 
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to update donation" };
+        return actionFailure(error, "Failed to update donation.");
     }
 }
 
@@ -51,8 +52,8 @@ export async function archiveDonationAction(organizationId: string, donationId: 
     try {
         await DonationService.archiveDonation(organizationId, donationId);
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to archive donation" };
+        return actionFailure(error, "Failed to archive donation.");
     }
 }

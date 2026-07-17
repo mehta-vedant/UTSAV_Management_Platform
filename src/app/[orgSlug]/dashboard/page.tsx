@@ -41,11 +41,6 @@ export default async function DashboardOverviewPage({
 
     const financials = data.financials;
     const isFestival = organization.type === "FESTIVAL";
-    const donationTerm = isFestival ? "Donation" : "Fund Records";
-    const totalDonationLabel = isFestival ? "Total Donations" : "Total Funds";
-    const budgetLabel = isFestival ? "Budget Target" : "Fund Alloted";
-    const statusLabel = isFestival ? "Status" : "Verification";
-
     return (
         <div className="space-y-10 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* 1️⃣ Organization Identity Header */}
@@ -85,7 +80,7 @@ export default async function DashboardOverviewPage({
                                     />
                                     {/* 2. Member Donations (App Recorded) */}
                                     <StatCard
-                                        title="Member Donations"
+                                        title="Recorded Donations"
                                         value={`₹${Number(financials.totalDonations).toLocaleString()}`}
                                         subtext={`${financials.totalDonationCount - financials.sponsorshipCount} app contributions`}
                                         iconName="donation"
@@ -101,7 +96,7 @@ export default async function DashboardOverviewPage({
                                     />
                                     {/* 4. Total Collection (Liquidity) */}
                                     <StatCard
-                                        title="Total Collection"
+                                        title="Available Liquidity"
                                         value={`₹${Number(financials.totalLiquidity).toLocaleString()}`}
                                         subtext="Combined Financial Strength"
                                         iconName="balance"
@@ -112,9 +107,9 @@ export default async function DashboardOverviewPage({
                                 <>
                                     {/* 1. Fund Allotted (Initial + General) */}
                                     <StatCard
-                                        title="Fund Allotted"
+                                        title="Starting Allocation"
                                         value={financials.openingBalance ? `₹${(Number(financials.openingBalance) + Number(financials.totalFunds)).toLocaleString()}` : "Not Set"}
-                                        subtext="Initial Allocation + General Funds"
+                                        subtext="Starting Allocation + Internal Funds"
                                         iconName="target"
                                         iconColor="text-saffron-500"
                                     />
@@ -128,9 +123,9 @@ export default async function DashboardOverviewPage({
                                     />
                                     {/* 3. Total Funds (Total Liquidity) */}
                                     <StatCard
-                                        title="Total Funds"
+                                        title="Remaining Allocation"
                                         value={`₹${Number(financials.totalLiquidity).toLocaleString()}`}
-                                        subtext="Allotted + Sponsorships"
+                                        subtext="Allocation + Funds + Sponsorships"
                                         iconName="balance"
                                         iconColor="text-emerald-600"
                                     />
@@ -152,7 +147,7 @@ export default async function DashboardOverviewPage({
                                 <StatCard
                                     title="Remaining Balance"
                                     value={`₹${Number(financials.remainingBalance).toLocaleString()}`}
-                                    subtext="Net Available for Deployment"
+                                    subtext={isFestival ? "Festival funds available" : "Club funds available"}
                                     iconName="wallet"
                                     iconColor="text-emerald-500"
                                     isNegative={Number(financials.remainingBalance) < 0}
@@ -173,7 +168,7 @@ export default async function DashboardOverviewPage({
                                 title="Utilization"
                                 value={`${Math.round(financials.utilizationRate)}%`}
                                 progress={financials.utilizationRate}
-                                subtext={financials.isOverspent ? "Budget Exceeded" : "Healthy Spending"}
+                                subtext={financials.isOverspent ? "Available funds exceeded" : "Healthy Spending"}
                                 iconName="utilization"
                                 iconColor={financials.isOverspent ? "text-red-500" : "text-green-500"}
                             />

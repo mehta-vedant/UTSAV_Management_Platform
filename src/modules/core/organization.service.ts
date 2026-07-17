@@ -19,6 +19,9 @@ export class OrganizationService {
                 name: true,
                 description: true,
                 budgetTarget: true,
+                openingBalance: true,
+                publicFundraisingTarget: true,
+                internalBudgetLimit: true,
                 startDate: true,
                 endDate: true,
                 type: true,
@@ -62,7 +65,9 @@ export class OrganizationService {
         description?: string;
         startDate: Date;
         endDate: Date;
-        budgetTarget?: number;
+        openingBalance?: number;
+        publicFundraisingTarget?: number;
+        internalBudgetLimit?: number;
         type: "FESTIVAL" | "CLUB";
     }, userId: string) {
         // Enforce 3-organization limit (as ADMIN)
@@ -87,7 +92,10 @@ export class OrganizationService {
                     description: data.description,
                     startDate: data.startDate,
                     endDate: data.endDate,
-                    budgetTarget: data.budgetTarget,
+                    openingBalance: data.openingBalance,
+                    publicFundraisingTarget: data.publicFundraisingTarget,
+                    internalBudgetLimit: data.internalBudgetLimit,
+                    budgetTarget: data.openingBalance,
                     type: data.type,
                 },
             });
@@ -114,13 +122,15 @@ export class OrganizationService {
         description?: string;
         startDate?: Date;
         endDate?: Date;
-        budgetTarget?: number;
+        openingBalance?: number;
+        publicFundraisingTarget?: number;
+        internalBudgetLimit?: number;
     }) {
         return await prisma.organization.update({
             where: { id: organizationId },
             data: {
                 ...data,
-                budgetTarget: data.budgetTarget !== undefined ? data.budgetTarget : undefined,
+                budgetTarget: data.openingBalance !== undefined ? data.openingBalance : undefined,
             },
         });
     }

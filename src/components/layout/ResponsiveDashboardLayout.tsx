@@ -92,7 +92,7 @@ export default function ResponsiveDashboardLayout({
                     </button>
                     <div className="flex flex-col text-left">
                         <span className="text-[8px] font-black uppercase tracking-[0.2em] text-saffron-500 leading-none mb-1">
-                            {organization.type === "FESTIVAL" ? "Pavilion" : "Management"}
+                            {organization.type === "FESTIVAL" ? "Festival" : "Club"}
                         </span>
                         <span className="text-sm font-black tracking-tight uppercase truncate max-w-[150px]">
                             {organization.name}
@@ -149,7 +149,7 @@ export default function ResponsiveDashboardLayout({
 
                     <div className="space-y-1">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-saffron-500 opacity-60">
-                            {organization.type === "FESTIVAL" ? "Pavilion Center" : "Management HQ"}
+                            {organization.type === "FESTIVAL" ? "Festival Center" : "Club HQ"}
                         </h2>
                         <div className="text-xl font-black tracking-tighter uppercase leading-tight truncate">
                             {organization.name}
@@ -198,7 +198,7 @@ export default function ResponsiveDashboardLayout({
                         <div className="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
                             <LayoutDashboard className="w-4 h-4" />
                         </div>
-                        Switch {organization.type === "FESTIVAL" ? "Pavilion" : "Organization"}
+                        Switch {organization.type === "FESTIVAL" ? "Festival" : "Club"}
                     </Link>
                 </div>
             </motion.aside>

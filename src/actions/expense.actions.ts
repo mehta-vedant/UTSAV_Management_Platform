@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ExpenseService } from "@/modules/finance/expense.service";
 import { ExpenseCategory, ExpenseStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { actionFailure, actionSuccess } from "@/lib/action-response";
 
 const CreateExpenseSchema = z.object({
     organizationId: z.string(),
@@ -21,9 +22,9 @@ export async function createExpenseAction(data: z.infer<typeof CreateExpenseSche
 
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/`, "layout"); // Update public dashboard totals if needed
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to record expense" };
+        return actionFailure(error, "Failed to record expense.");
     }
 }
 
@@ -31,9 +32,9 @@ export async function approveExpenseAction(organizationId: string, expenseId: st
     try {
         await ExpenseService.approveExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to approve expense" };
+        return actionFailure(error, "Failed to approve expense.");
     }
 }
 
@@ -41,9 +42,9 @@ export async function rejectExpenseAction(organizationId: string, expenseId: str
     try {
         await ExpenseService.rejectExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to reject expense" };
+        return actionFailure(error, "Failed to reject expense.");
     }
 }
 const UpdateExpenseSchema = z.object({
@@ -64,9 +65,9 @@ export async function updateExpenseAction(data: z.infer<typeof UpdateExpenseSche
 
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/[orgSlug]/dashboard/events/[eventId]`, "layout");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to update expense" };
+        return actionFailure(error, "Failed to update expense.");
     }
 }
 
@@ -75,8 +76,8 @@ export async function archiveExpenseAction(organizationId: string, expenseId: st
         await ExpenseService.archiveExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/[orgSlug]/dashboard/events/[eventId]`, "layout");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to archive expense" };
+        return actionFailure(error, "Failed to archive expense.");
     }
 }

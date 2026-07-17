@@ -24,6 +24,8 @@ async function main() {
             slug: "ganeshotsav-2026",
             description: "Grand annual Ganeshotsav celebration for the community.",
             type: "FESTIVAL",
+            openingBalance: 500000,
+            publicFundraisingTarget: 750000,
             budgetTarget: 500000,
             startDate: new Date("2026-09-07"),
             endDate: new Date("2026-09-17"),

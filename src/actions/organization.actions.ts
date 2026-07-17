@@ -6,6 +6,7 @@ import { OrganizationService } from "@/modules/core/organization.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { actionFailure, actionSuccess } from "@/lib/action-response";
 
 const CreateOrganizationSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -13,7 +14,9 @@ const CreateOrganizationSchema = z.object({
     description: z.string().optional(),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().min(1, "End date is required"),
-    budgetTarget: z.number().optional(),
+    openingBalance: z.number().optional(),
+    publicFundraisingTarget: z.number().optional(),
+    internalBudgetLimit: z.number().optional(),
     type: z.enum(["FESTIVAL", "CLUB"]).default("FESTIVAL"),
 });
 
@@ -23,7 +26,7 @@ export async function createOrganizationAction(data: CreateOrganizationInput) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-        return { error: "Authentication required" };
+        return actionFailure(new Error("Please sign in to continue."));
     }
 
     try {
@@ -36,12 +39,14 @@ export async function createOrganizationAction(data: CreateOrganizationInput) {
             type: validatedData.type,
         }, session.user.id);
 
-        return { success: true, slug: Organization.slug };
+        return {
+            ok: true as const,
+            success: true as const,
+            slug: Organization.slug,
+            data: { slug: Organization.slug },
+        };
     } catch (error: any) {
-        if (error instanceof z.ZodError) {
-            return { error: error.issues[0].message };
-        }
-        return { error: error.message || "Failed to create Organization" };
+        return actionFailure(error, "Failed to create organization.");
     }
 }
 const UpdateOrganizationSchema = z.object({
@@ -50,14 +55,16 @@ const UpdateOrganizationSchema = z.object({
     description: z.string().optional(),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    budgetTarget: z.number().optional(),
+    openingBalance: z.number().optional(),
+    publicFundraisingTarget: z.number().optional(),
+    internalBudgetLimit: z.number().optional(),
 });
 
 export async function updateOrganizationAction(data: z.infer<typeof UpdateOrganizationSchema>) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-        return { error: "Authentication required" };
+        return actionFailure(new Error("Please sign in to continue."));
     }
 
     try {
@@ -70,15 +77,15 @@ export async function updateOrganizationAction(data: z.infer<typeof UpdateOrgani
         });
 
         revalidatePath(`/[orgSlug]/dashboard`, "layout");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to update Organization" };
+        return actionFailure(error, "Failed to update organization.");
     }
 }
 
 export async function deleteOrganizationAction(organizationId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "Authentication required" };
+    if (!session?.user?.id) return actionFailure(new Error("Please sign in to continue."));
 
     try {
         // Strict ADMIN check
@@ -91,14 +98,14 @@ export async function deleteOrganizationAction(organizationId: string) {
             }
         });
 
-        if (!member) return { error: "Unauthorized: Only an Admin can delete an Organization" };
+        if (!member) return actionFailure(new Error("Only an admin can delete an organization."));
 
         await OrganizationService.deleteOrganization(organizationId);
 
         revalidatePath("/dashboard", "page");
-        return { success: true };
+        return actionSuccess();
     } catch (error: any) {
-        return { error: error.message || "Failed to delete Organization" };
+        return actionFailure(error, "Failed to delete organization.");
     }
 }
 

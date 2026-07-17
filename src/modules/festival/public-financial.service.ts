@@ -1,5 +1,16 @@
 import { getTenantPrisma } from "@/lib/access-control";
+import { prisma } from "@/lib/prisma";
+import { assertFestivalMode } from "@/lib/organization-mode";
 import { ExpenseStatus, Prisma } from "@prisma/client";
+
+export interface PublicFinancialOverview {
+    totalDonations: Prisma.Decimal;
+    totalExpenses: Prisma.Decimal;
+    remainingBalance: Prisma.Decimal;
+    fundraisingTarget: Prisma.Decimal | null;
+    utilizationRate: number;
+    isOverspent: boolean;
+}
 
 /**
  * Public Financial Service
@@ -11,10 +22,10 @@ export class PublicFinancialService {
      * Get public financial overview
      * Strictly read-only, excludes internal IDs and audit fields.
      */
-    static async getPublicFinancialOverview(organizationId: string) {
+    static async getPublicFinancialOverview(organizationId: string): Promise<PublicFinancialOverview> {
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        const [donations, expenses] = await Promise.all([
+        const [donations, expenses, organization] = await Promise.all([
             // Total Donations (Active only)
             tenantPrisma.donation.aggregate({
                 where: { isArchived: false },
@@ -28,13 +39,17 @@ export class PublicFinancialService {
                 },
                 _sum: { amount: true },
             }),
+            prisma.organization.findUnique({
+                where: { id: organizationId },
+                select: { type: true, publicFundraisingTarget: true },
+            }),
         ]);
+
+        assertFestivalMode(organization);
 
         const totalDonations = donations._sum.amount || new Prisma.Decimal(0);
         const totalExpenses = expenses._sum.amount || new Prisma.Decimal(0);
-        // The organization budgetTarget field is used internally as the opening balance
-        // / starting fund allocation. Do not expose it as a public budget target.
-        const publicBudgetTarget = new Prisma.Decimal(0);
+        const fundraisingTarget = organization?.publicFundraisingTarget || null;
 
         const remainingBalance = totalDonations.minus(totalExpenses);
         const rawUtilization = totalDonations.isZero()
@@ -45,7 +60,7 @@ export class PublicFinancialService {
             totalDonations,
             totalExpenses,
             remainingBalance,
-            budgetTarget: publicBudgetTarget,
+            fundraisingTarget,
             utilizationRate: rawUtilization,
             isOverspent: rawUtilization > 100,
         };

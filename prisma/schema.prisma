@@ -20,25 +20,29 @@ model User {
 }
 
 model Organization {
-  id           String                   @id @default(cuid())
-  name         String
-  slug         String                   @unique
-  description  String?
-  startDate    DateTime
-  endDate      DateTime
-  budgetTarget Decimal?                 @db.Decimal(12, 2)
-  type         OrganizationType         @default(FESTIVAL)
-  featureFlags Json?
-  createdAt    DateTime                 @default(now())
-  updatedAt    DateTime                 @updatedAt
-  bhogItems    BhogItem[]
-  donations    Donation[]
-  events       Event[]
-  expenses     Expense[]
-  invitations  OrganizationInvitation[]
-  members      OrganizationMember[]
-  volunteers   Volunteer[]
-  tasks        VolunteerTask[]
+  id                      String                   @id @default(cuid())
+  name                    String
+  slug                    String                   @unique
+  description             String?
+  startDate               DateTime
+  endDate                 DateTime
+  budgetTarget            Decimal?                 @db.Decimal(12, 2)
+  openingBalance          Decimal?                 @db.Decimal(12, 2)
+  publicFundraisingTarget Decimal?                 @db.Decimal(12, 2)
+  internalBudgetLimit     Decimal?                 @db.Decimal(12, 2)
+  type                    OrganizationType         @default(FESTIVAL)
+  featureFlags            Json?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  auditLogs               AuditLog[]
+  bhogItems               BhogItem[]
+  donations               Donation[]
+  events                  Event[]
+  expenses                Expense[]
+  invitations             OrganizationInvitation[]
+  members                 OrganizationMember[]
+  volunteers              Volunteer[]
+  tasks                   VolunteerTask[]
 
   @@index([slug])
 }
@@ -237,6 +241,24 @@ model OrganizationInvitation {
   @@index([email])
 }
 
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  actorMemberId  String?
+  entityType     String
+  entityId       String?
+  action         String
+  before         Json?
+  after          Json?
+  visibility     AuditVisibility @default(INTERNAL)
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([actorMemberId])
+  @@index([entityType, entityId])
+}
+
 enum OrganizationRole {
   ADMIN
   TREASURER
@@ -308,4 +330,9 @@ enum EventStatus {
   ACTIVE
   COMPLETED
   ARCHIVED
+}
+
+enum AuditVisibility {
+  INTERNAL
+  PUBLIC
 }

@@ -11,7 +11,9 @@ export interface DashboardOverview {
         slug: string;
         startDate: Date;
         endDate: Date;
-        budgetTarget: number | null;
+        openingBalance: number | null;
+        publicFundraisingTarget: number | null;
+        internalBudgetLimit: number | null;
         type: "FESTIVAL" | "CLUB";
     };
     financials: any; // Result from FinancialService.getOverview
@@ -67,7 +69,18 @@ export class OverviewService {
         ] = await Promise.all([
             prisma.organization.findUnique({
                 where: { id: organizationId },
-                select: { id: true, name: true, slug: true, startDate: true, endDate: true, budgetTarget: true, type: true }
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    startDate: true,
+                    endDate: true,
+                    openingBalance: true,
+                    publicFundraisingTarget: true,
+                    internalBudgetLimit: true,
+                    budgetTarget: true,
+                    type: true
+                }
             }),
             FinancialService.getRecentActivity(organizationId),
             tenantPrisma.organizationMember.count({
@@ -135,7 +148,13 @@ export class OverviewService {
         return {
             organization: {
                 ...organization,
-                budgetTarget: organization.budgetTarget ? Number(organization.budgetTarget) : null
+                openingBalance: organization.openingBalance
+                    ? Number(organization.openingBalance)
+                    : organization.budgetTarget
+                        ? Number(organization.budgetTarget)
+                        : null,
+                publicFundraisingTarget: organization.publicFundraisingTarget ? Number(organization.publicFundraisingTarget) : null,
+                internalBudgetLimit: organization.internalBudgetLimit ? Number(organization.internalBudgetLimit) : null,
             },
             financials,
             eventFinancials,

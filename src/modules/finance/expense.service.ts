@@ -1,5 +1,7 @@
-import { validateAccess, getTenantPrisma } from "@/lib/access-control";
-import { OrganizationRole, ExpenseCategory, ExpenseStatus, Prisma } from "@prisma/client";
+import { getTenantPrisma, requirePermission } from "@/lib/access-control";
+import { ExpenseCategory, ExpenseStatus, Prisma } from "@prisma/client";
+import { AuditService } from "@/modules/core/audit.service";
+import { ConflictAppError, ValidationAppError } from "@/lib/errors";
 
 /**
  * Enterprise-Grade Expense Service
@@ -21,30 +23,26 @@ export class ExpenseService {
         }
     ) {
         // 1. Validate Access
-        const { member } = await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:create");
 
         // 2. Business Logic: Validate input
         const title = data.title?.trim();
         if (!title) {
-            throw new Error("Expense title is required.");
+            throw new ValidationAppError("Expense title is required.");
         }
         if (title.length > 200) {
-            throw new Error("Expense title is too long (max 200 characters).");
+            throw new ValidationAppError("Expense title is too long. Use 200 characters or fewer.");
         }
 
         const amount = new Prisma.Decimal(data.amount.toString());
         if (amount.lte(0)) {
-            throw new Error("Expense amount must be greater than zero.");
+            throw new ValidationAppError("Amount must be greater than zero.");
         }
 
         // 3. SECURE WRITE: organizationId is auto-injected by tenantPrisma extension
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.expense.create({
+        const expense = await tenantPrisma.expense.create({
             data: {
                 title: title,
                 amount: amount,
@@ -56,6 +54,22 @@ export class ExpenseService {
                 eventId: data.eventId,
             },
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Expense",
+            entityId: expense.id,
+            action: "create",
+            after: {
+                title,
+                amount: amount.toString(),
+                category: data.category,
+                status: ExpenseStatus.PENDING,
+            },
+        });
+
+        return expense;
     }
 
     /**
@@ -64,10 +78,7 @@ export class ExpenseService {
      */
     static async approveExpense(organizationId: string, expenseId: string) {
         // 1. Validate Access (ADMIN or TREASURER)
-        const { member } = await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:approve");
 
         const tenantPrisma = getTenantPrisma(organizationId);
         // ... existing updateMany logic ...
@@ -88,8 +99,17 @@ export class ExpenseService {
         });
 
         if (result.count === 0) {
-            throw new Error("Cannot approve expense. It may have been processed by another treasurer or does not exist.");
+            throw new ConflictAppError("This expense was already processed.");
         }
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Expense",
+            entityId: expenseId,
+            action: "approve",
+            after: { status: ExpenseStatus.APPROVED },
+        });
 
         return { success: true };
     }
@@ -100,10 +120,7 @@ export class ExpenseService {
      */
     static async rejectExpense(organizationId: string, expenseId: string) {
         // 1. Validate Access (ADMIN or TREASURER)
-        const { member } = await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:approve");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
@@ -122,8 +139,17 @@ export class ExpenseService {
         });
 
         if (result.count === 0) {
-            throw new Error("Cannot reject expense. It may have been processed by another treasurer or does not exist.");
+            throw new ConflictAppError("This expense was already processed.");
         }
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Expense",
+            entityId: expenseId,
+            action: "reject",
+            after: { status: ExpenseStatus.REJECTED },
+        });
 
         return { success: true };
     }
@@ -142,20 +168,30 @@ export class ExpenseService {
             eventId?: string;
         }
     ) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:update");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.expense.update({
+        const before = await tenantPrisma.expense.findUnique({ where: { id: expenseId } });
+        const expense = await tenantPrisma.expense.update({
             where: { id: expenseId },
             data: {
                 ...data,
                 amount: data.amount ? new Prisma.Decimal(data.amount.toString()) : undefined,
             }
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Expense",
+            entityId: expenseId,
+            action: "update",
+            before: before ? { amount: before.amount.toString(), status: before.status } : undefined,
+            after: { amount: expense.amount.toString(), status: expense.status },
+        });
+
+        return expense;
     }
 
     /**
@@ -163,11 +199,7 @@ export class ExpenseService {
      */
     static async getExpenseSummary(organizationId: string) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+        await requirePermission(organizationId, "finance:read");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
@@ -217,16 +249,24 @@ export class ExpenseService {
      * Archive (soft-delete) an expense
      */
     static async archiveExpense(organizationId: string, expenseId: string) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-        ]);
+        const { member } = await requirePermission(organizationId, "finance:update");
 
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.expense.update({
+        const expense = await tenantPrisma.expense.update({
             where: { id: expenseId },
             data: { isArchived: true }
         });
+
+        await AuditService.record({
+            organizationId,
+            actorMemberId: member.id,
+            entityType: "Expense",
+            entityId: expenseId,
+            action: "archive",
+            after: { isArchived: true },
+        });
+
+        return expense;
     }
 }

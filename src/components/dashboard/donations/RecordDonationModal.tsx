@@ -10,11 +10,15 @@ import { Input } from "@/components/ui/input";
 export default function RecordDonationModal({
     organizationId,
     isFestival = true,
-    defaultCategory
+    defaultCategory,
+    eventId,
+    eventTitle,
 }: {
     organizationId: string,
     isFestival?: boolean,
-    defaultCategory?: DonationCategory
+    defaultCategory?: DonationCategory,
+    eventId?: string,
+    eventTitle?: string,
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +41,7 @@ export default function RecordDonationModal({
             amount: Number(formData.get("amount")),
             category: (formData.get("category") as DonationCategory) || defaultCategory,
             receivedAt: toIsoDateTime(formData.get("receivedAt") as string),
+            eventId,
             notes: formData.get("notes") as string,
         };
 
@@ -57,7 +62,7 @@ export default function RecordDonationModal({
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron-500 text-white font-bold rounded-2xl shadow-xl shadow-saffron-500/20 hover:bg-saffron-600 transition-all hover:scale-105 active:scale-95"
             >
                 <Plus className="w-5 h-5" />
-                {isFestival ? "Record Donation" : "Add Funds"}
+                {eventId ? "Record Event Donation" : isFestival ? "Record Donation" : "Add Funds"}
             </button>
         );
     }
@@ -75,8 +80,13 @@ export default function RecordDonationModal({
                                 </span>
                             </div>
                             <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
-                                {isFestival ? "Log Contribution" : "Deposit Funds"}
+                                {eventId ? "Log Event Collection" : isFestival ? "Log Contribution" : "Deposit Funds"}
                             </h2>
+                            {eventTitle && (
+                                <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-saffron-600">
+                                    Linked to {eventTitle}
+                                </p>
+                            )}
                         </div>
                         <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-slate-50 rounded-full transition-colors font-bold uppercase tracking-widest">
                             <X className="w-5 h-5 text-slate-400" />

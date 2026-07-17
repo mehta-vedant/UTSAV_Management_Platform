@@ -20,6 +20,7 @@ export class DonationService {
             category: DonationCategory;
             receivedAt?: Date;
             notes?: string;
+            eventId?: string;
         }
     ) {
         // 1. Validate Access (ADMIN, TREASURER, COMMITTEE_MEMBER)
@@ -54,6 +55,7 @@ export class DonationService {
                 receivedAt: data.receivedAt || new Date(),
                 addedById: member.id,
                 organizationId: organizationId, // Explicitly pass for type safety
+                eventId: data.eventId,
             },
             include: {
                 addedBy: {
@@ -62,6 +64,9 @@ export class DonationService {
                             select: { name: true, email: true }
                         }
                     }
+                },
+                event: {
+                    select: { title: true }
                 }
             }
         });
@@ -109,6 +114,9 @@ export class DonationService {
                     select: {
                         user: { select: { name: true } }
                     }
+                },
+                event: {
+                    select: { title: true }
                 }
             }
         });
@@ -144,6 +152,9 @@ export class DonationService {
                         select: {
                             user: { select: { name: true } }
                         }
+                    },
+                    event: {
+                        select: { title: true }
                     }
                 },
                 orderBy: { receivedAt: "desc" },
@@ -201,6 +212,7 @@ export class DonationService {
             amount?: number | Prisma.Decimal;
             category?: DonationCategory;
             notes?: string;
+            eventId?: string;
         }
     ) {
         const { member } = await requirePermission(organizationId, "finance:update");

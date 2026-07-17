@@ -18,9 +18,10 @@ export class PublicTransparencyService {
                     donorName: true,
                     amount: true,
                     category: true,
-                    date: true,
+                    receivedAt: true,
+                    event: { select: { title: true } },
                 },
-                orderBy: { date: "desc" },
+                orderBy: { receivedAt: "desc" },
                 take: limit,
             }),
             // All approved expenses
@@ -34,9 +35,10 @@ export class PublicTransparencyService {
                     title: true,
                     amount: true,
                     category: true,
-                    createdAt: true, // Use createdAt as the transaction date if date field is not explicit
+                    requestedAt: true,
+                    event: { select: { title: true } },
                 },
-                orderBy: { createdAt: "desc" },
+                orderBy: { requestedAt: "desc" },
                 take: limit,
             })
         ]);
@@ -48,8 +50,9 @@ export class PublicTransparencyService {
             source: d.donorName,
             title: `Donation: ${d.donorName}`,
             amount: Number(d.amount),
-            date: d.date,
+            date: d.receivedAt,
             category: d.category || "General",
+            eventTitle: d.event?.title || null,
             verified: true
         }));
 
@@ -59,8 +62,9 @@ export class PublicTransparencyService {
             source: "Audited Purchase",
             title: e.title,
             amount: Number(e.amount),
-            date: e.createdAt,
+            date: e.requestedAt,
             category: e.category,
+            eventTitle: e.event?.title || null,
             verified: true
         }));
 
@@ -103,9 +107,37 @@ export class PublicTransparencyService {
     static async getPublicSchedule(organizationId: string) {
         const tenantPrisma = getTenantPrisma(organizationId);
 
-        return await tenantPrisma.event.findMany({
+        const events = await tenantPrisma.event.findMany({
             where: { isArchived: false },
+            include: {
+                donations: {
+                    where: { isArchived: false },
+                    select: { amount: true }
+                },
+                expenses: {
+                    where: { isArchived: false, status: ExpenseStatus.APPROVED },
+                    select: { amount: true }
+                }
+            },
             orderBy: { startTime: "asc" }
+        });
+
+        return events.map((event) => {
+            const totalCollected = event.donations.reduce((sum, donation) => sum + Number(donation.amount), 0);
+            const totalSpent = event.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+
+            return {
+                id: event.id,
+                title: event.title,
+                description: event.description,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                location: event.location,
+                category: event.status,
+                totalCollected,
+                totalSpent,
+                balance: totalCollected - totalSpent,
+            };
         });
     }
 }

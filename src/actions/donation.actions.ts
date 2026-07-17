@@ -13,6 +13,7 @@ const RecordDonationSchema = z.object({
     category: z.nativeEnum(DonationCategory),
     receivedAt: z.string().datetime("Date and time received are required."),
     notes: z.string().optional(),
+    eventId: z.string().optional(),
 });
 
 export async function recordDonationAction(data: z.infer<typeof RecordDonationSchema>) {
@@ -37,6 +38,7 @@ const UpdateDonationSchema = z.object({
     amount: z.number().gt(0).optional(),
     category: z.nativeEnum(DonationCategory).optional(),
     notes: z.string().optional(),
+    eventId: z.string().optional(),
 });
 
 export async function updateDonationAction(data: z.infer<typeof UpdateDonationSchema>) {

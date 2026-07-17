@@ -45,8 +45,8 @@ export default function AuditTable({ entries }: AuditTableProps) {
     return (
         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Toolbar */}
-            <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30">
-                <div className="relative flex-1 max-w-md">
+            <div className="p-5 sm:p-8 border-b border-slate-50 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-slate-50/30">
+                <div className="relative w-full xl:max-w-sm">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                         type="text"
@@ -57,11 +57,11 @@ export default function AuditTable({ entries }: AuditTableProps) {
                     />
                 </div>
 
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 xl:flex xl:items-center gap-2 w-full xl:w-auto">
                     <button
                         onClick={() => setFilter("ALL")}
                         className={cn(
-                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap w-full",
                             filter === "ALL"
                                 ? "bg-slate-900 text-white shadow-lg shadow-slate-200"
                                 : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-50"
@@ -72,7 +72,7 @@ export default function AuditTable({ entries }: AuditTableProps) {
                     <button
                         onClick={() => setFilter("INCOME")}
                         className={cn(
-                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center justify-center gap-2 w-full",
                             filter === "INCOME"
                                 ? "bg-emerald-500 text-white shadow-lg shadow-emerald-100"
                                 : "bg-white text-slate-400 border border-slate-100 hover:bg-emerald-50 hover:text-emerald-600"
@@ -84,7 +84,7 @@ export default function AuditTable({ entries }: AuditTableProps) {
                     <button
                         onClick={() => setFilter("EXPENSE")}
                         className={cn(
-                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                            "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center justify-center gap-2 w-full",
                             filter === "EXPENSE"
                                 ? "bg-rose-500 text-white shadow-lg shadow-rose-100"
                                 : "bg-white text-slate-400 border border-slate-100 hover:bg-rose-50 hover:text-rose-600"

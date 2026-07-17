@@ -5,6 +5,7 @@ import { EventFinancialService } from "@/modules/festival/event-financial.servic
 import { MemberService } from "@/modules/core/member.service";
 import EventTeamManager from "@/components/dashboard/events/EventTeamManager";
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
+import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
 import CreateTaskModal from "@/components/dashboard/volunteers/CreateTaskModal";
 import EventRegistrationManager from "@/components/dashboard/events/EventRegistrationManager";
 import EventStatusSelector from "@/components/dashboard/events/EventStatusSelector";
@@ -61,7 +62,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
     if (!event) throw new Error("Event not found");
 
     const totalSpent = financials.totalExpenses;
-    const budgetLeft = financials.budgetTarget - financials.totalExpenses;
+    const budgetLeft = financials.budgetTarget + financials.totalCollections - financials.totalExpenses;
 
     return (
         <div className="p-8 max-w-7xl mx-auto pb-24 space-y-10">
@@ -296,11 +297,18 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                                 </div>
                                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Financial Deployment</h3>
                             </div>
-                            <AddExpenseModal organizationId={organization.id} eventId={eventId} />
+                            <div className="flex flex-wrap items-center justify-end gap-3">
+                                <RecordDonationModal organizationId={organization.id} isFestival={organization.type === "FESTIVAL"} eventId={eventId} eventTitle={event.title} />
+                                <AddExpenseModal organizationId={organization.id} eventId={eventId} />
+                            </div>
                         </div>
 
                         <div className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="p-6 rounded-[2rem] bg-emerald-50 border border-emerald-100">
+                                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Event Collected</p>
+                                    <p className="text-2xl font-black text-emerald-600 tracking-tighter">Rs {Number(financials.totalCollections).toLocaleString()}</p>
+                                </div>
                                 <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100">
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Spent</p>
                                     <p className="text-2xl font-black text-slate-900 tracking-tighter">₹{Number(totalSpent).toLocaleString()}</p>

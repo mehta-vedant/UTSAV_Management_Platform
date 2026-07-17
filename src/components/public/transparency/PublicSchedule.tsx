@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, MapPin, Calendar } from "lucide-react";
+import { Clock, MapPin, Calendar, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { format, isWithinInterval } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,9 @@ interface Event {
     startTime: Date;
     endTime: Date;
     location: string | null;
+    totalCollected?: number;
+    totalSpent?: number;
+    balance?: number;
 }
 
 interface PublicScheduleProps {
@@ -49,7 +52,8 @@ export default function PublicSchedule({ events }: PublicScheduleProps) {
                                 </div>
                             )}
 
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex flex-col gap-5">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="space-y-1">
                                     <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight group-hover:text-amber-600 transition-colors">
                                         {event.title}
@@ -73,6 +77,28 @@ export default function PublicSchedule({ events }: PublicScheduleProps) {
                                         {event.description}
                                     </p>
                                 )}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-slate-100 pt-4">
+                                    <FinancePill
+                                        icon="in"
+                                        label="Collected"
+                                        value={event.totalCollected || 0}
+                                        tone="emerald"
+                                    />
+                                    <FinancePill
+                                        icon="out"
+                                        label="Spent"
+                                        value={event.totalSpent || 0}
+                                        tone="rose"
+                                    />
+                                    <FinancePill
+                                        icon="balance"
+                                        label="Event Balance"
+                                        value={event.balance || 0}
+                                        tone={(event.balance || 0) < 0 ? "rose" : "slate"}
+                                    />
+                                </div>
                             </div>
                         </div>
                     );
@@ -87,6 +113,35 @@ export default function PublicSchedule({ events }: PublicScheduleProps) {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function FinancePill({
+    icon,
+    label,
+    value,
+    tone,
+}: {
+    icon: "in" | "out" | "balance";
+    label: string;
+    value: number;
+    tone: "emerald" | "rose" | "slate";
+}) {
+    const Icon = icon === "in" ? TrendingUp : icon === "out" ? TrendingDown : Wallet;
+    const className = {
+        emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
+        rose: "bg-rose-50 text-rose-700 border-rose-100",
+        slate: "bg-slate-50 text-slate-700 border-slate-100",
+    }[tone];
+
+    return (
+        <div className={cn("flex items-center justify-between gap-3 rounded-2xl border px-4 py-3", className)}>
+            <div className="flex items-center gap-2 min-w-0">
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-[9px] font-black uppercase tracking-widest truncate">{label}</span>
+            </div>
+            <span className="text-xs font-black whitespace-nowrap">Rs {value.toLocaleString("en-IN")}</span>
         </div>
     );
 }

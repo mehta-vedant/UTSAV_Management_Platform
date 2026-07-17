@@ -11,13 +11,17 @@ const RecordDonationSchema = z.object({
     donorName: z.string().min(1, "Name is required"),
     amount: z.number().gt(0, "Amount must be greater than zero"),
     category: z.nativeEnum(DonationCategory),
+    receivedAt: z.string().datetime("Date and time received are required."),
     notes: z.string().optional(),
 });
 
 export async function recordDonationAction(data: z.infer<typeof RecordDonationSchema>) {
     try {
         const validated = RecordDonationSchema.parse(data);
-        await DonationService.createDonation(validated.organizationId, validated);
+        await DonationService.createDonation(validated.organizationId, {
+            ...validated,
+            receivedAt: new Date(validated.receivedAt),
+        });
 
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
         revalidatePath(`/`, "layout"); // Update total collection on landing if needed

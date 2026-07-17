@@ -21,6 +21,7 @@ export class ExpenseService {
             category: ExpenseCategory;
             notes?: string;
             eventId?: string;
+            requestedAt?: Date;
         }
     ) {
         // 1. Validate Access
@@ -50,7 +51,7 @@ export class ExpenseService {
                 category: data.category,
                 notes: data.notes,
                 status: ExpenseStatus.PENDING,
-                requestedAt: new Date(),
+                requestedAt: data.requestedAt || new Date(),
                 addedById: member.id,
                 organizationId: organizationId,
                 eventId: data.eventId,

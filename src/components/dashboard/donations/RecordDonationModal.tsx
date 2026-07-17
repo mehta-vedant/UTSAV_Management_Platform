@@ -36,6 +36,7 @@ export default function RecordDonationModal({
             donorName: formData.get("donorName") as string,
             amount: Number(formData.get("amount")),
             category: (formData.get("category") as DonationCategory) || defaultCategory,
+            receivedAt: toIsoDateTime(formData.get("receivedAt") as string),
             notes: formData.get("notes") as string,
         };
 
@@ -127,6 +128,20 @@ export default function RecordDonationModal({
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="receivedAt" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                                Date & Time Received
+                            </Label>
+                            <Input
+                                id="receivedAt"
+                                name="receivedAt"
+                                type="datetime-local"
+                                required
+                                defaultValue={localDateTimeValue()}
+                                className="rounded-xl border-slate-200 h-12 text-sm font-medium"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="notes" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Record Remarks</Label>
                             <textarea id="notes" name="notes" placeholder="Receipt number or specific intention..." className="w-full rounded-xl border border-slate-200 p-4 text-sm font-medium h-24 focus:ring-2 focus:ring-saffron-500 outline-none resize-none" />
                         </div>
@@ -149,4 +164,13 @@ export default function RecordDonationModal({
             </div>
         </div>
     );
+}
+
+function localDateTimeValue(date = new Date()) {
+    const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function toIsoDateTime(value: string) {
+    return value ? new Date(value).toISOString() : new Date().toISOString();
 }

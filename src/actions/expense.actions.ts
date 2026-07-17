@@ -11,6 +11,7 @@ const CreateExpenseSchema = z.object({
     title: z.string().min(1, "Title is required"),
     amount: z.number().gt(0, "Amount must be greater than zero"),
     category: z.nativeEnum(ExpenseCategory),
+    requestedAt: z.string().datetime("Expense date and time are required."),
     notes: z.string().optional(),
     eventId: z.string().optional(),
 });
@@ -18,7 +19,10 @@ const CreateExpenseSchema = z.object({
 export async function createExpenseAction(data: z.infer<typeof CreateExpenseSchema>) {
     try {
         const validated = CreateExpenseSchema.parse(data);
-        await ExpenseService.createExpense(validated.organizationId, validated);
+        await ExpenseService.createExpense(validated.organizationId, {
+            ...validated,
+            requestedAt: new Date(validated.requestedAt),
+        });
 
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/`, "layout"); // Update public dashboard totals if needed

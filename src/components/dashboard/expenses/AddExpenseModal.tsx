@@ -32,6 +32,7 @@ export default function AddExpenseModal({
             title: formData.get("title") as string,
             amount: Number(formData.get("amount")),
             category: formData.get("category") as ExpenseCategory,
+            requestedAt: toIsoDateTime(formData.get("requestedAt") as string),
             notes: formData.get("notes") as string,
         };
 
@@ -123,6 +124,20 @@ export default function AddExpenseModal({
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="requestedAt" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                                Expense Date & Time
+                            </Label>
+                            <Input
+                                id="requestedAt"
+                                name="requestedAt"
+                                type="datetime-local"
+                                required
+                                defaultValue={localDateTimeValue()}
+                                className="rounded-xl border-slate-200 h-12 text-sm font-medium"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="notes" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Additional Notes</Label>
                             <textarea id="notes" name="notes" placeholder="Any specific vendor details or remarks..." className="w-full rounded-xl border border-slate-200 p-4 text-sm font-medium h-24 focus:ring-2 focus:ring-saffron-500 outline-none resize-none" />
                         </div>
@@ -166,4 +181,13 @@ function XCircle(props: any) {
             <path d="m9 9 6 6" />
         </svg>
     )
+}
+
+function localDateTimeValue(date = new Date()) {
+    const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function toIsoDateTime(value: string) {
+    return value ? new Date(value).toISOString() : new Date().toISOString();
 }

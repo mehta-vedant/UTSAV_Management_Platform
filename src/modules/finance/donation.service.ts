@@ -18,6 +18,7 @@ export class DonationService {
             donorName: string;
             amount: number | Prisma.Decimal;
             category: DonationCategory;
+            receivedAt?: Date;
             notes?: string;
         }
     ) {
@@ -49,7 +50,8 @@ export class DonationService {
                 amount: amount,
                 category: data.category,
                 notes: data.notes,
-                receivedAt: new Date(),
+                date: data.receivedAt || new Date(),
+                receivedAt: data.receivedAt || new Date(),
                 addedById: member.id,
                 organizationId: organizationId, // Explicitly pass for type safety
             },

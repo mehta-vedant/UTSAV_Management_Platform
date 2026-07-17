@@ -36,9 +36,9 @@ describe("PublicFinancialService", () => {
     it("exposes only public fundraising target, never opening balance", async () => {
         const result = await PublicFinancialService.getPublicFinancialOverview("org_1");
 
-        expect(result.totalDonations.toString()).toBe("1000");
+        expect(result.totalDonations.toString()).toBe("6000");
         expect(result.totalExpenses.toString()).toBe("250");
-        expect(result.remainingBalance.toString()).toBe("750");
+        expect(result.remainingBalance.toString()).toBe("5750");
         expect(result.fundraisingTarget?.toString()).toBe("10000");
         expect(result).not.toHaveProperty("openingBalance");
         expect(result).not.toHaveProperty("budgetTarget");

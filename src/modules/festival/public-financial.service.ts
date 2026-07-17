@@ -41,14 +41,16 @@ export class PublicFinancialService {
             }),
             prisma.organization.findUnique({
                 where: { id: organizationId },
-                select: { type: true, publicFundraisingTarget: true },
+                select: { type: true, openingBalance: true, budgetTarget: true, publicFundraisingTarget: true },
             }),
         ]);
 
         assertFestivalMode(organization);
 
-        const totalDonations = donations._sum.amount || new Prisma.Decimal(0);
+        const recordedDonations = donations._sum.amount || new Prisma.Decimal(0);
         const totalExpenses = expenses._sum.amount || new Prisma.Decimal(0);
+        const openingBalance = organization?.openingBalance || organization?.budgetTarget || new Prisma.Decimal(0);
+        const totalDonations = openingBalance.plus(recordedDonations);
         const fundraisingTarget = organization?.publicFundraisingTarget || null;
 
         const remainingBalance = totalDonations.minus(totalExpenses);

@@ -45,7 +45,7 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
                     label="Total Collected"
                     value={formatCurrency(financials.totalDonations)}
                     icon={<IndianRupee className="w-5 h-5 text-emerald-600" />}
-                    description="Gross sponsorship & donations"
+                    description="Opening funds plus donations"
                     trend="up"
                     delay={0.1}
                 />
@@ -61,7 +61,7 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
                     label="Available Balance"
                     value={formatCurrency(financials.remainingBalance)}
                     icon={<TrendingUp className="w-5 h-5 text-blue-600" />}
-                    description="Net Organization funds"
+                    description="Collected funds minus expenses"
                     primary
                     delay={0.3}
                 />

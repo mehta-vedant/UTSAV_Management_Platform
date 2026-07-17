@@ -45,7 +45,7 @@ export default function FinancialOverviewCard({ financials }: FinancialOverviewC
                     label="Total Collected"
                     value={formatCurrency(financials.totalDonations)}
                     icon={<IndianRupee className="text-green-600" />}
-                    sub="Total sponsorship & donations"
+                    sub="Opening funds plus donations"
                 />
                 <MetricItem
                     label="Approved Expenses"
@@ -57,7 +57,7 @@ export default function FinancialOverviewCard({ financials }: FinancialOverviewC
                     label="Available Balance"
                     value={formatCurrency(financials.remainingBalance)}
                     icon={<TrendingUp className="text-blue-600" />}
-                    sub="Remaining Organization funds"
+                    sub="Collected funds minus expenses"
                     primary
                 />
                 <MetricItem

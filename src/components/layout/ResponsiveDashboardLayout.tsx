@@ -39,11 +39,10 @@ export default function ResponsiveDashboardLayout({
     orgSlug
 }: ResponsiveDashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [sidebarSize, setSidebarSize] = useState<"collapsed" | "normal" | "expanded">("normal");
+    const [sidebarSize, setSidebarSize] = useState<"collapsed" | "normal">("normal");
     const [isMobile, setIsMobile] = useState(false);
     const pathname = usePathname();
     const isCollapsed = !isMobile && sidebarSize === "collapsed";
-    const isExpanded = !isMobile && sidebarSize === "expanded";
 
     // Check for mobile screen size
     useEffect(() => {
@@ -83,12 +82,8 @@ export default function ResponsiveDashboardLayout({
         { name: "Members", href: `/${orgSlug}/dashboard/members`, icon: Users },
     ];
 
-    const cycleSidebarSize = () => {
-        setSidebarSize((current) => {
-            if (current === "collapsed") return "normal";
-            if (current === "normal") return "expanded";
-            return "collapsed";
-        });
+    const toggleSidebarSize = () => {
+        setSidebarSize((current) => current === "collapsed" ? "normal" : "collapsed");
     };
 
     return (
@@ -137,7 +132,7 @@ export default function ResponsiveDashboardLayout({
                 initial={false}
                 animate={{
                     x: isMobile ? (isSidebarOpen ? 0 : -320) : 0,
-                    width: isMobile ? 280 : isCollapsed ? 84 : isExpanded ? 344 : 280,
+                    width: isMobile ? 280 : isCollapsed ? 84 : 280,
                 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 className={cn(
@@ -154,10 +149,10 @@ export default function ResponsiveDashboardLayout({
                 </button>
 
                 <button
-                    onClick={cycleSidebarSize}
+                    onClick={toggleSidebarSize}
                     className="absolute top-4 right-4 hidden md:flex w-9 h-9 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
-                    title={isCollapsed ? "Expand sidebar" : isExpanded ? "Collapse sidebar" : "Widen sidebar"}
-                    aria-label={isCollapsed ? "Expand sidebar" : isExpanded ? "Collapse sidebar" : "Widen sidebar"}
+                    title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
                     {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
                 </button>

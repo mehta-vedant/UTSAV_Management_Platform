@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ConflictAppError } from "@/lib/errors";
 import { cache } from "react";
 
 /**
@@ -95,6 +96,15 @@ export class OrganizationService {
 
         if (activeCount >= 10) {
             throw new Error("You have reached the maximum limit of 10 organizations. Please delete one to create another.");
+        }
+
+        const existingSlug = await prisma.organization.findUnique({
+            where: { slug: data.slug },
+            select: { id: true },
+        });
+
+        if (existingSlug) {
+            throw new ConflictAppError("This slug is already taken. Please choose a different URL slug.");
         }
 
         return await prisma.$transaction(async (tx) => {

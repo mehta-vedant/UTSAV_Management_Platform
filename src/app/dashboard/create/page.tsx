@@ -10,6 +10,7 @@ export default function CreateOrganizationPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [orgCount, setOrgCount] = useState<number>(0);
     const [type, setType] = useState<"FESTIVAL" | "CLUB">("FESTIVAL");
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -22,9 +23,10 @@ export default function CreateOrganizationPage() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setError(null);
 
         if (orgCount >= 10) {
-            alert("You have reached the maximum limit of 10 organizations. Please delete one to create another.");
+            setError("You have reached the maximum limit of 10 organizations. Please delete one to create another.");
             return;
         }
 
@@ -50,7 +52,7 @@ export default function CreateOrganizationPage() {
         if (result.success) {
             router.push(`/${result.slug}/dashboard`);
         } else {
-            alert(result.error);
+            setError(result.error);
             setIsLoading(false);
         }
     }
@@ -210,6 +212,16 @@ export default function CreateOrganizationPage() {
                             </div>
 
                             <div className="space-y-4">
+                                {error && (
+                                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3">
+                                        <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-xs font-bold text-red-900 uppercase tracking-tight">Could Not Create</p>
+                                            <p className="text-[10px] text-red-600 font-medium leading-relaxed">{error}</p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {orgCount >= 10 && (
                                     <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3">
                                         <AlertCircle className="w-4 h-4 text-red-500 mt-0.5" />

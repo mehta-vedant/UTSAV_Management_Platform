@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { updateOrganizationAction, deleteOrganizationAction } from "@/actions/organization.actions";
-import { Trash2, AlertTriangle, Settings, Loader2, Calendar } from "lucide-react";
+import { updateOrganizationAction, deleteOrganizationAction, endFestivalAction } from "@/actions/organization.actions";
+import { Trash2, AlertTriangle, Settings, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -25,18 +25,25 @@ interface EditOrganizationModalProps {
         name: string;
         description: string | null;
         startDate: Date;
-        endDate: Date;
+        endDate: Date | null;
         openingBalance: number | null;
         publicFundraisingTarget: number | null;
         internalBudgetLimit: number | null;
         type: "FESTIVAL" | "CLUB";
+        status?: "ACTIVE" | "ENDED";
+        prasadMorningStart?: string;
+        prasadMorningEnd?: string;
+        prasadEveningStart?: string;
+        prasadEveningEnd?: string;
     };
     trigger?: React.ReactNode;
+    canEndFestival?: boolean;
 }
 
 export default function EditOrganizationModal({
     organization,
-    trigger
+    trigger,
+    canEndFestival = false
 }: EditOrganizationModalProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -61,6 +68,24 @@ export default function EditOrganizationModal({
         }
     };
 
+    const handleEndFestival = async () => {
+        if (!window.confirm("This will end the festival immediately. Public submissions will close, while the public page remains visible as a read-only archive. Continue?")) {
+            return;
+        }
+
+        setLoading(true);
+        const res = await endFestivalAction(organization.id);
+        setLoading(false);
+
+        if (res.error) {
+            toast.error(res.error);
+        } else {
+            toast.success("Festival ended");
+            setOpen(false);
+            router.refresh();
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
@@ -71,10 +96,14 @@ export default function EditOrganizationModal({
             name: formData.get("name") as string,
             description: formData.get("description") as string,
             startDate: formData.get("startDate") as string,
-            endDate: formData.get("endDate") as string,
+            endDate: undefined,
             openingBalance: formData.get("openingBalance") ? Number(formData.get("openingBalance")) : undefined,
             publicFundraisingTarget: formData.get("publicFundraisingTarget") ? Number(formData.get("publicFundraisingTarget")) : undefined,
             internalBudgetLimit: formData.get("internalBudgetLimit") ? Number(formData.get("internalBudgetLimit")) : undefined,
+            prasadMorningStart: formData.get("prasadMorningStart") as string,
+            prasadMorningEnd: formData.get("prasadMorningEnd") as string,
+            prasadEveningStart: formData.get("prasadEveningStart") as string,
+            prasadEveningEnd: formData.get("prasadEveningEnd") as string,
         };
 
         const res = await updateOrganizationAction(input);
@@ -145,11 +174,9 @@ export default function EditOrganizationModal({
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Ends At</Label>
                                     <Input
-                                        name="endDate"
-                                        type="date"
-                                        defaultValue={format(new Date(organization.endDate), "yyyy-MM-dd")}
-                                        required
-                                        className="rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all h-12 font-medium"
+                                        value={organization.endDate ? format(new Date(organization.endDate), "yyyy-MM-dd") : "Active"}
+                                        readOnly
+                                        className="rounded-2xl border-slate-100 bg-slate-50/50 h-12 font-medium text-slate-500"
                                     />
                                 </div>
                             </div>
@@ -179,6 +206,30 @@ export default function EditOrganizationModal({
                                         placeholder="Optional public goal"
                                         className="rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white transition-all h-12 font-medium"
                                     />
+                                    <div className="mt-4 rounded-3xl border border-slate-100 bg-slate-50/60 p-4 space-y-4">
+                                        <div>
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Prasad Offering Windows</Label>
+                                            <p className="text-[10px] text-slate-400 font-medium ml-1 mt-1">Users can submit anytime, but only for windows that have not ended.</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Morning Opens</Label>
+                                                <Input name="prasadMorningStart" type="time" defaultValue={organization.prasadMorningStart || "08:00"} className="rounded-2xl border-slate-100 bg-white h-12 font-medium" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Morning Closes</Label>
+                                                <Input name="prasadMorningEnd" type="time" defaultValue={organization.prasadMorningEnd || "11:00"} className="rounded-2xl border-slate-100 bg-white h-12 font-medium" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Evening Opens</Label>
+                                                <Input name="prasadEveningStart" type="time" defaultValue={organization.prasadEveningStart || "17:00"} className="rounded-2xl border-slate-100 bg-white h-12 font-medium" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Evening Closes</Label>
+                                                <Input name="prasadEveningEnd" type="time" defaultValue={organization.prasadEveningEnd || "20:00"} className="rounded-2xl border-slate-100 bg-white h-12 font-medium" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -224,6 +275,18 @@ export default function EditOrganizationModal({
                                     <p className="text-[10px] text-red-500 font-bold mb-4 leading-relaxed">
                                         Permanently delete this organization, including all its financial records, members, and event data.
                                     </p>
+                                    {canEndFestival && organization.type === "FESTIVAL" && organization.status !== "ENDED" && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleEndFestival}
+                                            disabled={loading}
+                                            className="w-full mb-3 border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl h-12 font-bold text-xs"
+                                        >
+                                            <Lock className="w-4 h-4 mr-2" />
+                                            End Festival Now
+                                        </Button>
+                                    )}
                                     <Button
                                         type="button"
                                         variant="outline"

@@ -19,8 +19,15 @@ export class PublicBhogService {
                 quantity: true,
                 sponsorName: true,
                 status: true,
+                offeringDate: true,
+                offeringWindow: true,
+                submittedAt: true,
             },
-            orderBy: { createdAt: "asc" },
+            orderBy: [
+                { offeringDate: "asc" },
+                { offeringWindow: "asc" },
+                { createdAt: "asc" },
+            ],
         });
     }
 }

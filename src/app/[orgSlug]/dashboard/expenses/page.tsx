@@ -1,34 +1,31 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getTenantPrisma, validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { Receipt, Plus, CheckCircle2, XCircle, AlertCircle, ShoppingBag, Landmark, Users } from "lucide-react";
-import { ExpenseStatus, OrganizationRole } from "@prisma/client";
-import { format } from "date-fns";
+import { validateAccess } from "@/lib/access-control";
+import { formatOrgDateTime } from "@/lib/date-time";
+import { DashboardSearchParams, parsePageQuery } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/dashboard/shared/EmptyState";
+import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters";
+import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import EditExpenseModal from "@/components/dashboard/expenses/EditExpenseModal";
 import ExpenseApprovalActions from "@/components/dashboard/expenses/ExpenseApprovalActions";
+import { OrganizationService } from "@/modules/core/organization.service";
+import { ExpenseService } from "@/modules/finance/expense.service";
+import { ExpenseCategory, ExpenseStatus, OrganizationRole } from "@prisma/client";
+import { AlertCircle, CheckCircle2, Landmark, Receipt, ShoppingBag, XCircle } from "lucide-react";
 
-export default async function ExpensesPage({ params }: { params: { orgSlug: string } }) {
+export default async function ExpensesPage({
+    params,
+    searchParams,
+}: {
+    params: { orgSlug: string };
+    searchParams?: DashboardSearchParams;
+}) {
     const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
     if (!organization) return <div>Organization not found</div>;
 
     const { member: currentMember } = await validateAccess(organization.id);
-    const tenantPrisma = getTenantPrisma(organization.id);
-
-    const expenses = await tenantPrisma.expense.findMany({
-        where: { isArchived: false },
-        include: {
-            addedBy: {
-                select: { user: { select: { name: true } } }
-            },
-            event: {
-                select: { title: true, status: true }
-            }
-        },
-        orderBy: { createdAt: "desc" }
-    });
+    const query = parsePageQuery(searchParams);
+    const expenses = await ExpenseService.getPaginatedExpenses(organization.id, query);
 
     const isFestival = organization.type === "FESTIVAL";
     const isTreasurer = currentMember.role === OrganizationRole.TREASURER || currentMember.role === OrganizationRole.ADMIN;
@@ -36,22 +33,30 @@ export default async function ExpensesPage({ params }: { params: { orgSlug: stri
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <Receipt className="w-5 h-5 text-saffron-500" />
+                    <div className="mb-2 flex items-center gap-2">
+                        <Receipt className="h-5 w-5 text-saffron-500" />
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Financial Ledger</span>
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase">Expense Requests</h1>
-                    <p className="text-slate-500 font-medium mt-1">Track and approve all expenditures for the pavilion.</p>
+                    <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">Expense Requests</h1>
+                    <p className="mt-1 font-medium text-slate-500">Track and approve all expenditures for the pavilion.</p>
                 </div>
 
                 {canAdd && <AddExpenseModal organizationId={organization.id} isFestival={isFestival} />}
             </div>
 
-            {/* Expenses List */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm text-sm">
+            <DashboardFilters
+                searchPlaceholder="Search expenses"
+                current={query}
+                statusOptions={Object.values(ExpenseStatus).map((status) => ({ value: status, label: status }))}
+                categoryOptions={Object.values(ExpenseCategory).map((category) => ({
+                    value: category,
+                    label: category.replace("_", " "),
+                }))}
+            />
+
+            <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white text-sm shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
@@ -62,53 +67,47 @@ export default async function ExpensesPage({ params }: { params: { orgSlug: stri
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Requested By</th>
-                                {isTreasurer && <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>}
+                                {isTreasurer && <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {expenses.map((expense) => (
-                                <tr key={expense.id} className="group hover:bg-slate-50/50 transition-colors">
+                            {expenses.items.map((expense) => (
+                                <tr key={expense.id} className="group transition-colors hover:bg-slate-50/50">
                                     <td className="px-8 py-6">
                                         <div>
-                                            <div className="font-bold text-slate-900 uppercase tracking-tight">{expense.title}</div>
-                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                                                {format(new Date(expense.createdAt), "MMM d, HH:mm")}
+                                            <div className="font-bold uppercase tracking-tight text-slate-900">{expense.title}</div>
+                                            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                                Requested {formatOrgDateTime(expense.requestedAt, organization.timezone)}
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-tighter w-fit">
-                                            {expense.category.replace('_', ' ')}
+                                        <div className="w-fit rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-slate-600">
+                                            {expense.category.replace("_", " ")}
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
                                         {expense.event ? (
                                             <div className="flex flex-col gap-1">
-                                                <div className="text-[10px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <ShoppingBag className="w-3 h-3" />
+                                                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-amber-600">
+                                                    <ShoppingBag className="h-3 w-3" />
                                                     {expense.event.title}
                                                 </div>
-                                                <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest ml-4">
-                                                    Event Scoped
-                                                </div>
+                                                <div className="ml-4 text-[8px] font-bold uppercase tracking-widest text-slate-400">Event Scoped</div>
                                             </div>
                                         ) : (
-                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                <Landmark className="w-3 h-3" />
+                                            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                <Landmark className="h-3 w-3" />
                                                 Organization
                                             </div>
                                         )}
                                     </td>
-                                    <td className="px-8 py-6 font-black text-slate-900">
-                                        ₹{Number(expense.amount).toLocaleString()}
-                                    </td>
+                                    <td className="px-8 py-6 font-black text-slate-900">Rs {Number(expense.amount).toLocaleString()}</td>
                                     <td className="px-8 py-6">
                                         <StatusBadge status={expense.status} />
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="text-slate-500 font-medium">
-                                            {expense.addedBy?.user?.name || "System"}
-                                        </div>
+                                        <div className="font-medium text-slate-500">{expense.addedBy?.user?.name || "System"}</div>
                                     </td>
                                     {isTreasurer && (
                                         <td className="px-8 py-6 text-right">
@@ -118,14 +117,10 @@ export default async function ExpensesPage({ params }: { params: { orgSlug: stri
                                                     isFestival={isFestival}
                                                     expense={{
                                                         ...expense,
-                                                        amount: Number(expense.amount)
+                                                        amount: Number(expense.amount),
                                                     }}
                                                 />
-                                                <ExpenseApprovalActions
-                                                    expenseId={expense.id}
-                                                    organizationId={organization.id}
-                                                    status={expense.status}
-                                                />
+                                                <ExpenseApprovalActions expenseId={expense.id} organizationId={organization.id} status={expense.status} />
                                             </div>
                                         </td>
                                     )}
@@ -134,6 +129,19 @@ export default async function ExpensesPage({ params }: { params: { orgSlug: stri
                         </tbody>
                     </table>
                 </div>
+
+                {expenses.items.length === 0 ? (
+                    <EmptyState title="No expenses found" message="Try a different status, category, date range, or search term." />
+                ) : (
+                    <PaginationControls
+                        basePath={`/${params.orgSlug}/dashboard/expenses`}
+                        searchParams={searchParams}
+                        page={expenses.page}
+                        pageSize={expenses.pageSize}
+                        totalItems={expenses.totalItems}
+                        totalPages={expenses.totalPages}
+                    />
+                )}
             </div>
         </div>
     );
@@ -149,8 +157,8 @@ function StatusBadge({ status }: { status: ExpenseStatus }) {
     const Icon = config.icon;
 
     return (
-        <div className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest", config.class)}>
-            <Icon className="w-3.5 h-3.5" />
+        <div className={cn("inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[10px] font-black uppercase tracking-widest", config.class)}>
+            <Icon className="h-3.5 w-3.5" />
             {config.text}
         </div>
     );

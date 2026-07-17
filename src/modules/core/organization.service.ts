@@ -22,8 +22,16 @@ export class OrganizationService {
                 openingBalance: true,
                 publicFundraisingTarget: true,
                 internalBudgetLimit: true,
+                status: true,
+                prasadMorningStart: true,
+                prasadMorningEnd: true,
+                prasadEveningStart: true,
+                prasadEveningEnd: true,
+                timezone: true,
                 startDate: true,
                 endDate: true,
+                endedAt: true,
+                endedById: true,
                 type: true,
             },
         });
@@ -44,9 +52,10 @@ export class OrganizationService {
                     select: {
                         id: true,
                         name: true,
-                        slug: true,
-                        createdAt: true,
-                        type: true,
+                    slug: true,
+                    createdAt: true,
+                    timezone: true,
+                    type: true,
                     },
                 },
             },
@@ -64,10 +73,15 @@ export class OrganizationService {
         slug: string;
         description?: string;
         startDate: Date;
-        endDate: Date;
+        endDate?: Date | null;
         openingBalance?: number;
         publicFundraisingTarget?: number;
         internalBudgetLimit?: number;
+        prasadMorningStart?: string;
+        prasadMorningEnd?: string;
+        prasadEveningStart?: string;
+        prasadEveningEnd?: string;
+        timezone?: string;
         type: "FESTIVAL" | "CLUB";
     }, userId: string) {
         // Enforce 3-organization limit (as ADMIN)
@@ -91,10 +105,15 @@ export class OrganizationService {
                     slug: data.slug,
                     description: data.description,
                     startDate: data.startDate,
-                    endDate: data.endDate,
+                    endDate: data.endDate || null,
                     openingBalance: data.openingBalance,
                     publicFundraisingTarget: data.publicFundraisingTarget,
                     internalBudgetLimit: data.internalBudgetLimit,
+                    prasadMorningStart: data.prasadMorningStart,
+                    prasadMorningEnd: data.prasadMorningEnd,
+                    prasadEveningStart: data.prasadEveningStart,
+                    prasadEveningEnd: data.prasadEveningEnd,
+                    timezone: data.timezone || "Asia/Kolkata",
                     budgetTarget: data.openingBalance,
                     type: data.type,
                 },
@@ -121,16 +140,34 @@ export class OrganizationService {
         name?: string;
         description?: string;
         startDate?: Date;
-        endDate?: Date;
+        endDate?: Date | null;
         openingBalance?: number;
         publicFundraisingTarget?: number;
         internalBudgetLimit?: number;
+        prasadMorningStart?: string;
+        prasadMorningEnd?: string;
+        prasadEveningStart?: string;
+        prasadEveningEnd?: string;
+        timezone?: string;
     }) {
         return await prisma.organization.update({
             where: { id: organizationId },
             data: {
                 ...data,
                 budgetTarget: data.openingBalance !== undefined ? data.openingBalance : undefined,
+            },
+        });
+    }
+
+    static async endFestival(organizationId: string, endedById?: string) {
+        const now = new Date();
+        return await prisma.organization.update({
+            where: { id: organizationId },
+            data: {
+                status: "ENDED",
+                endDate: now,
+                endedAt: now,
+                endedById,
             },
         });
     }

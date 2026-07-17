@@ -13,7 +13,8 @@ interface DashboardHeaderProps {
         name: string;
         slug: string;
         startDate: Date;
-        endDate: Date;
+        endDate: Date | null;
+        status?: "ACTIVE" | "ENDED";
         openingBalance: number | null;
         publicFundraisingTarget: number | null;
         internalBudgetLimit: number | null;
@@ -54,7 +55,8 @@ export default function DashboardHeader({ organization, role }: DashboardHeaderP
                     <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-saffron-500" />
                         <span className="text-xs font-bold uppercase tracking-wider">
-                            {format(new Date(organization.startDate), "MMM d")} - {format(new Date(organization.endDate), "MMM d, yyyy")}
+                            Started {format(new Date(organization.startDate), "MMM d, yyyy")}
+                            {organization.endDate ? ` - Ended ${format(new Date(organization.endDate), "MMM d, yyyy")}` : ""}
                         </span>
                     </div>
                 </div>

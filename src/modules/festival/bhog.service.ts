@@ -1,5 +1,6 @@
 import { validateAccess, getTenantPrisma } from "@/lib/access-control";
-import { OrganizationRole, BhogStatus, Prisma } from "@prisma/client";
+import { OrganizationRole, BhogStatus, Prisma, BhogOfferingWindow } from "@prisma/client";
+import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
 
 /**
  * Bhog Moderation Service
@@ -14,6 +15,8 @@ export class BhogService {
             name: string;
             quantity: string;
             sponsorName: string;
+            offeringDate: Date;
+            offeringWindow: BhogOfferingWindow;
             storage?: string;
         }
     ) {
@@ -30,6 +33,8 @@ export class BhogService {
                 name: data.name,
                 quantity: data.quantity,
                 sponsorName: data.sponsorName,
+                offeringDate: data.offeringDate,
+                offeringWindow: data.offeringWindow,
                 storage: data.storage,
                 status: BhogStatus.PENDING,
                 organizationId,
@@ -51,8 +56,46 @@ export class BhogService {
 
         return await tenantPrisma.bhogItem.findMany({
             where: { isArchived: false },
-            orderBy: { createdAt: "desc" },
+            orderBy: { submittedAt: "desc" },
         });
+    }
+
+    static async getPaginatedBhogItems(organizationId: string, query: PageQuery) {
+        await validateAccess(organizationId, [
+            OrganizationRole.ADMIN,
+            OrganizationRole.COMMITTEE_MEMBER,
+            OrganizationRole.TREASURER,
+        ]);
+
+        const tenantPrisma = getTenantPrisma(organizationId);
+        const where: Prisma.BhogItemWhereInput = {
+            isArchived: false,
+            ...(query.status && isBhogStatus(query.status) ? { status: query.status } : {}),
+            ...(query.search ? {
+                OR: [
+                    { name: { contains: query.search, mode: "insensitive" } },
+                    { sponsorName: { contains: query.search, mode: "insensitive" } },
+                    { notes: { contains: query.search, mode: "insensitive" } },
+                ],
+            } : {}),
+            ...(query.dateFrom || query.dateTo ? {
+                offeringDate: {
+                    ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                    ...(query.dateTo ? { lte: query.dateTo } : {}),
+                },
+            } : {}),
+        };
+
+        const [items, totalItems] = await Promise.all([
+            tenantPrisma.bhogItem.findMany({
+                where,
+                ...getPaginationArgs(query),
+                orderBy: [{ offeringDate: "asc" }, { submittedAt: "desc" }],
+            }),
+            tenantPrisma.bhogItem.count({ where }),
+        ]);
+
+        return paginate(items, totalItems, query);
     }
 
     /**
@@ -69,7 +112,10 @@ export class BhogService {
 
         return await tenantPrisma.bhogItem.update({
             where: { id: itemId, organizationId },
-            data: { status },
+            data: {
+                status,
+                ...(status === BhogStatus.PREPARED ? { preparedAt: new Date(), approvedAt: new Date() } : {}),
+            },
         });
     }
 
@@ -115,7 +161,11 @@ export class BhogService {
 
         return await tenantPrisma.bhogItem.update({
             where: { id: itemId, organizationId },
-            data: { isArchived: true },
+            data: { isArchived: true, archivedAt: new Date() },
         });
     }
+}
+
+function isBhogStatus(value: string): value is BhogStatus {
+    return Object.values(BhogStatus).includes(value as BhogStatus);
 }

@@ -5,6 +5,8 @@ import { Plus, Loader2, X, Utensils, User } from "lucide-react";
 import { createBhogAction } from "@/actions/bhog.actions";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { BhogOfferingWindow } from "@prisma/client";
+import { formatDateInput } from "@/lib/prasad-windows";
 
 export default function AddBhogModal({ organizationId }: { organizationId: string }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +23,8 @@ export default function AddBhogModal({ organizationId }: { organizationId: strin
             organizationId,
             name: formData.get("name") as string,
             quantity: formData.get("quantity") as string,
+            offeringDate: formData.get("offeringDate") as string,
+            offeringWindow: formData.get("offeringWindow") as BhogOfferingWindow,
             storage: formData.get("storage") as string,
             sponsorName: formData.get("sponsorName") as string,
         };
@@ -78,6 +82,20 @@ export default function AddBhogModal({ organizationId }: { organizationId: strin
                             <div className="space-y-2">
                                 <Label htmlFor="storage" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Storage Location</Label>
                                 <Input id="storage" name="storage" placeholder="e.g., Room 101" className="rounded-xl border-slate-200 h-12 text-sm font-medium" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="offeringDate" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Offering Date</Label>
+                                <Input id="offeringDate" name="offeringDate" type="date" defaultValue={formatDateInput(new Date())} required className="rounded-xl border-slate-200 h-12 text-sm font-medium" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="offeringWindow" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Window</Label>
+                                <select id="offeringWindow" name="offeringWindow" defaultValue={BhogOfferingWindow.MORNING} className="flex h-12 w-full rounded-xl border border-slate-200 bg-background px-3 py-2 text-sm font-medium">
+                                    <option value={BhogOfferingWindow.MORNING}>Morning</option>
+                                    <option value={BhogOfferingWindow.EVENING}>Evening</option>
+                                </select>
                             </div>
                         </div>
 

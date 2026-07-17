@@ -73,6 +73,12 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                                     {organization.description}
                                 </p>
                             )}
+
+                            {organization.status === "ENDED" && (
+                                <div className="mt-8 rounded-2xl border border-amber-100 bg-amber-50 px-5 py-3 text-sm font-bold text-amber-700">
+                                    This festival has ended. The page remains available as a read-only transparency archive.
+                                </div>
+                            )}
                         </div>
                     </SectionWrapper>
                 </div>
@@ -104,6 +110,15 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                             bhogList={bhogList}
                             organizationId={organization.id}
                             OrganizationName={organization.name}
+                            festivalStartDate={organization.startDate}
+                            festivalEndDate={organization.endDate}
+                            festivalStatus={organization.status}
+                            prasadWindowConfig={{
+                                morningStart: organization.prasadMorningStart,
+                                morningEnd: organization.prasadMorningEnd,
+                                eveningStart: organization.prasadEveningStart,
+                                eveningEnd: organization.prasadEveningEnd,
+                            }}
                         />
                     </SectionWrapper>
                 </div>

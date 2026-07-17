@@ -104,6 +104,8 @@ async function main() {
             name: "Ladoo",
             quantity: "500 Pieces",
             sponsorName: "Mahesh Traders",
+            offeringDate: new Date("2026-09-08"),
+            offeringWindow: "MORNING",
             organizationId: organization.id,
             status: BhogStatus.PENDING,
         },

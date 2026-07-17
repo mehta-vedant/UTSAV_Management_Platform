@@ -25,13 +25,21 @@ model Organization {
   slug                    String                   @unique
   description             String?
   startDate               DateTime
-  endDate                 DateTime
+  endDate                 DateTime?
   budgetTarget            Decimal?                 @db.Decimal(12, 2)
   openingBalance          Decimal?                 @db.Decimal(12, 2)
   publicFundraisingTarget Decimal?                 @db.Decimal(12, 2)
   internalBudgetLimit     Decimal?                 @db.Decimal(12, 2)
+  status                  OrganizationStatus       @default(ACTIVE)
+  prasadMorningStart      String                   @default("08:00")
+  prasadMorningEnd        String                   @default("11:00")
+  prasadEveningStart      String                   @default("17:00")
+  prasadEveningEnd        String                   @default("20:00")
+  timezone                String                   @default("Asia/Kolkata")
   type                    OrganizationType         @default(FESTIVAL)
   featureFlags            Json?
+  endedAt                 DateTime?
+  endedById               String?
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
   auditLogs               AuditLog[]
@@ -77,8 +85,11 @@ model Donation {
   amount         Decimal             @db.Decimal(12, 2)
   category       DonationCategory    @default(GENERAL)
   date           DateTime            @default(now())
+  receivedAt     DateTime            @default(now())
   notes          String?
   isArchived     Boolean             @default(false)
+  archivedAt     DateTime?
+  archivedById   String?
   addedById      String?
   organizationId String
   createdAt      DateTime            @default(now())
@@ -100,6 +111,12 @@ model Expense {
   isArchived     Boolean             @default(false)
   addedById      String
   approvedById   String?
+  requestedAt    DateTime            @default(now())
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  processedAt    DateTime?
+  archivedAt     DateTime?
+  archivedById   String?
   organizationId String
   eventId        String?
   createdAt      DateTime            @default(now())
@@ -120,16 +137,23 @@ model BhogItem {
   quantity       String
   status         BhogStatus   @default(PENDING)
   sponsorName    String?
+  offeringDate   DateTime
+  offeringWindow BhogOfferingWindow
   storage        String?
   estimatedCost  Decimal?     @db.Decimal(12, 2)
   notes          String?
   isArchived     Boolean      @default(false)
   organizationId String
+  submittedAt    DateTime     @default(now())
+  approvedAt      DateTime?
+  preparedAt      DateTime?
+  archivedAt      DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
+  @@index([organizationId, offeringDate])
 }
 
 model Volunteer {
@@ -182,6 +206,8 @@ model VolunteerTask {
   priority       TaskPriority       @default(MEDIUM)
   dueDate        DateTime?
   isArchived     Boolean            @default(false)
+  completedAt     DateTime?
+  archivedAt      DateTime?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   assignedTo     OrganizationMember @relation(fields: [assignedToId], references: [id], onDelete: Cascade)
@@ -231,6 +257,8 @@ model OrganizationInvitation {
   accepted       Boolean             @default(false)
   eventId        String?
   invitedById    String?
+  acceptedAt      DateTime?
+  revokedAt       DateTime?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
   event          Event?              @relation(fields: [eventId], references: [id])
@@ -250,7 +278,9 @@ model AuditLog {
   action         String
   before         Json?
   after          Json?
+  metadata       Json?
   visibility     AuditVisibility @default(INTERNAL)
+  occurredAt      DateTime     @default(now())
   createdAt      DateTime     @default(now())
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -302,6 +332,11 @@ enum BhogStatus {
   PREPARED
 }
 
+enum BhogOfferingWindow {
+  MORNING
+  EVENING
+}
+
 enum VolunteerStatus {
   PENDING
   ACTIVE
@@ -323,6 +358,11 @@ enum TaskPriority {
 enum OrganizationType {
   FESTIVAL
   CLUB
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  ENDED
 }
 
 enum EventStatus {

@@ -2,6 +2,7 @@ import { validateAccess, getTenantPrisma, requirePermission } from "@/lib/access
 import { DonationCategory, Prisma } from "@prisma/client";
 import { AuditService } from "@/modules/core/audit.service";
 import { ValidationAppError } from "@/lib/errors";
+import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
 
 /**
  * Enterprise-Grade Donation Service
@@ -48,6 +49,7 @@ export class DonationService {
                 amount: amount,
                 category: data.category,
                 notes: data.notes,
+                receivedAt: new Date(),
                 addedById: member.id,
                 organizationId: organizationId, // Explicitly pass for type safety
             },
@@ -98,7 +100,7 @@ export class DonationService {
                 ...(filters?.category && { category: filters.category }),
             },
             orderBy: {
-                date: "desc",
+                receivedAt: "desc",
             },
             include: {
                 addedBy: {
@@ -108,6 +110,46 @@ export class DonationService {
                 }
             }
         });
+    }
+
+    static async getPaginatedDonations(organizationId: string, query: PageQuery) {
+        await requirePermission(organizationId, "finance:read");
+
+        const tenantPrisma = getTenantPrisma(organizationId);
+        const where: Prisma.DonationWhereInput = {
+            isArchived: false,
+            ...(query.category && isDonationCategory(query.category) ? { category: query.category } : {}),
+            ...(query.search ? {
+                OR: [
+                    { donorName: { contains: query.search, mode: "insensitive" } },
+                    { notes: { contains: query.search, mode: "insensitive" } },
+                ],
+            } : {}),
+            ...(query.dateFrom || query.dateTo ? {
+                receivedAt: {
+                    ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                    ...(query.dateTo ? { lte: query.dateTo } : {}),
+                },
+            } : {}),
+        };
+
+        const [items, totalItems] = await Promise.all([
+            tenantPrisma.donation.findMany({
+                where,
+                ...getPaginationArgs(query),
+                include: {
+                    addedBy: {
+                        select: {
+                            user: { select: { name: true } }
+                        }
+                    }
+                },
+                orderBy: { receivedAt: "desc" },
+            }),
+            tenantPrisma.donation.count({ where }),
+        ]);
+
+        return paginate(items, totalItems, query);
     }
 
     /**
@@ -194,7 +236,7 @@ export class DonationService {
 
         const donation = await tenantPrisma.donation.update({
             where: { id: donationId },
-            data: { isArchived: true }
+            data: { isArchived: true, archivedAt: new Date(), archivedById: member.id }
         });
 
         await AuditService.record({
@@ -208,4 +250,8 @@ export class DonationService {
 
         return donation;
     }
+}
+
+function isDonationCategory(value: string): value is DonationCategory {
+    return Object.values(DonationCategory).includes(value as DonationCategory);
 }

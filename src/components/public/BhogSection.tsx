@@ -4,20 +4,38 @@ import { Soup, UtensilsCrossed, Circle, Plus } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BhogSponsorshipDialog from "./BhogSponsorshipDialog";
+import { BhogOfferingWindow, OrganizationStatus } from "@prisma/client";
+import { formatOfferingWindow, PrasadWindowConfig, getPrasadWindowOptions } from "@/lib/prasad-windows";
 
 interface BhogSectionProps {
     organizationId: string;
     OrganizationName: string;
+    festivalStartDate: Date;
+    festivalEndDate: Date | null;
+    festivalStatus: OrganizationStatus;
+    prasadWindowConfig: PrasadWindowConfig;
     bhogList: {
         id: string;
         name: string;
         quantity: string;
         sponsorName: string | null;
         status: string;
+        offeringDate: Date;
+        offeringWindow: BhogOfferingWindow;
     }[];
 }
 
-export default function BhogSection({ bhogList, organizationId, OrganizationName }: BhogSectionProps) {
+export default function BhogSection({
+    bhogList,
+    organizationId,
+    OrganizationName,
+    festivalStartDate,
+    festivalEndDate,
+    festivalStatus,
+    prasadWindowConfig
+}: BhogSectionProps) {
+    const windowSummary = getPrasadWindowOptions(prasadWindowConfig).map((option) => option.label).join(" and ");
+
     return (
         <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white h-full flex flex-col">
             <CardHeader className="pb-4">
@@ -31,9 +49,21 @@ export default function BhogSection({ bhogList, organizationId, OrganizationName
 
             <CardContent className="px-6 pb-6 flex-1">
                 <div className="mb-6">
-                    <BhogSponsorshipDialog organizationId={organizationId} OrganizationName={OrganizationName} />
+                    <div className="mb-3 rounded-2xl bg-saffron-50 border border-saffron-100 px-4 py-3">
+                        <p className="text-[11px] text-saffron-800 font-bold leading-relaxed">
+                            Prasad offerings are accepted for {windowSummary}. Expired windows are hidden automatically.
+                        </p>
+                    </div>
+                    <BhogSponsorshipDialog
+                        organizationId={organizationId}
+                        OrganizationName={OrganizationName}
+                        festivalStartDate={festivalStartDate}
+                        festivalEndDate={festivalEndDate}
+                        festivalStatus={festivalStatus}
+                        prasadWindowConfig={prasadWindowConfig}
+                    />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[520px] overflow-y-auto pr-1">
                     {bhogList.map((b) => (
                         <div
                             key={b.id}
@@ -54,6 +84,9 @@ export default function BhogSection({ bhogList, organizationId, OrganizationName
                                 <div className="flex items-center text-[10px] text-slate-400 font-bold mb-3 uppercase tracking-widest">
                                     <UtensilsCrossed className="w-2.5 h-2.5 mr-1" />
                                     Qty: {b.quantity}
+                                </div>
+                                <div className="text-[10px] text-slate-500 font-bold mb-3 uppercase tracking-wider">
+                                    {new Date(b.offeringDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} - {formatOfferingWindow(b.offeringWindow, prasadWindowConfig)}
                                 </div>
 
                                 {b.sponsorName ? (

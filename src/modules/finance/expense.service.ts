@@ -2,6 +2,7 @@ import { getTenantPrisma, requirePermission } from "@/lib/access-control";
 import { ExpenseCategory, ExpenseStatus, Prisma } from "@prisma/client";
 import { AuditService } from "@/modules/core/audit.service";
 import { ConflictAppError, ValidationAppError } from "@/lib/errors";
+import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
 
 /**
  * Enterprise-Grade Expense Service
@@ -49,6 +50,7 @@ export class ExpenseService {
                 category: data.category,
                 notes: data.notes,
                 status: ExpenseStatus.PENDING,
+                requestedAt: new Date(),
                 addedById: member.id,
                 organizationId: organizationId,
                 eventId: data.eventId,
@@ -95,6 +97,8 @@ export class ExpenseService {
             data: {
                 status: ExpenseStatus.APPROVED,
                 approvedById: member.id,
+                approvedAt: new Date(),
+                processedAt: new Date(),
             },
         });
 
@@ -135,6 +139,8 @@ export class ExpenseService {
             data: {
                 status: ExpenseStatus.REJECTED,
                 approvedById: member.id,
+                rejectedAt: new Date(),
+                processedAt: new Date(),
             },
         });
 
@@ -152,6 +158,48 @@ export class ExpenseService {
         });
 
         return { success: true };
+    }
+
+    static async getPaginatedExpenses(organizationId: string, query: PageQuery) {
+        await requirePermission(organizationId, "finance:read");
+
+        const tenantPrisma = getTenantPrisma(organizationId);
+        const where: Prisma.ExpenseWhereInput = {
+            isArchived: false,
+            ...(query.status && isExpenseStatus(query.status) ? { status: query.status } : {}),
+            ...(query.category && isExpenseCategory(query.category) ? { category: query.category } : {}),
+            ...(query.search ? {
+                OR: [
+                    { title: { contains: query.search, mode: "insensitive" } },
+                    { notes: { contains: query.search, mode: "insensitive" } },
+                ],
+            } : {}),
+            ...(query.dateFrom || query.dateTo ? {
+                requestedAt: {
+                    ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                    ...(query.dateTo ? { lte: query.dateTo } : {}),
+                },
+            } : {}),
+        };
+
+        const [items, totalItems] = await Promise.all([
+            tenantPrisma.expense.findMany({
+                where,
+                ...getPaginationArgs(query),
+                include: {
+                    addedBy: {
+                        select: { user: { select: { name: true } } }
+                    },
+                    event: {
+                        select: { title: true, status: true }
+                    }
+                },
+                orderBy: { requestedAt: "desc" },
+            }),
+            tenantPrisma.expense.count({ where }),
+        ]);
+
+        return paginate(items, totalItems, query);
     }
 
     /**
@@ -255,7 +303,7 @@ export class ExpenseService {
 
         const expense = await tenantPrisma.expense.update({
             where: { id: expenseId },
-            data: { isArchived: true }
+            data: { isArchived: true, archivedAt: new Date(), archivedById: member.id }
         });
 
         await AuditService.record({
@@ -269,4 +317,12 @@ export class ExpenseService {
 
         return expense;
     }
+}
+
+function isExpenseStatus(value: string): value is ExpenseStatus {
+    return Object.values(ExpenseStatus).includes(value as ExpenseStatus);
+}
+
+function isExpenseCategory(value: string): value is ExpenseCategory {
+    return Object.values(ExpenseCategory).includes(value as ExpenseCategory);
 }

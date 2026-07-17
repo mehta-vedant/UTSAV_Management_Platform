@@ -52,6 +52,7 @@ export default async function DashboardOverviewPage({
                 {(member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.TREASURER) && (
                     <EditOrganizationModal
                         organization={data.organization as any}
+                        canEndFestival={member.role === OrganizationRole.ADMIN}
                         trigger={
                             <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
                                 Edit Identity

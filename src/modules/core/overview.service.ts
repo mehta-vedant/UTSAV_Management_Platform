@@ -10,7 +10,9 @@ export interface DashboardOverview {
         name: string;
         slug: string;
         startDate: Date;
-        endDate: Date;
+        endDate: Date | null;
+        status: "ACTIVE" | "ENDED";
+        timezone: string;
         openingBalance: number | null;
         publicFundraisingTarget: number | null;
         internalBudgetLimit: number | null;
@@ -75,6 +77,12 @@ export class OverviewService {
                     slug: true,
                     startDate: true,
                     endDate: true,
+                    status: true,
+                    prasadMorningStart: true,
+                    prasadMorningEnd: true,
+                    prasadEveningStart: true,
+                    prasadEveningEnd: true,
+                    timezone: true,
                     openingBalance: true,
                     publicFundraisingTarget: true,
                     internalBudgetLimit: true,

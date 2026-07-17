@@ -1,22 +1,28 @@
 "use server";
 
 import { BhogService } from "@/modules/festival/bhog.service";
-import { BhogStatus } from "@prisma/client";
+import { BhogOfferingWindow, BhogStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { parseDateInput } from "@/lib/prasad-windows";
 
 const CreateBhogSchema = z.object({
     organizationId: z.string(),
     name: z.string().min(1, "Item name is required"),
     quantity: z.string().min(1, "Quantity is required"),
     sponsorName: z.string().min(1, "Sponsor name is required"),
+    offeringDate: z.string().min(1, "Offering date is required"),
+    offeringWindow: z.nativeEnum(BhogOfferingWindow),
     storage: z.string().optional(),
 });
 
 export async function createBhogAction(data: z.infer<typeof CreateBhogSchema>) {
     try {
         const validated = CreateBhogSchema.parse(data);
-        await BhogService.createBhogItem(validated.organizationId, validated);
+        await BhogService.createBhogItem(validated.organizationId, {
+            ...validated,
+            offeringDate: parseDateInput(validated.offeringDate),
+        });
         revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
         return { success: true };
     } catch (error: any) {

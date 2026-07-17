@@ -10,6 +10,7 @@ export class AuditService {
         action: string;
         before?: Prisma.InputJsonValue | null;
         after?: Prisma.InputJsonValue | null;
+        metadata?: Prisma.InputJsonValue | null;
         visibility?: AuditVisibility;
     }) {
         const tenantPrisma = getTenantPrisma(input.organizationId);
@@ -23,7 +24,9 @@ export class AuditService {
                 action: input.action,
                 before: input.before || undefined,
                 after: input.after || undefined,
+                metadata: input.metadata || undefined,
                 visibility: input.visibility || AuditVisibility.INTERNAL,
+                occurredAt: new Date(),
             },
         });
     }

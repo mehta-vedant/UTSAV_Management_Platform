@@ -18,7 +18,8 @@ import {
     Shield,
     ChevronRight,
     LayoutDashboard,
-    Handshake
+    PanelLeftClose,
+    PanelLeftOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,8 +39,11 @@ export default function ResponsiveDashboardLayout({
     orgSlug
 }: ResponsiveDashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [sidebarSize, setSidebarSize] = useState<"collapsed" | "normal" | "expanded">("normal");
     const [isMobile, setIsMobile] = useState(false);
     const pathname = usePathname();
+    const isCollapsed = !isMobile && sidebarSize === "collapsed";
+    const isExpanded = !isMobile && sidebarSize === "expanded";
 
     // Check for mobile screen size
     useEffect(() => {
@@ -78,6 +82,14 @@ export default function ResponsiveDashboardLayout({
         { name: "Events", href: `/${orgSlug}/dashboard/events`, icon: Calendar },
         { name: "Members", href: `/${orgSlug}/dashboard/members`, icon: Users },
     ];
+
+    const cycleSidebarSize = () => {
+        setSidebarSize((current) => {
+            if (current === "collapsed") return "normal";
+            if (current === "normal") return "expanded";
+            return "collapsed";
+        });
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
@@ -125,10 +137,11 @@ export default function ResponsiveDashboardLayout({
                 initial={false}
                 animate={{
                     x: isMobile ? (isSidebarOpen ? 0 : -320) : 0,
+                    width: isMobile ? 280 : isCollapsed ? 84 : isExpanded ? 344 : 280,
                 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
                 className={cn(
-                    "fixed top-0 left-0 bottom-0 w-[280px] bg-slate-900 text-white z-[70] flex flex-col border-r border-slate-800/50 shadow-2xl md:shadow-none md:sticky md:top-0 md:translate-x-0 md:w-64 md:z-30",
+                    "fixed top-0 left-0 bottom-0 bg-slate-900 text-white z-[70] flex flex-col border-r border-slate-800/50 shadow-2xl md:shadow-none md:sticky md:top-0 md:translate-x-0 md:z-30",
                     !isSidebarOpen && "hidden md:flex"
                 )}
             >
@@ -140,65 +153,80 @@ export default function ResponsiveDashboardLayout({
                     <X className="w-5 h-5" />
                 </button>
 
-                <div className="p-8 pb-4">
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="w-8 h-8 bg-saffron-500 rounded-xl flex items-center justify-center shadow-lg shadow-saffron-500/20">
+                <button
+                    onClick={cycleSidebarSize}
+                    className="absolute top-4 right-4 hidden md:flex w-9 h-9 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    title={isCollapsed ? "Expand sidebar" : isExpanded ? "Collapse sidebar" : "Widen sidebar"}
+                    aria-label={isCollapsed ? "Expand sidebar" : isExpanded ? "Collapse sidebar" : "Widen sidebar"}
+                >
+                    {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                </button>
+
+                <div className={cn("pb-4", isCollapsed ? "px-4 pt-6" : "p-8")}>
+                    <div className={cn("flex items-center mb-6", isCollapsed ? "justify-center mt-8" : "gap-2 pr-10")}>
+                        <div className="w-8 h-8 shrink-0 bg-saffron-500 rounded-xl flex items-center justify-center shadow-lg shadow-saffron-500/20">
                             <Shield className="w-5 h-5 text-white" />
                         </div>
                     </div>
 
-                    <div className="space-y-1">
+                    {!isCollapsed && <div className="space-y-2">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-saffron-500 opacity-60">
                             {organization.type === "FESTIVAL" ? "Festival Center" : "Club HQ"}
                         </h2>
-                        <div className="text-xl font-black tracking-tighter uppercase leading-tight truncate">
+                        <div className="text-xl font-black uppercase leading-tight whitespace-normal break-words tracking-normal">
                             {organization.name}
                         </div>
-                    </div>
+                    </div>}
                 </div>
 
                 {/* Navigation Items */}
-                <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
+                <nav className={cn("flex-1 py-8 space-y-1.5 overflow-y-auto custom-scrollbar", isCollapsed ? "px-3" : "px-4")}>
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
                                 key={item.name}
                                 href={item.href}
+                                title={isCollapsed ? item.name : undefined}
                                 className={cn(
-                                    "flex items-center justify-between px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all group relative overflow-hidden",
+                                    "flex items-center rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all group relative overflow-hidden",
+                                    isCollapsed ? "justify-center px-0 py-3.5 aspect-square" : "justify-between px-4 py-3.5",
                                     isActive
                                         ? "bg-saffron-500 text-white shadow-lg shadow-saffron-500/20"
                                         : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                 )}
                             >
-                                <div className="flex items-center gap-3 relative z-10">
+                                <div className={cn("flex items-center relative z-10 min-w-0", isCollapsed ? "justify-center" : "gap-3")}>
                                     <item.icon className={cn(
-                                        "w-4 h-4 transition-colors",
+                                        "w-4 h-4 shrink-0 transition-colors",
                                         isActive ? "text-white" : "text-slate-500 group-hover:text-saffron-400"
                                     )} />
-                                    {item.name}
+                                    {!isCollapsed && <span className="whitespace-normal break-words">{item.name}</span>}
                                 </div>
-                                {isActive ? (
+                                {!isCollapsed && (isActive ? (
                                     <div className="w-1.5 h-1.5 bg-white rounded-full relative z-10" />
                                 ) : (
                                     <ChevronRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-slate-500" />
-                                )}
+                                ))}
                             </Link>
                         );
                     })}
                 </nav>
 
                 {/* Footer Controls */}
-                <div className="p-6 border-t border-slate-800/50 bg-slate-950/30">
+                <div className={cn("border-t border-slate-800/50 bg-slate-950/30", isCollapsed ? "p-3" : "p-6")}>
                     <Link
                         href="/dashboard"
-                        className="flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white hover:bg-slate-800 transition-all group"
+                        title={isCollapsed ? `Switch ${organization.type === "FESTIVAL" ? "Festival" : "Club"}` : undefined}
+                        className={cn(
+                            "flex items-center rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white hover:bg-slate-800 transition-all group",
+                            isCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3"
+                        )}
                     >
-                        <div className="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
+                        <div className="w-8 h-8 shrink-0 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
                             <LayoutDashboard className="w-4 h-4" />
                         </div>
-                        Switch {organization.type === "FESTIVAL" ? "Festival" : "Club"}
+                        {!isCollapsed && <span className="whitespace-normal break-words">Switch {organization.type === "FESTIVAL" ? "Festival" : "Club"}</span>}
                     </Link>
                 </div>
             </motion.aside>

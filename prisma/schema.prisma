@@ -137,8 +137,8 @@ model BhogItem {
   quantity       String
   status         BhogStatus   @default(PENDING)
   sponsorName    String?
-  offeringDate   DateTime
-  offeringWindow BhogOfferingWindow
+  offeringDate   DateTime     @default(now())
+  offeringWindow BhogOfferingWindow @default(MORNING)
   storage        String?
   estimatedCost  Decimal?     @db.Decimal(12, 2)
   notes          String?

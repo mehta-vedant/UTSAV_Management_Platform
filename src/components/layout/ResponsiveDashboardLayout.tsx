@@ -22,10 +22,12 @@ import {
     PanelLeftOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AdminAssistantPanel from "@/components/dashboard/assistant/AdminAssistantPanel";
 
 interface ResponsiveDashboardLayoutProps {
     children: React.ReactNode;
     organization: {
+        id: string;
         name: string;
         slug: string;
         type: "FESTIVAL" | "CLUB";
@@ -232,6 +234,7 @@ export default function ResponsiveDashboardLayout({
                     {children}
                 </div>
             </main>
+            <AdminAssistantPanel organizationId={organization.id} organizationName={organization.name} />
         </div>
     );
 }

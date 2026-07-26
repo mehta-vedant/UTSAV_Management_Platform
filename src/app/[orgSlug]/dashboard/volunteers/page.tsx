@@ -1,5 +1,4 @@
-import { validateAccess } from "@/lib/access-control";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { resolveOrgContext } from "@/lib/org-context";
 import { getAllTasks, getMyTasks, getVolunteerWorkload } from "@/modules/tasks/task.service";
 import VolunteerListView from "@/components/dashboard/volunteers/VolunteerListView";
 import TaskBoard from "@/components/dashboard/volunteers/TaskBoard";
@@ -17,11 +16,7 @@ export default async function VolunteersPage({ params }: VolunteersPageProps) {
     const { orgSlug } = params;
 
     // 1. Resolve Organization & Permissions
-    const organization = await getOrganizationBySlug(orgSlug);
-    if (!organization) throw new Error("Organization not found");
-
-    const { member } = await validateAccess(organization.id);
-    const isAdmin = member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.COMMITTEE_MEMBER;
+    const { organization, member, isAdmin } = await resolveOrgContext(orgSlug);
 
     // 2. Data Fetching (Parallel)
     const [tasks, volunteers] = await Promise.all([

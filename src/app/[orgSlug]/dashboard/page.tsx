@@ -1,6 +1,5 @@
 import { getOrganizationOverview } from "@/modules/core/overview.service";
-import { prisma } from "@/lib/prisma";
-import { validateAccess } from "@/lib/access-control";
+import { resolveOrgContext } from "@/lib/org-context";
 import DashboardHeader from "@/components/dashboard/overview/DashboardHeader";
 import StatCard from "@/components/dashboard/overview/StatCard";
 import AlertBox from "@/components/dashboard/overview/AlertBox";
@@ -30,17 +29,10 @@ export default async function DashboardOverviewPage({
 }) {
     const { orgSlug } = params;
 
-    const organization = await prisma.organization.findUnique({
-        where: { slug: orgSlug },
-    });
-
-    if (!organization) return <div>Organization not found</div>;
-
-    const { member } = await validateAccess(organization.id);
+    const { organization, member, isFestival } = await resolveOrgContext(orgSlug);
     const data = await getOrganizationOverview(organization.id);
 
     const financials = data.financials;
-    const isFestival = organization.type === "FESTIVAL";
     return (
         <div className="space-y-10 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* 1️⃣ Organization Identity Header */}

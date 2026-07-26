@@ -1,5 +1,4 @@
-import { validateAccess } from "@/lib/access-control";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { resolveOrgContext } from "@/lib/org-context";
 import { getEventWithDetails } from "@/modules/events/event.service";
 import { getEventFinancialSummary } from "@/modules/festival/event-financial.service";
 import { getOrganizationMembers } from "@/modules/core/member.service";
@@ -44,10 +43,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
     const { orgSlug, eventId } = params;
 
     // 1. Resolve Org & Permissions
-    const organization = await getOrganizationBySlug(orgSlug);
-    if (!organization) throw new Error("Organization not found");
-
-    const { member } = await validateAccess(organization.id);
+    const { organization, member } = await resolveOrgContext(orgSlug);
     const isAdmin = member.role === OrganizationRole.ADMIN ||
         member.role === OrganizationRole.COMMITTEE_MEMBER ||
         member.role === OrganizationRole.TREASURER;

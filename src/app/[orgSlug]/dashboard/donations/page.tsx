@@ -1,4 +1,4 @@
-import { validateAccess } from "@/lib/access-control";
+import { resolveOrgContext } from "@/lib/org-context";
 import { formatOrgDateTime } from "@/lib/date-time";
 import { DashboardSearchParams, parsePageQuery } from "@/lib/pagination";
 import { EmptyState } from "@/components/dashboard/shared/EmptyState";
@@ -6,7 +6,6 @@ import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters
 import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { getPaginatedDonations } from "@/modules/finance/donation.service";
 import { DonationCategory, OrganizationRole } from "@prisma/client";
 import { Heart } from "lucide-react";
@@ -18,15 +17,11 @@ export default async function DonationsPage({
     params: { orgSlug: string };
     searchParams?: DashboardSearchParams;
 }) {
-    const organization = await getOrganizationBySlug(params.orgSlug);
-    if (!organization) return <div>Organization not found</div>;
-
-    const { member: currentMember } = await validateAccess(organization.id);
+    const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
     const donations = await getPaginatedDonations(organization.id, query);
 
-    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(currentMember.role);
-    const isFestival = organization.type === "FESTIVAL";
+    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(member.role);
     const term = isFestival ? "Donation" : "Funds";
     const pluralTerm = isFestival ? "Donations" : "Fund Records";
     const contributorTerm = isFestival ? "Donor Name" : "Source";
@@ -95,7 +90,7 @@ export default async function DonationsPage({
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        {(currentMember.role === OrganizationRole.ADMIN || currentMember.role === OrganizationRole.TREASURER) && (
+                                        {(member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.TREASURER) && (
                                             <EditDonationModal
                                                 organizationId={organization.id}
                                                 isFestival={isFestival}

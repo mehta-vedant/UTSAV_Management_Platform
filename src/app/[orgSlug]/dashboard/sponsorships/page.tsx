@@ -1,5 +1,5 @@
-import { getTenantPrisma, validateAccess } from "@/lib/access-control";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getTenantPrisma } from "@/lib/access-control";
+import { resolveOrgContext } from "@/lib/org-context";
 import { OrganizationRole } from "@prisma/client";
 import { Handshake, Plus, Calendar, Coins, Landmark, Sparkles } from "lucide-react";
 import { format } from "date-fns";
@@ -7,15 +7,12 @@ import RecordDonationModal from "@/components/dashboard/donations/RecordDonation
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
 
 export default async function SponsorshipsPage({ params }: { params: { orgSlug: string } }) {
-    const organization = await getOrganizationBySlug(params.orgSlug);
-    if (!organization) return <div>Organization not found</div>;
+    const { organization, member } = await resolveOrgContext(params.orgSlug);
 
     // Ensure this is a CLUB
     if (organization.type === "FESTIVAL") {
         return <div>Sponsorships are managed under Donations for Festivals.</div>;
     }
-
-    const { member: currentMember } = await validateAccess(organization.id);
     const tenantPrisma = getTenantPrisma(organization.id);
 
     const sponsorships = await tenantPrisma.donation.findMany({
@@ -31,7 +28,7 @@ export default async function SponsorshipsPage({ params }: { params: { orgSlug: 
         orderBy: { date: "desc" }
     });
 
-    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(currentMember.role);
+    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(member.role);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -91,7 +88,7 @@ export default async function SponsorshipsPage({ params }: { params: { orgSlug: 
                                             </div>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            {(currentMember.role === OrganizationRole.ADMIN || currentMember.role === OrganizationRole.TREASURER) && (
+                                            {(member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.TREASURER) && (
                                                 <EditDonationModal
                                                     organizationId={organization.id}
                                                     isFestival={false}

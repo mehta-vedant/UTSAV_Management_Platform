@@ -1,4 +1,4 @@
-import { validateAccess } from "@/lib/access-control";
+import { resolveOrgContext } from "@/lib/org-context";
 import { formatOrgDateTime, formatOrgDate } from "@/lib/date-time";
 import { DashboardSearchParams, parsePageQuery } from "@/lib/pagination";
 import { formatOfferingWindow } from "@/lib/prasad-windows";
@@ -8,7 +8,6 @@ import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters
 import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import BhogModerationActions from "@/components/dashboard/bhog/BhogModerationActions";
 import AddBhogModal from "@/components/dashboard/bhog/AddBhogModal";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { getPaginatedBhogItems } from "@/modules/festival/bhog.service";
 import { BhogStatus, OrganizationRole } from "@prisma/client";
 import { CheckCircle2, Clock, Utensils } from "lucide-react";
@@ -20,15 +19,12 @@ export default async function BhogModerationPage({
     params: { orgSlug: string };
     searchParams?: DashboardSearchParams;
 }) {
-    const organization = await getOrganizationBySlug(params.orgSlug);
-    if (!organization) return <div>Organization not found</div>;
-
-    const { member: currentMember } = await validateAccess(organization.id);
+    const { organization, member } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
     const bhogItems = await getPaginatedBhogItems(organization.id, query);
 
-    const isModerator = currentMember.role === OrganizationRole.ADMIN || currentMember.role === OrganizationRole.COMMITTEE_MEMBER;
-    const isAdmin = currentMember.role === OrganizationRole.ADMIN;
+    const isModerator = member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.COMMITTEE_MEMBER;
+    const isAdmin = member.role === OrganizationRole.ADMIN;
     const windowConfig = {
         morningStart: organization.prasadMorningStart,
         morningEnd: organization.prasadMorningEnd,

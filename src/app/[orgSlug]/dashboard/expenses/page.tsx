@@ -1,4 +1,4 @@
-import { validateAccess } from "@/lib/access-control";
+import { resolveOrgContext } from "@/lib/org-context";
 import { formatOrgDateTime } from "@/lib/date-time";
 import { DashboardSearchParams, parsePageQuery } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,6 @@ import { PaginationControls } from "@/components/dashboard/shared/PaginationCont
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import EditExpenseModal from "@/components/dashboard/expenses/EditExpenseModal";
 import ExpenseApprovalActions from "@/components/dashboard/expenses/ExpenseApprovalActions";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { getPaginatedExpenses } from "@/modules/finance/expense.service";
 import { ExpenseCategory, ExpenseStatus, OrganizationRole } from "@prisma/client";
 import { AlertCircle, CheckCircle2, Landmark, Receipt, ShoppingBag, XCircle } from "lucide-react";
@@ -20,16 +19,12 @@ export default async function ExpensesPage({
     params: { orgSlug: string };
     searchParams?: DashboardSearchParams;
 }) {
-    const organization = await getOrganizationBySlug(params.orgSlug);
-    if (!organization) return <div>Organization not found</div>;
-
-    const { member: currentMember } = await validateAccess(organization.id);
+    const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
     const expenses = await getPaginatedExpenses(organization.id, query);
 
-    const isFestival = organization.type === "FESTIVAL";
-    const isTreasurer = currentMember.role === OrganizationRole.TREASURER || currentMember.role === OrganizationRole.ADMIN;
-    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.COMMITTEE_MEMBER, OrganizationRole.TREASURER] as string[]).includes(currentMember.role);
+    const isTreasurer = member.role === OrganizationRole.TREASURER || member.role === OrganizationRole.ADMIN;
+    const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.COMMITTEE_MEMBER, OrganizationRole.TREASURER] as string[]).includes(member.role);
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

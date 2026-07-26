@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { validateAccess } from "@/lib/access-control";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { resolveOrgContext } from "@/lib/org-context";
 import { Users, Mail, Shield, Trash2, UserPlus, Sparkles } from "lucide-react";
 import { OrganizationRole } from "@prisma/client";
 import { format } from "date-fns";
@@ -14,11 +13,7 @@ import ShareOnWhatsApp from "@/components/dashboard/members/ShareOnWhatsApp";
 import RevokeInviteButton from "@/components/dashboard/members/RevokeInviteButton";
 
 export default async function MembersPage({ params }: { params: { orgSlug: string } }) {
-    const organization = await getOrganizationBySlug(params.orgSlug);
-    if (!organization) return <div>Organization not found</div>;
-
-    const { member: currentMember } = await validateAccess(organization.id);
-    const isAdmin = currentMember.role === OrganizationRole.ADMIN;
+    const { organization, member, isAdmin } = await resolveOrgContext(params.orgSlug);
 
     const members = await prisma.organizationMember.findMany({
         where: {
@@ -128,7 +123,7 @@ export default async function MembersPage({ params }: { params: { orgSlug: strin
                                                 memberId={m.id}
                                                 currentRole={m.role}
                                                 organizationId={organization.id}
-                                                isSelf={currentMember.id === m.id}
+                                                isSelf={member.id === m.id}
                                             />
                                         </td>
                                     )}

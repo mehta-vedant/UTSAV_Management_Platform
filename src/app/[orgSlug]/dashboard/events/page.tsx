@@ -1,10 +1,8 @@
-import { validateAccess } from "@/lib/access-control";
-import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { resolveOrgContext } from "@/lib/org-context";
 import { getEvents } from "@/modules/events/event.service";
 import EventCard from "@/components/dashboard/events/EventCard";
 import EventModal from "@/components/dashboard/events/EventModal";
 import { Calendar, History, ShieldCheck, Info } from "lucide-react";
-import { OrganizationRole } from "@prisma/client";
 
 interface EventsPageProps {
     params: {
@@ -16,11 +14,7 @@ export default async function EventsDashboardPage({ params }: EventsPageProps) {
     const { orgSlug } = params;
 
     // 1. Resolve Organization & Permissions
-    const organization = await getOrganizationBySlug(orgSlug);
-    if (!organization) throw new Error("Organization not found");
-
-    const { member } = await validateAccess(organization.id);
-    const isAdmin = member.role === OrganizationRole.ADMIN || member.role === OrganizationRole.COMMITTEE_MEMBER;
+    const { organization, isAdmin } = await resolveOrgContext(orgSlug);
 
     // 2. Fetch Events (Including archived for admins)
     const events = await getEvents(organization.id, isAdmin);

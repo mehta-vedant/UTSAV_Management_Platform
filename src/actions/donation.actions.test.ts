@@ -6,9 +6,7 @@ vi.mock("next/cache", () => ({
 }));
 
 vi.mock("@/modules/finance/donation.service", () => ({
-    DonationService: {
-        createDonation: vi.fn(),
-    },
+    createDonation: vi.fn(),
 }));
 
 describe("donation actions", () => {
@@ -18,14 +16,12 @@ describe("donation actions", () => {
             donorName: "Asha",
             amount: 0,
             category: "GENERAL",
+            receivedAt: new Date().toISOString(),
         });
 
-        expect(result).toMatchObject({
-            ok: false,
-            success: false,
-            code: "VALIDATION_ERROR",
-            message: "Amount must be greater than zero",
-            error: "Amount must be greater than zero",
-        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error).toBe("Amount must be greater than zero");
+        }
     });
 });

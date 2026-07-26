@@ -59,7 +59,7 @@ export default function RecordDonationModal({
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron-500 text-white font-bold rounded-2xl shadow-xl shadow-saffron-500/20 hover:bg-saffron-600 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-saffron-500 px-6 py-4 font-bold text-white shadow-xl shadow-saffron-500/20 transition-all hover:bg-saffron-600 active:scale-95 sm:w-auto sm:px-8 sm:hover:scale-105"
             >
                 <Plus className="w-5 h-5" />
                 {eventId ? "Record Event Donation" : isFestival ? "Record Donation" : "Add Funds"}
@@ -68,9 +68,9 @@ export default function RecordDonationModal({
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200 border-t-8 border-saffron-500">
-                <div className="p-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 backdrop-blur-sm sm:p-4">
+            <div className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-[2.5rem] border-t-8 border-saffron-500 bg-white shadow-2xl animate-in zoom-in-95 duration-200">
+                <div className="p-5 sm:p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <div className="flex items-center gap-2 mb-1">

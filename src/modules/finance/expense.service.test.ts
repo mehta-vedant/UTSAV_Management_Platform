@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ExpenseService } from "./expense.service";
+import { approveExpense } from "./expense.service";
 
 const mocks = vi.hoisted(() => ({
     updateMany: vi.fn(),
@@ -17,9 +17,7 @@ vi.mock("@/lib/access-control", () => ({
 }));
 
 vi.mock("@/modules/core/audit.service", () => ({
-    AuditService: {
-        record: mocks.createAudit,
-    },
+    record: mocks.createAudit,
 }));
 
 describe("ExpenseService", () => {
@@ -30,7 +28,7 @@ describe("ExpenseService", () => {
     it("returns a helpful conflict when approving an already processed expense", async () => {
         mocks.updateMany.mockResolvedValue({ count: 0 });
 
-        await expect(ExpenseService.approveExpense("org_1", "expense_1")).rejects.toThrow(
+        await expect(approveExpense("org_1", "expense_1")).rejects.toThrow(
             "This expense was already processed."
         );
     });
@@ -39,7 +37,7 @@ describe("ExpenseService", () => {
         mocks.updateMany.mockResolvedValue({ count: 1 });
         mocks.createAudit.mockResolvedValue({});
 
-        await expect(ExpenseService.approveExpense("org_1", "expense_1")).resolves.toEqual({ success: true });
+        await expect(approveExpense("org_1", "expense_1")).resolves.toEqual({ success: true });
         expect(mocks.createAudit).toHaveBeenCalledWith(
             expect.objectContaining({
                 organizationId: "org_1",

@@ -1,14 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { EventService, CreateEventInput, UpdateEventInput } from "@/modules/events/event.service";
+import { createEvent, updateEvent, deleteEvent, assignMemberToEvent, removeMemberFromEvent, CreateEventInput, UpdateEventInput } from "@/modules/events/event.service";
 
 /**
  * Action to create a new event
  */
 export async function createEventAction(organizationId: string, orgSlug: string, input: CreateEventInput) {
     try {
-        const event = await EventService.createEvent(organizationId, input);
+        const event = await createEvent(organizationId, input);
         revalidatePath(`/${orgSlug}/dashboard/events`);
         revalidatePath(`/${orgSlug}/transparency`); // Update public schedule
         return { success: true, eventId: event.id };
@@ -28,7 +28,7 @@ export async function updateEventAction(
     input: UpdateEventInput
 ) {
     try {
-        await EventService.updateEvent(organizationId, eventId, input);
+        await updateEvent(organizationId, eventId, input);
         revalidatePath(`/${orgSlug}/dashboard/events`);
         revalidatePath(`/${orgSlug}/transparency`);
         return { success: true };
@@ -43,7 +43,7 @@ export async function updateEventAction(
  */
 export async function deleteEventAction(organizationId: string, orgSlug: string, eventId: string) {
     try {
-        await EventService.deleteEvent(organizationId, eventId);
+        await deleteEvent(organizationId, eventId);
         revalidatePath(`/${orgSlug}/dashboard/events`);
         revalidatePath(`/${orgSlug}/transparency`);
         return { success: true };
@@ -58,7 +58,7 @@ export async function deleteEventAction(organizationId: string, orgSlug: string,
  */
 export async function assignMemberToEventAction(organizationId: string, orgSlug: string, eventId: string, memberId: string) {
     try {
-        await EventService.assignMemberToEvent(organizationId, eventId, memberId);
+        await assignMemberToEvent(organizationId, eventId, memberId);
         revalidatePath(`/${orgSlug}/dashboard/events/${eventId}`);
         return { success: true };
     } catch (error: any) {
@@ -72,7 +72,7 @@ export async function assignMemberToEventAction(organizationId: string, orgSlug:
  */
 export async function removeMemberFromEventAction(organizationId: string, orgSlug: string, eventId: string, memberId: string) {
     try {
-        await EventService.removeMemberFromEvent(organizationId, eventId, memberId);
+        await removeMemberFromEvent(organizationId, eventId, memberId);
         revalidatePath(`/${orgSlug}/dashboard/events/${eventId}`);
         return { success: true };
     } catch (error: any) {

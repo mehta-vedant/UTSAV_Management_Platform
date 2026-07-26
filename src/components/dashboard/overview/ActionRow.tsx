@@ -21,30 +21,30 @@ export default function ActionRow({ organizationId, role, isFestival = true }: A
     const isCommittee = role === OrganizationRole.COMMITTEE_MEMBER || isTreasurer;
 
     return (
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:flex xl:flex-wrap xl:items-center xl:gap-4">
             {/* Admin/Invites */}
             {isAdmin && (
-                <div className="w-full sm:w-auto">
+                <div className="w-full [&_button]:w-full xl:[&_button]:w-auto">
                     <InviteMemberModal organizationId={organizationId} />
                 </div>
             )}
 
             {/* Financials */}
             {isCommittee && (
-                <div className="w-full sm:w-auto">
+                <div className="w-full [&_button]:w-full xl:[&_button]:w-auto">
                     <AddExpenseModal organizationId={organizationId} />
                 </div>
             )}
 
             {isTreasurer && (
-                <div className="w-full sm:w-auto">
+                <div className="w-full [&_button]:w-full xl:[&_button]:w-auto">
                     <RecordDonationModal organizationId={organizationId} isFestival={isFestival} />
                 </div>
             )}
 
             {/* Logistics - Only for Festivals */}
             {isCommittee && isFestival && (
-                <div className="w-full sm:w-auto">
+                <div className="w-full [&_button]:w-full xl:[&_button]:w-auto">
                     <AddBhogModal organizationId={organizationId} />
                 </div>
             )}
@@ -53,7 +53,7 @@ export default function ActionRow({ organizationId, role, isFestival = true }: A
             {isAdmin && (
                 <button
                     disabled
-                    className="w-full sm:w-auto px-6 h-12 bg-slate-50 border border-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center sm:justify-start gap-2 cursor-not-allowed opacity-60"
+                    className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-60 flex items-center justify-center gap-2 cursor-not-allowed xl:w-auto"
                 >
                     <Plus className="w-3.5 h-3.5" />
                     Assign Task

@@ -73,5 +73,63 @@
 
     body {
         @apply bg-background text-foreground;
+        overflow-x: hidden;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    html {
+        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    h1,
+    h2,
+    h3 {
+        text-wrap: balance;
+    }
+
+    p,
+    li {
+        text-wrap: pretty;
+    }
+}
+
+@layer utilities {
+    .mobile-safe-text {
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .mobile-page-x {
+        @apply px-4 sm:px-6 lg:px-8;
+    }
+
+    .mobile-section-y {
+        @apply py-8 sm:py-12 lg:py-16;
+    }
+
+    .mobile-card {
+        @apply rounded-3xl sm:rounded-[2rem];
+    }
+
+    .mobile-card-pad {
+        @apply p-4 sm:p-6 lg:p-8;
+    }
+
+    @media (max-width: 640px) {
+        .rounded-\[2\.5rem\],
+        .rounded-\[3rem\] {
+            border-radius: 1.5rem;
+        }
+
+        .tracking-\[0\.2em\],
+        .tracking-\[0\.3em\] {
+            letter-spacing: 0.12em;
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 18px 45px -28px rgb(15 23 42 / 0.45);
+        }
     }
 }

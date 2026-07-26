@@ -48,7 +48,7 @@ function LoginForm() {
     };
 
     return (
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl">
+        <div className="rounded-[2.5rem] border border-slate-800 bg-slate-900/50 p-5 shadow-2xl backdrop-blur-xl sm:p-8">
             <h2 className="text-2xl font-bold text-white mb-6">Welcome Back</h2>
 
             {error && (
@@ -121,7 +121,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#020617] p-3 sm:p-6">
             {/* Background Glows */}
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-saffron-500/10 blur-[128px] pointer-events-none" />
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-slate-500/5 blur-[128px] pointer-events-none" />
@@ -132,8 +132,8 @@ export default function LoginPage() {
                 className="w-full max-w-md z-10"
             >
                 {/* Brand Header */}
-                <div className="flex flex-col items-center mb-8">
-                    <div className="relative w-24 h-24 mb-4">
+                <div className="mb-6 flex flex-col items-center sm:mb-8">
+                    <div className="relative mb-4 h-20 w-20 sm:h-24 sm:w-24">
                         <Image
                             src="/logo.png"
                             alt="UTSAV Logo"
@@ -143,12 +143,12 @@ export default function LoginPage() {
                         />
                     </div>
                     <h1 className="text-4xl font-black text-white tracking-tighter">UTSAV</h1>
-                    <p className="text-slate-500 font-medium mt-2">Traditional Trust, Modern Management</p>
+                    <p className="mt-2 text-center font-medium text-slate-500">Traditional Trust, Modern Management</p>
                 </div>
 
                 {/* Login Card wrapping in Suspense */}
                 <Suspense fallback={
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl flex items-center justify-center min-h-[400px]">
+                    <div className="flex min-h-[320px] items-center justify-center rounded-[2.5rem] border border-slate-800 bg-slate-900/50 p-5 shadow-2xl backdrop-blur-xl sm:min-h-[400px] sm:p-8">
                         <Loader2 className="w-8 h-8 text-saffron-500 animate-spin" />
                     </div>
                 }>

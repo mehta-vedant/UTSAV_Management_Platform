@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { PublicFinancialService } from "./public-financial.service";
+import { getPublicFinancialOverview } from "./public-financial.service";
 
 const mocks = vi.hoisted(() => ({
     aggregateDonation: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
-describe("PublicFinancialService", () => {
+describe("getPublicFinancialOverview", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mocks.aggregateDonation.mockResolvedValue({ _sum: { amount: new Prisma.Decimal(1000) } });
@@ -34,7 +34,7 @@ describe("PublicFinancialService", () => {
     });
 
     it("exposes only public fundraising target, never opening balance", async () => {
-        const result = await PublicFinancialService.getPublicFinancialOverview("org_1");
+        const result = await getPublicFinancialOverview("org_1");
 
         expect(result.totalDonations.toString()).toBe("6000");
         expect(result.totalExpenses.toString()).toBe("250");
@@ -51,7 +51,7 @@ describe("PublicFinancialService", () => {
             publicFundraisingTarget: null,
         });
 
-        await expect(PublicFinancialService.getPublicFinancialOverview("club_1")).rejects.toThrow(
+        await expect(getPublicFinancialOverview("club_1")).rejects.toThrow(
             "This public Festival page is not available for Clubs."
         );
     });

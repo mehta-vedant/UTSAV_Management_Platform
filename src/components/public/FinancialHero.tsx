@@ -39,8 +39,8 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
     const isFundraisingTargetSet = Number(financials.fundraisingTarget || 0) > 0;
 
     return (
-        <section className="mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section className="mb-10 sm:mb-12">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
                 <StatCard
                     label="Total Collected"
                     value={formatCurrency(financials.totalDonations)}
@@ -79,9 +79,9 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-8 bg-white/50 backdrop-blur-sm border border-slate-100 rounded-3xl p-8"
+                className="mt-6 rounded-3xl border border-slate-100 bg-white/50 p-4 backdrop-blur-sm sm:mt-8 sm:p-8"
             >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
                     <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                             <h3 className="text-lg font-bold text-slate-900">Budget Utilization</h3>
@@ -117,7 +117,7 @@ export default function FinancialHero({ financials }: FinancialHeroProps) {
 
                     <a
                         href={`${pathname}/transparency`}
-                        className="inline-flex items-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all hover:shadow-lg hover:shadow-slate-200 group"
+                        className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-4 text-center text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-200 sm:w-auto sm:px-6"
                     >
                         <ShieldCheck className="w-4 h-4 text-saffron-500" />
                         View Full Audit Trail
@@ -154,7 +154,7 @@ function StatCard({
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
         >
             <Card className={`border-none shadow-sm rounded-3xl overflow-hidden group hover:shadow-xl transition-all duration-300 ${primary ? 'bg-slate-900 text-white' : 'bg-white'}`}>
-                <CardContent className="p-6">
+                <CardContent className="p-5 sm:p-6">
                     <div className="flex items-start justify-between mb-4">
                         <div className={`p-3 rounded-2xl ${primary ? 'bg-slate-800' : 'bg-slate-50 group-hover:bg-saffron-50 group-hover:text-saffron-600 transition-colors'}`}>
                             {icon}
@@ -171,7 +171,7 @@ function StatCard({
                         <p className={`text-xs font-bold uppercase tracking-widest ${primary ? 'text-slate-400' : 'text-slate-500'}`}>
                             {label}
                         </p>
-                        <p className="text-3xl font-black tracking-tight leading-none">
+                        <p className="mobile-safe-text text-2xl font-black leading-none tracking-tight sm:text-3xl">
                             {value}
                         </p>
                         <p className={`text-[10px] font-medium pt-2 ${primary ? 'text-slate-500' : 'text-slate-400'}`}>

@@ -6,8 +6,8 @@ import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters
 import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { DonationService } from "@/modules/finance/donation.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getPaginatedDonations } from "@/modules/finance/donation.service";
 import { DonationCategory, OrganizationRole } from "@prisma/client";
 import { Heart } from "lucide-react";
 
@@ -18,12 +18,12 @@ export default async function DonationsPage({
     params: { orgSlug: string };
     searchParams?: DashboardSearchParams;
 }) {
-    const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
+    const organization = await getOrganizationBySlug(params.orgSlug);
     if (!organization) return <div>Organization not found</div>;
 
     const { member: currentMember } = await validateAccess(organization.id);
     const query = parsePageQuery(searchParams);
-    const donations = await DonationService.getPaginatedDonations(organization.id, query);
+    const donations = await getPaginatedDonations(organization.id, query);
 
     const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(currentMember.role);
     const isFestival = organization.type === "FESTIVAL";
@@ -33,13 +33,13 @@ export default async function DonationsPage({
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <div className="mb-2 flex items-center gap-2">
                         <Heart className="h-5 w-5 text-saffron-500" />
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">{isFestival ? "Contribution Hub" : "Financial Source"}</span>
                     </div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">{term} Records</h1>
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 sm:text-4xl sm:tracking-tighter">{term} Records</h1>
                     <p className="mt-1 font-medium text-slate-500">
                         {isFestival
                             ? "Manage all voluntary contributions received for the pavilion."

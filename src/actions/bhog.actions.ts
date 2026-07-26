@@ -1,6 +1,6 @@
 "use server";
 
-import { BhogService } from "@/modules/festival/bhog.service";
+import { createBhogItem, updateBhogStatus, archiveBhog, updateBhogItem } from "@/modules/festival/bhog.service";
 import { BhogOfferingWindow, BhogStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -19,7 +19,7 @@ const CreateBhogSchema = z.object({
 export async function createBhogAction(data: z.infer<typeof CreateBhogSchema>) {
     try {
         const validated = CreateBhogSchema.parse(data);
-        await BhogService.createBhogItem(validated.organizationId, {
+        await createBhogItem(validated.organizationId, {
             ...validated,
             offeringDate: parseDateInput(validated.offeringDate),
         });
@@ -32,7 +32,7 @@ export async function createBhogAction(data: z.infer<typeof CreateBhogSchema>) {
 
 export async function updateBhogStatusAction(organizationId: string, itemId: string, status: BhogStatus) {
     try {
-        await BhogService.updateBhogStatus(organizationId, itemId, status);
+        await updateBhogStatus(organizationId, itemId, status);
         revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
         return { success: true };
     } catch (error: any) {
@@ -42,7 +42,7 @@ export async function updateBhogStatusAction(organizationId: string, itemId: str
 
 export async function archiveBhogAction(organizationId: string, itemId: string) {
     try {
-        await BhogService.archiveBhog(organizationId, itemId);
+        await archiveBhog(organizationId, itemId);
         revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
         return { success: true };
     } catch (error: any) {
@@ -64,7 +64,7 @@ export async function updateBhogItemAction(data: z.infer<typeof UpdateBhogSchema
     try {
         const validated = UpdateBhogSchema.parse(data);
         const { organizationId, itemId, ...updateData } = validated;
-        await BhogService.updateBhogItem(organizationId, itemId, updateData);
+        await updateBhogItem(organizationId, itemId, updateData);
         revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
         return { success: true };
     } catch (error: any) {

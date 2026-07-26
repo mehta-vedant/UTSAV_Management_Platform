@@ -8,8 +8,8 @@ import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters
 import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import BhogModerationActions from "@/components/dashboard/bhog/BhogModerationActions";
 import AddBhogModal from "@/components/dashboard/bhog/AddBhogModal";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { BhogService } from "@/modules/festival/bhog.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getPaginatedBhogItems } from "@/modules/festival/bhog.service";
 import { BhogStatus, OrganizationRole } from "@prisma/client";
 import { CheckCircle2, Clock, Utensils } from "lucide-react";
 
@@ -20,12 +20,12 @@ export default async function BhogModerationPage({
     params: { orgSlug: string };
     searchParams?: DashboardSearchParams;
 }) {
-    const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
+    const organization = await getOrganizationBySlug(params.orgSlug);
     if (!organization) return <div>Organization not found</div>;
 
     const { member: currentMember } = await validateAccess(organization.id);
     const query = parsePageQuery(searchParams);
-    const bhogItems = await BhogService.getPaginatedBhogItems(organization.id, query);
+    const bhogItems = await getPaginatedBhogItems(organization.id, query);
 
     const isModerator = currentMember.role === OrganizationRole.ADMIN || currentMember.role === OrganizationRole.COMMITTEE_MEMBER;
     const isAdmin = currentMember.role === OrganizationRole.ADMIN;
@@ -38,13 +38,13 @@ export default async function BhogModerationPage({
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <div className="mb-2 flex items-center gap-2">
                         <Utensils className="h-5 w-5 text-saffron-500" />
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Prasadam Moderation</span>
                     </div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">Bhog Sponsorships</h1>
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900 sm:text-4xl sm:tracking-tighter">Bhog Sponsorships</h1>
                     <p className="mt-1 font-medium text-slate-500">Manage and track public contributions for organization offerings.</p>
                 </div>
 

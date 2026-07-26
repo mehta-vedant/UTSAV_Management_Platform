@@ -1,5 +1,5 @@
 import { getTenantPrisma, validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { OrganizationRole } from "@prisma/client";
 import { Handshake, Plus, Calendar, Coins, Landmark, Sparkles } from "lucide-react";
 import { format } from "date-fns";
@@ -7,7 +7,7 @@ import RecordDonationModal from "@/components/dashboard/donations/RecordDonation
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
 
 export default async function SponsorshipsPage({ params }: { params: { orgSlug: string } }) {
-    const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
+    const organization = await getOrganizationBySlug(params.orgSlug);
     if (!organization) return <div>Organization not found</div>;
 
     // Ensure this is a CLUB

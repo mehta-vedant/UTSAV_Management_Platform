@@ -1,4 +1,4 @@
-import { OverviewService } from "@/modules/core/overview.service";
+import { getOrganizationOverview } from "@/modules/core/overview.service";
 import { prisma } from "@/lib/prisma";
 import { validateAccess } from "@/lib/access-control";
 import DashboardHeader from "@/components/dashboard/overview/DashboardHeader";
@@ -37,7 +37,7 @@ export default async function DashboardOverviewPage({
     if (!organization) return <div>Organization not found</div>;
 
     const { member } = await validateAccess(organization.id);
-    const data = await OverviewService.getOrganizationOverview(organization.id);
+    const data = await getOrganizationOverview(organization.id);
 
     const financials = data.financials;
     const isFestival = organization.type === "FESTIVAL";

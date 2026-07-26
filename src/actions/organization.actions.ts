@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { OrganizationService } from "@/modules/core/organization.service";
+import { createOrganization, updateOrganization, endFestival, deleteOrganization } from "@/modules/core/organization.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -53,7 +53,7 @@ export async function createOrganizationAction(data: CreateOrganizationInput) {
         const validatedData = CreateOrganizationSchema.parse(data);
         assertValidPrasadWindowConfig(toPrasadWindowConfig(validatedData));
 
-        const Organization = await OrganizationService.createOrganization({
+        const Organization = await createOrganization({
             ...validatedData,
             startDate: validatedData.startDate ? new Date(validatedData.startDate) : new Date(),
             endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
@@ -92,7 +92,7 @@ export async function updateOrganizationAction(data: z.infer<typeof UpdateOrgani
         const { organizationId, ...updateData } = UpdateOrganizationSchema.parse(data);
         assertValidPrasadWindowConfig(toPrasadWindowConfig(updateData));
 
-        await OrganizationService.updateOrganization(organizationId, {
+        await updateOrganization(organizationId, {
             ...updateData,
             startDate: updateData.startDate ? new Date(updateData.startDate) : undefined,
             endDate: updateData.endDate ? new Date(updateData.endDate) : undefined,
@@ -121,7 +121,7 @@ export async function endFestivalAction(organizationId: string) {
 
         if (!member) return actionFailure(new Error("Only an admin can end a festival."));
 
-        const organization = await OrganizationService.endFestival(organizationId, member.id);
+        const organization = await endFestival(organizationId, member.id);
         revalidatePath(`/${organization.slug}`);
         revalidatePath(`/${organization.slug}/dashboard`, "layout");
         return actionSuccess();
@@ -147,7 +147,7 @@ export async function deleteOrganizationAction(organizationId: string) {
 
         if (!member) return actionFailure(new Error("Only an admin can delete an organization."));
 
-        await OrganizationService.deleteOrganization(organizationId);
+        await deleteOrganization(organizationId);
 
         revalidatePath("/dashboard", "page");
         return actionSuccess();

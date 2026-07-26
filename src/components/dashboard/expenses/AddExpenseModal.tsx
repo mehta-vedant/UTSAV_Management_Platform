@@ -50,7 +50,7 @@ export default function AddExpenseModal({
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-950 text-white font-bold rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all hover:scale-105 active:scale-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-4 font-bold text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 sm:w-auto sm:px-8 sm:hover:scale-105"
             >
                 <Plus className="w-5 h-5" />
                 Record Expense
@@ -59,9 +59,9 @@ export default function AddExpenseModal({
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="p-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 backdrop-blur-sm sm:p-4">
+            <div className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-[2.5rem] bg-white shadow-2xl animate-in zoom-in-95 duration-200">
+                <div className="p-5 sm:p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">Add Expenditure</h2>

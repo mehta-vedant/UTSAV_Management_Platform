@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { PublicFinancialService } from "@/modules/festival/public-financial.service";
-import { PublicDonationService } from "@/modules/festival/public-donation.service";
-import { PublicExpenseService } from "@/modules/festival/public-expense.service";
-import { PublicBhogService } from "@/modules/festival/public-bhog.service";
-import { PublicEventService } from "@/modules/festival/public-event.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getPublicFinancialOverview } from "@/modules/festival/public-financial.service";
+import { getPublicDonations } from "@/modules/festival/public-donation.service";
+import { getPublicApprovedExpenses } from "@/modules/festival/public-expense.service";
+import { getPublicBhogList } from "@/modules/festival/public-bhog.service";
+import { getPublicEvents } from "@/modules/festival/public-event.service";
 
 // Premium Modular Components
 import SectionWrapper from "@/components/public/SectionWrapper";
@@ -27,7 +27,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
     const { orgSlug } = params;
 
     // 1. Resolve Organization (Cached & Memoized)
-    const organization = await OrganizationService.getOrganizationBySlug(orgSlug);
+    const organization = await getOrganizationBySlug(orgSlug);
 
     if (!organization || !isFestivalOrganization(organization)) {
         notFound();
@@ -35,17 +35,17 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
 
     // 2. Parallel Data Fetching
     const [financials, donations, expenses, bhogList, events] = await Promise.all([
-        PublicFinancialService.getPublicFinancialOverview(organization.id),
-        PublicDonationService.getPublicDonations(organization.id),
-        PublicExpenseService.getPublicApprovedExpenses(organization.id),
-        PublicBhogService.getPublicBhogList(organization.id),
-        PublicEventService.getPublicEvents(organization.id),
+        getPublicFinancialOverview(organization.id),
+        getPublicDonations(organization.id),
+        getPublicApprovedExpenses(organization.id),
+        getPublicBhogList(organization.id),
+        getPublicEvents(organization.id),
     ]);
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-24">
+        <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] pb-16 sm:pb-24">
             {/* Dynamic Header / Hero */}
-            <header className="relative bg-white border-b border-slate-100 pt-20 pb-16 px-6 overflow-hidden">
+            <header className="relative overflow-hidden border-b border-slate-100 bg-white px-4 pb-12 pt-16 sm:px-6 sm:pb-16 sm:pt-20">
                 {/* Subtle Decorative Elements */}
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-saffron-50/30 to-transparent pointer-events-none" />
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-50 rounded-full blur-3xl opacity-50" />
@@ -53,11 +53,11 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 <div className="max-w-7xl mx-auto relative z-10">
                     <SectionWrapper delay={0.1}>
                         <div className="flex flex-col items-center text-center">
-                            <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter mb-6 mt-8">
+                            <h1 className="mobile-safe-text mt-6 mb-6 max-w-full text-4xl font-black tracking-tight text-slate-900 sm:mt-8 sm:text-5xl md:text-7xl md:tracking-tighter">
                                 {organization.name}
                             </h1>
 
-                            <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-bold text-slate-400">
+                            <div className="flex flex-wrap items-center justify-center gap-3 text-center text-xs font-bold text-slate-400 sm:gap-6 sm:text-sm">
                                 <div className="flex items-center">
                                     <CalendarIcon className="w-4 h-4 mr-2 text-saffron-500" />
                                     {new Date(organization.startDate).toLocaleDateString("en-IN", { month: 'long', year: 'numeric' })}
@@ -69,7 +69,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                             </div>
 
                             {organization.description && (
-                                <p className="mt-8 text-slate-500 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+                                <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-slate-500 sm:mt-8 md:text-xl">
                                     {organization.description}
                                 </p>
                             )}
@@ -84,7 +84,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-6 -mt-10 relative z-20">
+            <main className="relative z-20 mx-auto -mt-8 max-w-7xl px-4 sm:-mt-10 sm:px-6">
                 {/* 1. Statistics Cards */}
                 <FinancialHero financials={financials} />
 
@@ -98,7 +98,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 </SectionWrapper>
 
                 {/* 3. Primary Data Grids */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <div className="mb-12 grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-3">
                     <SectionWrapper className="lg:col-span-1" delay={0.7}>
                         <DonationList donations={donations} />
                     </SectionWrapper>
@@ -130,7 +130,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
             </main>
 
             {/* Persistent Footer */}
-            <footer className="max-w-7xl mx-auto px-6 mt-20 pt-10 border-t border-slate-100">
+            <footer className="mx-auto mt-14 max-w-7xl border-t border-slate-100 px-4 pt-8 sm:mt-20 sm:px-6 sm:pt-10">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xl">U</div>
@@ -140,7 +140,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-8 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-black uppercase tracking-widest text-slate-400 sm:gap-8">
                         <button className="hover:text-saffron-600 transition-colors">Contact</button>
                         <button className="hover:text-saffron-600 transition-colors">Volunteers</button>
                         <button className="hover:text-saffron-600 transition-colors">Audit</button>

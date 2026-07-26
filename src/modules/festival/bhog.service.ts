@@ -3,167 +3,162 @@ import { OrganizationRole, BhogStatus, Prisma, BhogOfferingWindow } from "@prism
 import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
 
 /**
- * Bhog Moderation Service
+ * Create a new bhog item (Internal)
  */
-export class BhogService {
-    /**
-     * Create a new bhog item (Internal)
-     */
-    static async createBhogItem(
-        organizationId: string,
+export async function createBhogItem(
+    organizationId: string,
+    data: {
+        name: string;
+        quantity: string;
+        sponsorName: string;
+        offeringDate: Date;
+        offeringWindow: BhogOfferingWindow;
+        storage?: string;
+    }
+) {
+    const { member } = await validateAccess(organizationId, [
+        OrganizationRole.ADMIN,
+        OrganizationRole.COMMITTEE_MEMBER,
+        OrganizationRole.TREASURER,
+    ]);
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    return await tenantPrisma.bhogItem.create({
         data: {
-            name: string;
-            quantity: string;
-            sponsorName: string;
-            offeringDate: Date;
-            offeringWindow: BhogOfferingWindow;
-            storage?: string;
+            name: data.name,
+            quantity: data.quantity,
+            sponsorName: data.sponsorName,
+            offeringDate: data.offeringDate,
+            offeringWindow: data.offeringWindow,
+            storage: data.storage,
+            status: BhogStatus.PENDING,
+            organizationId,
         }
-    ) {
-        const { member } = await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.COMMITTEE_MEMBER,
-            OrganizationRole.TREASURER,
-        ]);
+    });
+}
 
-        const tenantPrisma = getTenantPrisma(organizationId);
+/**
+ * Get all bhog items for moderation
+ */
+export async function getBhogItems(organizationId: string) {
+    await validateAccess(organizationId, [
+        OrganizationRole.ADMIN,
+        OrganizationRole.COMMITTEE_MEMBER,
+        OrganizationRole.TREASURER,
+    ]);
 
-        return await tenantPrisma.bhogItem.create({
-            data: {
-                name: data.name,
-                quantity: data.quantity,
-                sponsorName: data.sponsorName,
-                offeringDate: data.offeringDate,
-                offeringWindow: data.offeringWindow,
-                storage: data.storage,
-                status: BhogStatus.PENDING,
-                organizationId,
-            }
-        });
-    }
+    const tenantPrisma = getTenantPrisma(organizationId);
 
-    /**
-     * Get all bhog items for moderation
-     */
-    static async getBhogItems(organizationId: string) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.COMMITTEE_MEMBER,
-            OrganizationRole.TREASURER,
-        ]);
+    return await tenantPrisma.bhogItem.findMany({
+        where: { isArchived: false },
+        orderBy: { submittedAt: "desc" },
+    });
+}
 
-        const tenantPrisma = getTenantPrisma(organizationId);
+export async function getPaginatedBhogItems(organizationId: string, query: PageQuery) {
+    await validateAccess(organizationId, [
+        OrganizationRole.ADMIN,
+        OrganizationRole.COMMITTEE_MEMBER,
+        OrganizationRole.TREASURER,
+    ]);
 
-        return await tenantPrisma.bhogItem.findMany({
-            where: { isArchived: false },
-            orderBy: { submittedAt: "desc" },
-        });
-    }
-
-    static async getPaginatedBhogItems(organizationId: string, query: PageQuery) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.COMMITTEE_MEMBER,
-            OrganizationRole.TREASURER,
-        ]);
-
-        const tenantPrisma = getTenantPrisma(organizationId);
-        const where: Prisma.BhogItemWhereInput = {
-            isArchived: false,
-            ...(query.status && isBhogStatus(query.status) ? { status: query.status } : {}),
-            ...(query.search ? {
-                OR: [
-                    { name: { contains: query.search, mode: "insensitive" } },
-                    { sponsorName: { contains: query.search, mode: "insensitive" } },
-                    { notes: { contains: query.search, mode: "insensitive" } },
-                ],
-            } : {}),
-            ...(query.dateFrom || query.dateTo ? {
-                offeringDate: {
-                    ...(query.dateFrom ? { gte: query.dateFrom } : {}),
-                    ...(query.dateTo ? { lte: query.dateTo } : {}),
-                },
-            } : {}),
-        };
-
-        const [items, totalItems] = await Promise.all([
-            tenantPrisma.bhogItem.findMany({
-                where,
-                ...getPaginationArgs(query),
-                orderBy: [{ offeringDate: "asc" }, { submittedAt: "desc" }],
-            }),
-            tenantPrisma.bhogItem.count({ where }),
-        ]);
-
-        return paginate(items, totalItems, query);
-    }
-
-    /**
-     * Update bhog item status
-     */
-    static async updateBhogStatus(organizationId: string, itemId: string, status: BhogStatus) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.COMMITTEE_MEMBER,
-            OrganizationRole.TREASURER,
-        ]);
-
-        const tenantPrisma = getTenantPrisma(organizationId);
-
-        return await tenantPrisma.bhogItem.update({
-            where: { id: itemId, organizationId },
-            data: {
-                status,
-                ...(status === BhogStatus.PREPARED ? { preparedAt: new Date(), approvedAt: new Date() } : {}),
+    const tenantPrisma = getTenantPrisma(organizationId);
+    const where: Prisma.BhogItemWhereInput = {
+        isArchived: false,
+        ...(query.status && isBhogStatus(query.status) ? { status: query.status } : {}),
+        ...(query.search ? {
+            OR: [
+                { name: { contains: query.search, mode: "insensitive" } },
+                { sponsorName: { contains: query.search, mode: "insensitive" } },
+                { notes: { contains: query.search, mode: "insensitive" } },
+            ],
+        } : {}),
+        ...(query.dateFrom || query.dateTo ? {
+            offeringDate: {
+                ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                ...(query.dateTo ? { lte: query.dateTo } : {}),
             },
-        });
-    }
+        } : {}),
+    };
 
-    /**
-     * Update bhog item details
-     */
-    static async updateBhogItem(
-        organizationId: string,
-        itemId: string,
+    const [items, totalItems] = await Promise.all([
+        tenantPrisma.bhogItem.findMany({
+            where,
+            ...getPaginationArgs(query),
+            orderBy: [{ offeringDate: "asc" }, { submittedAt: "desc" }],
+        }),
+        tenantPrisma.bhogItem.count({ where }),
+    ]);
+
+    return paginate(items, totalItems, query);
+}
+
+/**
+ * Update bhog item status
+ */
+export async function updateBhogStatus(organizationId: string, itemId: string, status: BhogStatus) {
+    await validateAccess(organizationId, [
+        OrganizationRole.ADMIN,
+        OrganizationRole.COMMITTEE_MEMBER,
+        OrganizationRole.TREASURER,
+    ]);
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    return await tenantPrisma.bhogItem.update({
+        where: { id: itemId, organizationId },
         data: {
-            name?: string;
-            quantity?: string;
-            sponsorName?: string;
-            storage?: string;
-            estimatedCost?: number | Prisma.Decimal;
-            notes?: string;
-        }
-    ) {
-        await validateAccess(organizationId, [
-            OrganizationRole.ADMIN,
-            OrganizationRole.TREASURER,
-            OrganizationRole.COMMITTEE_MEMBER,
-        ]);
+            status,
+            ...(status === BhogStatus.PREPARED ? { preparedAt: new Date(), approvedAt: new Date() } : {}),
+        },
+    });
+}
 
-        const tenantPrisma = getTenantPrisma(organizationId);
-
-        return await tenantPrisma.bhogItem.update({
-            where: { id: itemId, organizationId },
-            data: {
-                ...data,
-                estimatedCost: data.estimatedCost ? new Prisma.Decimal(data.estimatedCost.toString()) : undefined,
-            },
-        });
+/**
+ * Update bhog item details
+ */
+export async function updateBhogItem(
+    organizationId: string,
+    itemId: string,
+    data: {
+        name?: string;
+        quantity?: string;
+        sponsorName?: string;
+        storage?: string;
+        estimatedCost?: number | Prisma.Decimal;
+        notes?: string;
     }
+) {
+    await validateAccess(organizationId, [
+        OrganizationRole.ADMIN,
+        OrganizationRole.TREASURER,
+        OrganizationRole.COMMITTEE_MEMBER,
+    ]);
 
-    /**
-     * Archive bhog item (Moderation)
-     */
-    static async archiveBhog(organizationId: string, itemId: string) {
-        await validateAccess(organizationId, [OrganizationRole.ADMIN]);
+    const tenantPrisma = getTenantPrisma(organizationId);
 
-        const tenantPrisma = getTenantPrisma(organizationId);
+    return await tenantPrisma.bhogItem.update({
+        where: { id: itemId, organizationId },
+        data: {
+            ...data,
+            estimatedCost: data.estimatedCost ? new Prisma.Decimal(data.estimatedCost.toString()) : undefined,
+        },
+    });
+}
 
-        return await tenantPrisma.bhogItem.update({
-            where: { id: itemId, organizationId },
-            data: { isArchived: true, archivedAt: new Date() },
-        });
-    }
+/**
+ * Archive bhog item (Moderation)
+ */
+export async function archiveBhog(organizationId: string, itemId: string) {
+    await validateAccess(organizationId, [OrganizationRole.ADMIN]);
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    return await tenantPrisma.bhogItem.update({
+        where: { id: itemId, organizationId },
+        data: { isArchived: true, archivedAt: new Date() },
+    });
 }
 
 function isBhogStatus(value: string): value is BhogStatus {

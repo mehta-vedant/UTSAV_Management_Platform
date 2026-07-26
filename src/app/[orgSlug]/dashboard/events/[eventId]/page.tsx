@@ -1,8 +1,8 @@
 import { validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { EventService } from "@/modules/events/event.service";
-import { EventFinancialService } from "@/modules/festival/event-financial.service";
-import { MemberService } from "@/modules/core/member.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getEventWithDetails } from "@/modules/events/event.service";
+import { getEventFinancialSummary } from "@/modules/festival/event-financial.service";
+import { getOrganizationMembers } from "@/modules/core/member.service";
 import EventTeamManager from "@/components/dashboard/events/EventTeamManager";
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
@@ -44,7 +44,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
     const { orgSlug, eventId } = params;
 
     // 1. Resolve Org & Permissions
-    const organization = await OrganizationService.getOrganizationBySlug(orgSlug);
+    const organization = await getOrganizationBySlug(orgSlug);
     if (!organization) throw new Error("Organization not found");
 
     const { member } = await validateAccess(organization.id);
@@ -54,9 +54,9 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
 
     // 2. Fetch Event Details & Financials
     const [event, financials, availableMembers] = await Promise.all([
-        EventService.getEventWithDetails(organization.id, eventId),
-        EventFinancialService.getEventFinancialSummary(organization.id, eventId),
-        MemberService.getOrganizationMembers(organization.id)
+        getEventWithDetails(organization.id, eventId),
+        getEventFinancialSummary(organization.id, eventId),
+        getOrganizationMembers(organization.id)
     ]);
 
     if (!event) throw new Error("Event not found");
@@ -65,7 +65,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
     const budgetLeft = financials.budgetTarget + financials.totalCollections - financials.totalExpenses;
 
     return (
-        <div className="p-8 max-w-7xl mx-auto pb-24 space-y-10">
+        <div className="mx-auto max-w-7xl space-y-8 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-24 lg:space-y-10">
             {/* Navigation & Header */}
             <div className="space-y-4">
                 <Link
@@ -76,7 +76,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                     Back to Schedule
                 </Link>
 
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <EventStatusSelector
@@ -87,7 +87,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                                 isAdmin={isAdmin}
                             />
                         </div>
-                        <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase leading-[0.9]">
+                        <h1 className="mobile-safe-text text-3xl font-black uppercase leading-none tracking-tight text-slate-900 sm:text-5xl sm:tracking-tighter">
                             {event.title}
                         </h1>
                         <div className="flex flex-wrap items-center gap-4 text-xs font-black uppercase tracking-wider text-slate-400">
@@ -102,7 +102,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <EventModal
                             organizationId={organization.id}
                             orgSlug={orgSlug}
@@ -127,9 +127,9 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
             </div>
 
             {/* Operational HUD */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
                 {/* Budget Card */}
-                <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50">
+                <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-xl shadow-slate-200/50 sm:p-8">
                     <div className="flex items-center justify-between mb-6">
                         <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl border border-amber-100">
                             <TrendingUp className="w-5 h-5" />
@@ -164,7 +164,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                 </div>
 
                 {/* Team Readiness */}
-                <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50">
+                <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-xl shadow-slate-200/50 sm:p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100">
                             <Users className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                 </div>
 
                 {/* Success Metrics */}
-                <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50">
+                <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-xl shadow-slate-200/50 sm:p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100">
                             <CheckCircle2 className="w-5 h-5" />
@@ -225,11 +225,11 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
             </div>
 
             {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 {/* Left Column: Tasks */}
                 <div className="space-y-8">
-                    <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
+                    <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
+                        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-blue-50 rounded-xl">
                                     <CheckCircle2 className="w-5 h-5 text-blue-500" />
@@ -289,8 +289,8 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
 
                 {/* Right Column: Financials & Participants */}
                 <div className="space-y-8">
-                    <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
-                        <div className="flex items-center justify-between mb-8">
+                    <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
+                        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-emerald-50 rounded-xl">
                                     <ShoppingBag className="w-5 h-5 text-emerald-500" />
@@ -344,7 +344,7 @@ export default async function EventDashboardPage({ params }: EventDashboardProps
                         </div>
                     </div>
 
-                    <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                    <div className="rounded-[2.5rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="p-2 bg-saffron-50 rounded-xl">
                                 <Users2 className="w-5 h-5 text-saffron-500" />

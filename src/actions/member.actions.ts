@@ -6,7 +6,7 @@ import { validateAccess, getTenantPrisma } from "@/lib/access-control";
 import { revalidatePath } from "next/cache";
 import { OrganizationRole } from "@prisma/client";
 import { sendInvitationEmail } from "@/lib/email";
-import { InvitationService } from "@/modules/core/invitation.service";
+import { inviteMember } from "@/modules/core/invitation.service";
 
 const InviteMemberSchema = z.object({
     organizationId: z.string(),
@@ -46,7 +46,7 @@ export async function inviteMemberAction(data: z.infer<typeof InviteMemberSchema
         if (!organization) return { error: "Organization not found" };
 
         // Use the new InvitationService for token-based invitation
-        await InvitationService.inviteMember({
+        await inviteMember({
             organizationId: validated.organizationId,
             email: normalizedEmail,
             role: validated.role,

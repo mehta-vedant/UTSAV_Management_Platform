@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { DonationService } from "@/modules/finance/donation.service";
+import { createDonation, updateDonation, archiveDonation } from "@/modules/finance/donation.service";
 import { DonationCategory } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { actionFailure, actionSuccess } from "@/lib/action-response";
@@ -19,7 +19,7 @@ const RecordDonationSchema = z.object({
 export async function recordDonationAction(data: z.infer<typeof RecordDonationSchema>) {
     try {
         const validated = RecordDonationSchema.parse(data);
-        await DonationService.createDonation(validated.organizationId, {
+        await createDonation(validated.organizationId, {
             ...validated,
             receivedAt: new Date(validated.receivedAt),
         });
@@ -45,7 +45,7 @@ export async function updateDonationAction(data: z.infer<typeof UpdateDonationSc
     try {
         const validated = UpdateDonationSchema.parse(data);
         const { organizationId, donationId, ...updateData } = validated;
-        await DonationService.updateDonation(organizationId, donationId, updateData);
+        await updateDonation(organizationId, donationId, updateData);
 
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
         return actionSuccess();
@@ -56,7 +56,7 @@ export async function updateDonationAction(data: z.infer<typeof UpdateDonationSc
 
 export async function archiveDonationAction(organizationId: string, donationId: string) {
     try {
-        await DonationService.archiveDonation(organizationId, donationId);
+        await archiveDonation(organizationId, donationId);
         revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
         return actionSuccess();
     } catch (error: any) {

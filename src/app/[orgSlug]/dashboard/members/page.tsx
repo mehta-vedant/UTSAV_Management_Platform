@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { Users, Mail, Shield, Trash2, UserPlus, Sparkles } from "lucide-react";
 import { OrganizationRole } from "@prisma/client";
 import { format } from "date-fns";
@@ -14,7 +14,7 @@ import ShareOnWhatsApp from "@/components/dashboard/members/ShareOnWhatsApp";
 import RevokeInviteButton from "@/components/dashboard/members/RevokeInviteButton";
 
 export default async function MembersPage({ params }: { params: { orgSlug: string } }) {
-    const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
+    const organization = await getOrganizationBySlug(params.orgSlug);
     if (!organization) return <div>Organization not found</div>;
 
     const { member: currentMember } = await validateAccess(organization.id);

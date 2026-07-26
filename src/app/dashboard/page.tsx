@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { OrganizationService } from "@/modules/core/organization.service";
+import { getUserOrganizations } from "@/modules/core/organization.service";
 import Link from "next/link";
 import { Plus, Calendar, Shield, ArrowRight, Sparkles, Building2 } from "lucide-react";
 import { format } from "date-fns";
@@ -8,24 +8,24 @@ import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
-    const memberships = await OrganizationService.getUserOrganizations(session?.user?.id || "");
+    const memberships = await getUserOrganizations(session?.user?.id || "");
 
     return (
-        <div className="min-h-screen bg-slate-50/50 p-6 md:p-12 lg:p-16">
+        <div className="min-h-screen overflow-x-hidden bg-slate-50/50 p-4 sm:p-6 md:p-12 lg:p-16">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div className="mb-8 flex flex-col gap-5 sm:mb-12 md:flex-row md:items-end md:justify-between">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <Sparkles className="w-5 h-5 text-saffron-500" />
                             <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Control Center</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">Your Organizations</h1>
+                        <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-5xl md:tracking-tighter">Your Organizations</h1>
                     </div>
 
                     <Link
                         href="/dashboard/create"
-                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-slate-950 text-white font-bold rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all hover:scale-105 active:scale-95"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-4 font-bold text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-slate-800 active:scale-95 sm:w-auto sm:px-8 sm:hover:scale-105"
                     >
                         <Plus className="w-5 h-5" />
                         Create New Organization
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
                             <Link
                                 key={membership.id}
                                 href={`/${membership.organization.slug}/dashboard`}
-                                className="group bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:border-saffron-500/30 transition-all relative overflow-hidden flex flex-col h-full"
+                                className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-saffron-500/30 hover:shadow-xl sm:p-8"
                             >
                                 {/* Decorative Glow */}
                                 <div className="absolute -top-12 -right-12 w-24 h-24 bg-saffron-500/5 rounded-full blur-3xl group-hover:bg-saffron-500/10 transition-all" />
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
                                             {membership.organization.type}
                                         </div>
                                     </div>
-                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-saffron-600 transition-colors uppercase">
+                                    <h3 className="mobile-safe-text text-xl font-black uppercase tracking-tight text-slate-900 transition-colors group-hover:text-saffron-600 sm:text-2xl">
                                         {membership.organization.name}
                                     </h3>
                                 </div>
@@ -76,7 +76,7 @@ export default async function DashboardPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="py-24 text-center bg-white border-2 border-dashed border-slate-200 rounded-[3rem]">
+                    <div className="rounded-[3rem] border-2 border-dashed border-slate-200 bg-white px-4 py-16 text-center sm:py-24">
                         <div className="mb-6 inline-flex p-6 bg-slate-50 rounded-3xl">
                             <Plus className="w-12 h-12 text-slate-300" />
                         </div>

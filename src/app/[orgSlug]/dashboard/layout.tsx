@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import Link from "next/link";
 import {
     Sparkles,
@@ -32,7 +32,7 @@ export default async function OrganizationDashboardLayout({
     }
 
     // Resolve slug to organization
-    const organization = await OrganizationService.getOrganizationBySlug(params.orgSlug);
+    const organization = await getOrganizationBySlug(params.orgSlug);
 
     if (!organization) redirect("/dashboard");
 

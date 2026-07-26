@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "UTSAV | Organization Transparency Platform",
@@ -19,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="antialiased">
-      <body className={`${inter.className} bg-[#F8FAFC]`}>
+    <html lang="en" className={`${inter.variable} antialiased`}>
+      <body className="bg-[#F8FAFC] font-sans">
         <SessionProvider>
           <Toaster position="top-center" expand={true} richColors />
           <Navbar />

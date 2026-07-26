@@ -1,6 +1,6 @@
 import { validateAccess } from "@/lib/access-control";
-import { OrganizationService } from "@/modules/core/organization.service";
-import { MemberService } from "@/modules/core/member.service";
+import { getOrganizationBySlug } from "@/modules/core/organization.service";
+import { getAllTasks, getMyTasks, getVolunteerWorkload } from "@/modules/tasks/task.service";
 import VolunteerListView from "@/components/dashboard/volunteers/VolunteerListView";
 import TaskBoard from "@/components/dashboard/volunteers/TaskBoard";
 import CreateTaskModal from "@/components/dashboard/volunteers/CreateTaskModal";
@@ -17,7 +17,7 @@ export default async function VolunteersPage({ params }: VolunteersPageProps) {
     const { orgSlug } = params;
 
     // 1. Resolve Organization & Permissions
-    const organization = await OrganizationService.getOrganizationBySlug(orgSlug);
+    const organization = await getOrganizationBySlug(orgSlug);
     if (!organization) throw new Error("Organization not found");
 
     const { member } = await validateAccess(organization.id);
@@ -26,10 +26,10 @@ export default async function VolunteersPage({ params }: VolunteersPageProps) {
     // 2. Data Fetching (Parallel)
     const [tasks, volunteers] = await Promise.all([
         isAdmin || member.role === OrganizationRole.TREASURER
-            ? MemberService.getAllTasks(organization.id)
-            : MemberService.getMyTasks(organization.id),
+            ? getAllTasks(organization.id)
+            : getMyTasks(organization.id),
         isAdmin || member.role === OrganizationRole.TREASURER
-            ? MemberService.getVolunteerWorkload(organization.id)
+            ? getVolunteerWorkload(organization.id)
             : Promise.resolve([]),
     ]);
 

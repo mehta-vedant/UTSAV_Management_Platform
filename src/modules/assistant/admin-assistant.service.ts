@@ -1,9 +1,9 @@
 import { ExpenseStatus, Prisma } from "@prisma/client";
 import { getTenantPrisma, requirePermission, validateAccess } from "@/lib/access-control";
-import { FinancialService } from "@/modules/finance/financial.service";
-import { ExpenseService } from "@/modules/finance/expense.service";
-import { DonationService } from "@/modules/finance/donation.service";
-import { OrganizationFinancialService } from "@/modules/festival/organization-financial.service";
+import { getOrganizationFinancialOverview, getRecentActivity } from "@/modules/finance/financial.service";
+import { getExpenseSummary } from "@/modules/finance/expense.service";
+import { getDonationSummary } from "@/modules/finance/donation.service";
+import { getOrganizationSummary } from "@/modules/festival/organization-financial.service";
 import { generateGeminiText } from "@/lib/gemini";
 
 export type AssistantIntent =
@@ -230,10 +230,10 @@ async function buildAssistantContext(organizationId: string, intent: AssistantIn
 }
 
 async function getFinancialOverviewContext(organizationId: string): Promise<AssistantContext> {
-    const overview = await FinancialService.getOrganizationFinancialOverview(organizationId);
+    const overview = await getOrganizationFinancialOverview(organizationId);
     return {
         intent: "FINANCIAL_OVERVIEW",
-        facts: overview,
+        facts: overview as unknown as Record<string, unknown>,
         cards: [
             moneyCard("Available Liquidity", overview.totalLiquidity),
             moneyCard("Approved Expenses", overview.totalExpenses),
@@ -245,7 +245,7 @@ async function getFinancialOverviewContext(organizationId: string): Promise<Assi
 }
 
 async function getExpenseBreakdownContext(organizationId: string): Promise<AssistantContext> {
-    const summary = await ExpenseService.getExpenseSummary(organizationId);
+    const summary = await getExpenseSummary(organizationId);
     const breakdown = summary.categoryBreakdown
         .map((item) => ({
             category: item.category,
@@ -277,7 +277,7 @@ async function getExpenseBreakdownContext(organizationId: string): Promise<Assis
 async function getDonationSummaryContext(organizationId: string): Promise<AssistantContext> {
     const tenantPrisma = getTenantPrisma(organizationId);
     const [summary, topDonations, recentDonations] = await Promise.all([
-        DonationService.getDonationSummary(organizationId),
+        getDonationSummary(organizationId),
         tenantPrisma.donation.findMany({
             where: { isArchived: false },
             orderBy: { amount: "desc" },
@@ -394,7 +394,7 @@ async function getPendingExpensesContext(organizationId: string): Promise<Assist
 }
 
 async function getEventFinancialsContext(organizationId: string): Promise<AssistantContext> {
-    const summary = await OrganizationFinancialService.getOrganizationSummary(organizationId);
+    const summary = await getOrganizationSummary(organizationId);
     const eventBreakdown = summary.eventBreakdown
         .map((event) => ({
             eventId: event.eventId,
@@ -425,7 +425,7 @@ async function getEventFinancialsContext(organizationId: string): Promise<Assist
 }
 
 async function getRecentActivityContext(organizationId: string): Promise<AssistantContext> {
-    const activity = await FinancialService.getRecentActivity(organizationId, 5);
+    const activity = await getRecentActivity(organizationId, 5);
     return {
         intent: "RECENT_ACTIVITY",
         facts: {

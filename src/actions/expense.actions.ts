@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { ExpenseService } from "@/modules/finance/expense.service";
+import { createExpense, approveExpense, rejectExpense, updateExpense, archiveExpense } from "@/modules/finance/expense.service";
 import { ExpenseCategory, ExpenseStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { actionFailure, actionSuccess } from "@/lib/action-response";
@@ -19,7 +19,7 @@ const CreateExpenseSchema = z.object({
 export async function createExpenseAction(data: z.infer<typeof CreateExpenseSchema>) {
     try {
         const validated = CreateExpenseSchema.parse(data);
-        await ExpenseService.createExpense(validated.organizationId, {
+        await createExpense(validated.organizationId, {
             ...validated,
             requestedAt: new Date(validated.requestedAt),
         });
@@ -34,7 +34,7 @@ export async function createExpenseAction(data: z.infer<typeof CreateExpenseSche
 
 export async function approveExpenseAction(organizationId: string, expenseId: string) {
     try {
-        await ExpenseService.approveExpense(organizationId, expenseId);
+        await approveExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         return actionSuccess();
     } catch (error: any) {
@@ -44,7 +44,7 @@ export async function approveExpenseAction(organizationId: string, expenseId: st
 
 export async function rejectExpenseAction(organizationId: string, expenseId: string) {
     try {
-        await ExpenseService.rejectExpense(organizationId, expenseId);
+        await rejectExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         return actionSuccess();
     } catch (error: any) {
@@ -65,7 +65,7 @@ export async function updateExpenseAction(data: z.infer<typeof UpdateExpenseSche
     try {
         const validated = UpdateExpenseSchema.parse(data);
         const { organizationId, expenseId, ...updateData } = validated;
-        await ExpenseService.updateExpense(organizationId, expenseId, updateData);
+        await updateExpense(organizationId, expenseId, updateData);
 
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/[orgSlug]/dashboard/events/[eventId]`, "layout");
@@ -77,7 +77,7 @@ export async function updateExpenseAction(data: z.infer<typeof UpdateExpenseSche
 
 export async function archiveExpenseAction(organizationId: string, expenseId: string) {
     try {
-        await ExpenseService.archiveExpense(organizationId, expenseId);
+        await archiveExpense(organizationId, expenseId);
         revalidatePath(`/[orgSlug]/dashboard/expenses`, "page");
         revalidatePath(`/[orgSlug]/dashboard/events/[eventId]`, "layout");
         return actionSuccess();

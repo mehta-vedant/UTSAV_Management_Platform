@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { MemberService, CreateTaskInput } from "@/modules/core/member.service";
+import { createTask, updateTask, updateTaskStatus, deleteTask, CreateTaskInput } from "@/modules/tasks/task.service";
 import { TaskStatus } from "@prisma/client";
 
 /**
@@ -9,7 +9,7 @@ import { TaskStatus } from "@prisma/client";
  */
 export async function createTaskAction(organizationId: string, orgSlug: string, input: CreateTaskInput) {
     try {
-        await MemberService.createTask(organizationId, input);
+        await createTask(organizationId, input);
         revalidatePath(`/${orgSlug}/dashboard/volunteers`);
         return { success: true };
     } catch (error: any) {
@@ -28,7 +28,7 @@ export async function updateTaskAction(
     input: Partial<CreateTaskInput>
 ) {
     try {
-        await MemberService.updateTask(organizationId, taskId, input);
+        await updateTask(organizationId, taskId, input);
         revalidatePath(`/${orgSlug}/dashboard/volunteers`);
         revalidatePath(`/${orgSlug}/dashboard/events/[eventId]`, "layout");
         return { success: true };
@@ -48,7 +48,7 @@ export async function updateTaskStatusAction(
     status: TaskStatus
 ) {
     try {
-        await MemberService.updateTaskStatus(organizationId, taskId, status);
+        await updateTaskStatus(organizationId, taskId, status);
         revalidatePath(`/${orgSlug}/dashboard/volunteers`);
         return { success: true };
     } catch (error: any) {
@@ -62,7 +62,7 @@ export async function updateTaskStatusAction(
  */
 export async function deleteTaskAction(organizationId: string, orgSlug: string, taskId: string) {
     try {
-        await MemberService.deleteTask(organizationId, taskId);
+        await deleteTask(organizationId, taskId);
         revalidatePath(`/${orgSlug}/dashboard/volunteers`);
         return { success: true };
     } catch (error: any) {

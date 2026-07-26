@@ -25,7 +25,7 @@ export function DashboardFilters({
     current,
 }: DashboardFiltersProps) {
     return (
-        <form className="grid gap-3 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_auto_auto_auto_auto_auto]">
+        <form className="grid gap-3 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-[minmax(220px,1fr)_repeat(5,minmax(0,auto))]">
             <label className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <Search className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
@@ -37,7 +37,7 @@ export function DashboardFilters({
             </label>
 
             {statusOptions.length > 0 && (
-                <select name="status" defaultValue={current?.status || ""} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600">
+                <select name="status" defaultValue={current?.status || ""} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600">
                     <option value="">All Statuses</option>
                     {statusOptions.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
@@ -46,7 +46,7 @@ export function DashboardFilters({
             )}
 
             {categoryOptions.length > 0 && (
-                <select name="category" defaultValue={current?.category || ""} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600">
+                <select name="category" defaultValue={current?.category || ""} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600">
                     <option value="">All Categories</option>
                     {categoryOptions.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
@@ -54,10 +54,10 @@ export function DashboardFilters({
                 </select>
             )}
 
-            <input name="from" type="date" defaultValue={dateInput(current?.dateFrom)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600" />
-            <input name="to" type="date" defaultValue={dateInput(current?.dateTo)} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600" />
+            <input name="from" type="date" defaultValue={dateInput(current?.dateFrom)} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600" />
+            <input name="to" type="date" defaultValue={dateInput(current?.dateTo)} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-600" />
 
-            <button className="rounded-2xl bg-slate-950 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-sm transition hover:bg-saffron-500">
+            <button className="w-full rounded-2xl bg-slate-950 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-sm transition hover:bg-saffron-500">
                 Filter
             </button>
         </form>

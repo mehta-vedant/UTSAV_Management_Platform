@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTSAV - Complete Interview Preparation Guide V2</title>
+<style>
+  :root {
+    --saffron: #FF6B2B;
+    --saffron-dark: #E55A1B;
+    --saffron-light: #FFF3ED;
+    --navy: #0F172A;
+    --slate-800: #1E293B;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748B;
+    --slate-400: #94A3B8;
+    --slate-300: #CBD5E1;
+    --slate-200: #E2E8F0;
+    --slate-100: #F1F5F9;
+    --slate-50: #F8FAFC;
+    --green: #10B981;
+    --green-light: #ECFDF5;
+    --blue: #3B82F6;
+    --blue-light: #EFF6FF;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --yellow: #F59E0B;
+    --yellow-light: #FFFBEB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--slate-50); color: var(--slate-800); line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--slate-800) 50%, #1a1a2e 100%); color: white; padding: 60px 40px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,107,43,0.1) 0%, transparent 50%); animation: pulse 8s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .hero h1 { font-size: 3rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; position: relative; }
+  .hero h1 span { color: var(--saffron); }
+  .hero .subtitle { font-size: 1.1rem; color: var(--slate-400); margin-top: 12px; position: relative; }
+  .hero .tagline { margin-top: 20px; font-size: 0.9rem; color: var(--saffron); position: relative; font-weight: 600; }
+  .nav-bar { background: white; border-bottom: 2px solid var(--slate-200); padding: 12px 20px; position: sticky; top: 0; z-index: 100; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .nav-bar a { text-decoration: none; color: var(--slate-600); font-size: 0.75rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav-bar a:hover { background: var(--saffron); color: white; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .section { margin-bottom: 50px; }
+  .section-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid var(--saffron); display: flex; align-items: center; gap: 10px; }
+  .section-title .num { background: var(--saffron); color: white; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .card { background: white; border-radius: 16px; padding: 28px; margin-bottom: 20px; border: 1px solid var(--slate-200); box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .card h3 { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+  .card p, .card li { font-size: 0.92rem; color: var(--slate-600); line-height: 1.7; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { margin-bottom: 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead th { background: var(--navy); color: white; padding: 12px 16px; text-align: left; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.78rem; }
+  thead th:first-child { border-radius: 10px 0 0 0; }
+  thead th:last-child { border-radius: 0 10px 0 0; }
+  tbody td { padding: 10px 16px; border-bottom: 1px solid var(--slate-200); color: var(--slate-700); }
+  tbody tr:hover { background: var(--saffron-light); }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .badge-saffron { background: var(--saffron-light); color: var(--saffron); }
+  .badge-green { background: var(--green-light); color: #059669; }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-yellow { background: var(--yellow-light); color: #D97706; }
+  .code-block { background: var(--navy); color: #E2E8F0; padding: 20px; border-radius: 12px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.82rem; line-height: 1.6; overflow-x: auto; margin: 12px 0; white-space: pre-wrap; }
+  .code-block .keyword { color: #C084FC; }
+  .code-block .string { color: #34D399; }
+  .code-block .comment { color: #64748B; font-style: italic; }
+  .code-block .func { color: #60A5FA; }
+  .code-block .type { color: #FBBF24; }
+  .stat-box { background: white; border-radius: 16px; padding: 24px; text-align: center; border: 1px solid var(--slate-200); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-box .stat-num { font-size: 2.2rem; font-weight: 900; color: var(--saffron); }
+  .stat-box .stat-label { font-size: 0.78rem; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; font-weight: 600; }
+  .callout { padding: 18px 22px; border-radius: 12px; margin: 16px 0; font-size: 0.9rem; border-left: 4px solid; }
+  .callout-saffron { background: var(--saffron-light); border-color: var(--saffron); }
+  .callout-green { background: var(--green-light); border-color: var(--green); }
+  .callout-blue { background: var(--blue-light); border-color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-color: var(--purple); }
+  .callout-red { background: var(--red-light); border-color: var(--red); }
+  .callout strong { color: var(--navy); }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 16px 0; font-size: 0.85rem; }
+  .flow-step { background: var(--slate-100); border: 2px solid var(--slate-300); padding: 8px 16px; border-radius: 10px; font-weight: 600; color: var(--slate-700); white-space: nowrap; }
+  .flow-arrow { color: var(--saffron); font-weight: 900; font-size: 1.1rem; }
+  .perm-matrix td:not(:first-child) { text-align: center; font-size: 1rem; }
+  .arch-diagram { background: var(--slate-100); border: 2px solid var(--slate-200); border-radius: 16px; padding: 30px; text-align: left; font-family: 'Cascadia Code', monospace; font-size: 0.8rem; line-height: 1.8; color: var(--slate-700); overflow-x: auto; white-space: pre; }
+  .divider { border: none; border-top: 2px dashed var(--slate-200); margin: 30px 0; }
+  .explain-box { background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 16px 20px; margin: 12px 0; font-size: 0.88rem; }
+  .explain-box strong { color: #92400E; }
+  .explain-box::before { content: "LEARNING: "; font-weight: 900; color: #D97706; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .decision-box { background: #F0F9FF; border: 2px solid #BAE6FD; border-radius: 12px; padding: 16px 20px; margin: 12px 0; font-size: 0.88rem; }
+  .decision-box strong { color: #0C4A6E; }
+  .decision-box::before { content: "WHY THIS DECISION: "; font-weight: 900; color: #0284C7; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .qa-card { border-left: 4px solid var(--saffron); }
+  .qa-card h3 { color: var(--saffron); }
+  .phase-card { border-left: 4px solid; position: relative; padding-left: 32px; }
+  .phase-card::before { content: attr(data-phase); position: absolute; left: -1px; top: 0; width: 32px; height: 100%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 900; border-radius: 16px 0 0 16px; writing-mode: vertical-lr; text-orientation: mixed; letter-spacing: 0.1em; }
+  .phase-card.phase-1 { border-color: var(--blue); }
+  .phase-card.phase-2 { border-color: var(--saffron); }
+  .phase-card.phase-3 { border-color: var(--green); }
+  .phase-card.phase-4 { border-color: var(--purple); }
+  .phase-card.phase-5 { border-color: var(--yellow); }
+  .phase-card.phase-6 { border-color: var(--red); }
+  .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  .before-after > div { padding: 16px; }
+  .before-after .before-col { background: #FEF2F2; border-right: 2px solid var(--slate-200); }
+  .before-after .after-col { background: #ECFDF5; }
+  .before-after h4 { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .before-after .before-col h4 { color: var(--red); }
+  .before-after .after-col h4 { color: var(--green); }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .metric-card { background: white; border-radius: 16px; padding: 24px; text-align: center; border: 2px solid var(--slate-200); }
+  .metric-card .metric-value { font-size: 2.5rem; font-weight: 900; }
+  .metric-card .metric-label { font-size: 0.78rem; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; font-weight: 600; }
+  @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } .container { padding: 20px 14px; } .card { padding: 20px; } table { font-size: 0.8rem; } .metric-grid { grid-template-columns: 1fr 1fr; } .before-after { grid-template-columns: 1fr; } .before-after .before-col { border-right: none; border-bottom: 2px solid var(--slate-200); } }
+  @media print { .nav-bar { display: none; } .hero { padding: 30px; } .card:hover { transform: none; box-shadow: none; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>UTSAV <span>Interview Prep</span></h1>
+  <div class="subtitle">Multi-Tenant Governance Platform for Indian Cultural Festivals</div>
+  <div class="tagline">Built by Vedant Mehta &bull; Production-Grade Full-Stack Application &bull; 6 Phases of Architectural Refactoring</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#overview">Overview</a>
+  <a href="#concepts">Key Concepts</a>
+  <a href="#stack">Tech Stack</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#refactoring">Refactoring</a>
+  <a href="#database">Database</a>
+  <a href="#auth">Auth</a>
+  <a href="#multitenancy">Multi-Tenancy</a>
+  <a href="#rbac">RBAC</a>
+  <a href="#finance">Finance</a>
+  <a href="#ai">AI</a>
+  <a href="#code-examples">Code Examples</a>
+  <a href="#decisions">Design Decisions</a>
+  <a href="#interview">Interview Q&A</a>
+  <a href="#metrics">Metrics</a>
+</div>
+
+<div class="container">
+
+<!-- ==================== SECTION 1: OVERVIEW ==================== -->
+<div class="section" id="overview">
+  <div class="section-title"><span class="num">1</span> Project Overview</div>
+  <div class="card">
+    <h3>What is UTSAV?</h3>
+    <p><strong>UTSAV</strong> is a <strong>production-grade, multi-tenant web application</strong> built to help organizations manage large-scale cultural events like Ganeshotsav festivals and community clubs. Think of it as a specialized management tool that handles:</p>
+    <ul style="margin-top:12px;">
+      <li><strong>Money tracking</strong> - Who donated how much, what was spent where, approval workflows for expenses</li>
+      <li><strong>Event management</strong> - Schedule ceremonies, assign team members, track registrations</li>
+      <li><strong>Volunteer coordination</strong> - Create tasks, assign them, track completion</li>
+      <li><strong>Public transparency</strong> - Let the public see how funds are used (without logging in)</li>
+      <li><strong>AI-powered insights</strong> - Ask questions like "How much have we spent on decoration?" in plain English</li>
+    </ul>
+    <p style="margin-top:12px;">The key word is <strong>"multi-tenant"</strong> - one codebase serves hundreds of different organizations, and each organization's data is completely isolated from others. After <strong>6 phases of refactoring</strong>, the codebase is clean, modular, and interview-ready.</p>
+  </div>
+
+  <div class="grid-4">
+    <div class="stat-box"><div class="stat-num">13</div><div class="stat-label">Database Tables</div></div>
+    <div class="stat-box"><div class="stat-num">15+</div><div class="stat-label">Service Modules</div></div>
+    <div class="stat-box"><div class="stat-num">7</div><div class="stat-label">Action Files</div></div>
+    <div class="stat-box"><div class="stat-num">6</div><div class="stat-label">Architectural Patterns</div></div>
+  </div>
+
+  <div class="grid-4" style="margin-top:16px;">
+    <div class="stat-box"><div class="stat-num">0</div><div class="stat-label">TypeScript Errors</div></div>
+    <div class="stat-box"><div class="stat-num">25</div><div class="stat-label">Passing Tests</div></div>
+    <div class="stat-box"><div class="stat-num">12</div><div class="stat-label">Granular Permissions</div></div>
+    <div class="stat-box"><div class="stat-num">4</div><div class="stat-label">RBAC Roles</div></div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 2: KEY CONCEPTS ==================== -->
+<div class="section" id="concepts">
+  <div class="section-title"><span class="num">2</span> Key Concepts (Learn Before Interview)</div>
+
+  <div class="card">
+    <h3>What is an ORM? (Object-Relational Mapper)</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> An ORM lets you write code like <code>prisma.donation.findMany()</code> instead of writing raw SQL like <code>SELECT * FROM "Donation" WHERE "organizationId" = 'abc123'</code>. It maps your code's objects/tables to actual database tables. You define your schema in code, and the ORM generates the SQL for you.
+    </div>
+    <p style="margin-top:12px;"><strong>Prisma</strong> is the specific ORM used in UTSAV. It has 3 parts:</p>
+    <ol>
+      <li><strong>Prisma Schema</strong> (<code>prisma/schema.prisma</code>) - A file where you define all your database tables, their fields, and relationships. This is your "database blueprint."</li>
+      <li><strong>Prisma Client</strong> - Auto-generated TypeScript code from the schema. You use it to talk to the database: <code>prisma.user.findMany()</code>, <code>prisma.donation.create()</code>, etc.</li>
+      <li><strong>Prisma Migrations</strong> - Commands to sync your schema changes to the actual database. Run <code>prisma db push</code> and Prisma alters the real PostgreSQL tables to match your schema.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>What are Server Components vs Client Components?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> In Next.js 14, React components run on the server by default (Server Components). They can directly access databases, read files, and do heavy work WITHOUT sending JavaScript to the browser. Only add <code>"use client"</code> at the top of a file if you need interactivity (clicks, forms, state, animations). This means most of UTSAV's pages send ZERO JavaScript to the browser - they just send finished HTML.
+    </div>
+    <table style="margin-top:16px;">
+      <thead><tr><th>Server Component (default)</th><th>Client Component ("use client")</th></tr></thead>
+      <tbody>
+        <tr><td>Runs on the server only</td><td>Runs in the browser</td></tr>
+        <tr><td>Can directly call database, services</td><td>Cannot directly access DB</td></tr>
+        <tr><td>No useState, useEffect, onClick</td><td>Full React hooks support</td></tr>
+        <tr><td>Sends HTML to browser (small bundle)</td><td>Sends JavaScript to browser</td></tr>
+        <tr><td>Used for: Dashboards, data tables, public pages</td><td>Used for: Forms, modals, animated landing page</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>What are Server Actions?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> Server Actions are functions that run on the server, called directly from client components. Instead of creating a separate API endpoint (like <code>/api/donations</code>), you write a function with <code>"use server"</code> at the top, and the client can call it like a regular function. Next.js handles the HTTP behind the scenes. In V2, all actions use the <code>withAction</code> wrapper for consistent error handling.
+    </div>
+    <div class="code-block">
+<span class="comment">// Example: A Server Action in UTSAV V2</span>
+<span class="string">"use server"</span>
+
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(data: FormData) {
+  <span class="keyword">return</span> <span class="func">withActionNoReturn</span>(<span class="keyword">async</span> () =&gt; {
+    <span class="comment">// 1. Validate input with Zod</span>
+    <span class="comment">// 2. Call service function (plain export)</span>
+    <span class="comment">// 3. No try/catch needed - withAction handles errors</span>
+  }, { paths: [{ path: <span class="string">"/[orgSlug]/dashboard/donations"</span> }] });
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is JWT (JSON Web Token)?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> JWT is a way to keep users logged in. When you log in, the server creates a small encrypted token (like a digital ID card) and stores it in your browser's cookie. Every time you make a request, the browser sends this token back. The server decrypts it to know who you are WITHOUT looking up the database every time. It's "stateless" - the server doesn't need to remember your session.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is Multi-Tenancy?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> Multi-tenancy means one application instance (one codebase, one database) serves multiple organizations ("tenants"). Think of it like Gmail - one Google servers handle millions of different users' emails, but each person's data is isolated. In UTSAV, the same app serves Festival A, Festival B, and Club C, but none can see each other's data.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is RBAC (Role-Based Access Control)?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> RBAC means different users get different permissions based on their role. In V2, this is permission-based (e.g., "finance:read", "members:manage") with 12 granular permissions across 5 resource types. An ADMIN has all 17 permissions, a TREASURER has 9, a COMMITTEE_MEMBER has 9, and a VOLUNTEER has only 3.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: TECH STACK ==================== -->
+<div class="section" id="stack">
+  <div class="section-title"><span class="num">3</span> Technology Stack</div>
+  <div class="card">
+    <h3>Core Technologies</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Technology</th><th>What It Does</th><th>Why This Choice?</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">Framework</span></td><td>Next.js 14 (App Router)</td><td>Full-stack React framework with file-based routing</td><td>Server Components, Server Actions, built-in middleware, best Vercel deployment</td></tr>
+        <tr><td><span class="badge badge-blue">Language</span></td><td>TypeScript</td><td>JavaScript with type checking</td><td>Catches bugs at compile time, better IDE autocomplete, zero TS errors in V2</td></tr>
+        <tr><td><span class="badge badge-saffron">UI</span></td><td>React 18</td><td>Component-based UI library</td><td>Server Components support, massive ecosystem, component reusability</td></tr>
+        <tr><td><span class="badge badge-green">Database</span></td><td>PostgreSQL</td><td>Relational database</td><td>ACID compliance, JSON support, mature, great for multi-tenant with complex relations</td></tr>
+        <tr><td><span class="badge badge-green">ORM</span></td><td>Prisma 5.10</td><td>Type-safe database client</td><td>Auto-generated types, migrations, $extends for multi-tenancy, plain function services</td></tr>
+        <tr><td><span class="badge badge-purple">Auth</span></td><td>NextAuth.js 4.24</td><td>Authentication library</td><td>JWT strategy, Prisma adapter, Credentials provider, Next.js integration</td></tr>
+        <tr><td><span class="badge badge-red">Styling</span></td><td>Tailwind CSS + shadcn/ui</td><td>Utility CSS + pre-built components</td><td>Fast styling, consistent design system, accessible components, New York variant</td></tr>
+        <tr><td><span class="badge badge-yellow">AI</span></td><td>Google Gemini 2.5 Flash</td><td>AI language model</td><td>Fast inference, good at code/data, generous free tier, easy API</td></tr>
+        <tr><td><span class="badge badge-blue">Email</span></td><td>Resend</td><td>Email delivery service</td><td>Simple API, reliable delivery, React email support</td></tr>
+        <tr><td><span class="badge badge-green">Validation</span></td><td>Zod + React Hook Form</td><td>Schema validation + form management</td><td>Type inference, composable schemas, great DX with TypeScript</td></tr>
+        <tr><td><span class="badge badge-purple">Animation</span></td><td>Framer Motion</td><td>Animation library</td><td>Declarative API, layout animations, gesture support</td></tr>
+        <tr><td><span class="badge badge-red">Testing</span></td><td>Vitest</td><td>Test runner</td><td>Vite-native speed, Jest-compatible, 25/25 tests passing</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Why Prisma over Raw SQL or other ORMs?</h3>
+    <div class="decision-box">
+      We chose Prisma because: (1) <strong>Type safety</strong> - Every query result is fully typed, so your IDE catches errors before runtime. (2) <strong>Schema as code</strong> - The database schema lives in a single file (<code>schema.prisma</code>), making it easy to review and version control. (3) <strong>Migrations</strong> - <code>prisma db push</code> syncs schema changes to the DB automatically. (4) <strong>$extends</strong> - Prisma's client extension API enabled the multi-tenancy pattern (auto-injecting organizationId into queries). (5) <strong>Relations</strong> - Easy <code>include</code>/<code>select</code> for nested queries without JOINs. (6) <strong>Works with plain functions</strong> - After refactoring, services are tree-shakeable exports, not static classes.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: ARCHITECTURE ==================== -->
+<div class="section" id="architecture">
+  <div class="section-title"><span class="num">4</span> System Architecture</div>
+
+  <div class="card">
+    <h3>High-Level Architecture (V2 - Post Refactoring)</h3>
+    <div class="arch-diagram">
+Browser (User Interface)
+  |
+  |-- Landing Page (Client Component, Framer Motion animations)
+  |-- Login/Signup (Client Component, React Hook Form)
+  |-- Dashboard Pages (Server Components - zero JS sent to browser)
+  |
+  v
+Next.js Server (Node.js Runtime)
+  |
+  |-- Middleware (JWT token check on protected routes)
+  |     Protects: /dashboard/* and /[slug]/dashboard/*
+  |
+  |-- NextAuth.js (Credentials provider + JWT strategy)
+  |     Login -> bcrypt.compare() -> Create JWT -> Set cookie
+  |
+  |-- Server Actions ("use server" functions)
+  |     withAction(() => handler(), { paths: [...] })
+  |     Eliminates try/catch boilerplate, catches errors, revalidates cache
+  |
+  |-- resolveOrgContext() helper
+  |     Single call replaces org resolution + validateAccess in all 9 pages
+  |     Returns { organization, member, isAdmin, isFestival }
+  |
+  |-- Service Layer (Plain Functions - NOT classes)
+  |     core/     -> getOrganizationBySlug(), getUserOrganizations(), record()
+  |     finance/  -> createDonation(), approveExpense(), getDonationSummary()
+  |     events/   -> createEvent(), assignMembers(), getEventWithDetails()
+  |     festival/ -> bhog CRUD, public transparency, financial analytics
+  |     tasks/    -> createTask(), updateTaskStatus(), getVolunteerWorkload()
+  |     assistant/ -> classifyIntent(), askAssistant()
+  |
+  |-- Access Control Layer
+  |     requirePermission() -> Single function, permission-based (12 permissions)
+  |     hasPermission() -> Synchronous role-permission lookup
+  |     getTenantPrisma() -> Auto-isolated database client via $extends
+  |
+  |-- Prisma ORM (Type-safe database queries)
+  |     Singleton pattern (one instance, hot-reload safe)
+  |     $extends for automatic multi-tenancy
+  |
+  v
+PostgreSQL Database
+  |-- User, Organization, OrganizationMember
+  |-- Donation, Expense, Event, BhogItem
+  |-- VolunteerTask, EventAssignment, EventRegistration
+  |-- OrganizationInvitation, AuditLog
+
+External Services:
+  -> Resend (invitation emails)
+  -> Google Gemini (AI assistant questions)
+  -> Vercel (hosting + deployment)
+  -> Neon/Railway (PostgreSQL hosting)
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How a Typical Request Flows (Step by Step)</h3>
+    <p>Let's trace what happens when an admin approves an expense (V2 flow):</p>
+    <div class="flow" style="margin-top:12px;">
+      <span class="flow-step">1. Admin clicks "Approve"<br><small>Browser sends request</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">2. Middleware runs<br><small>Checks JWT cookie exists</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">3. Server Action<br><small>expense.actions.ts<br>wraps with withAction()</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step">4. Zod validates input<br><small>expenseId is valid?</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">5. requirePermission()<br><small>"finance:approve" for this role?</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">6. approveExpense()<br><small>Plain function call</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step">7. TenantPrisma.updateMany()<br><small>WHERE status = 'PENDING' (atomic)</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">8. recordAudit()<br><small>Before/after snapshots saved</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">9. withAction revalidates<br><small>Cache busted, UI refreshes</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step" style="margin-left:180px;">10. ActionResult returned<br><small>{ success: true, data: undefined }</small></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>File Structure (V2 - Refactored)</h3>
+    <div class="code-block">
+UTSAV/
+├── prisma/
+│   ├── schema.prisma       <span class="comment">// Database blueprint (all tables, relations, enums)</span>
+│   └── seed.ts             <span class="comment">// Fills database with test data</span>
+│
+├── src/
+│   ├── actions/            <span class="comment">// Server Actions (all use withAction wrapper)</span>
+│   │   ├── auth.actions.ts          <span class="comment">// User registration</span>
+│   │   ├── donation.actions.ts      <span class="comment">// Record/update/archive donations</span>
+│   │   ├── expense.actions.ts       <span class="comment">// Create/approve/reject expenses</span>
+│   │   ├── event.actions.ts         <span class="comment">// CRUD + team assignments</span>
+│   │   ├── member.actions.ts        <span class="comment">// Invite/role-change/archive members</span>
+│   │   ├── volunteer.actions.ts     <span class="comment">// Task CRUD + status updates</span>
+│   │   ├── organization.actions.ts  <span class="comment">// Create/update/delete orgs</span>
+│   │   ├── bhog.actions.ts          <span class="comment">// Bhog moderation</span>
+│   │   ├── public-bhog.actions.ts   <span class="comment">// Public bhog sponsorship (no auth)</span>
+│   │   ├── registration.actions.ts  <span class="comment">// Event attendance</span>
+│   │   └── admin-assistant.actions.ts <span class="comment">// AI assistant</span>
+│   │
+│   ├── modules/            <span class="comment">// Business logic (PLAIN FUNCTIONS, not classes)</span>
+│   │   ├── core/           <span class="comment">// organization, member, invitation, audit, overview</span>
+│   │   ├── finance/        <span class="comment">// donation, expense, financial analytics</span>
+│   │   ├── events/         <span class="comment">// event CRUD + team management</span>
+│   │   ├── festival/       <span class="comment">// bhog, public pages, transparency</span>
+│   │   ├── tasks/          <span class="comment">// task.service.ts (extracted from member.service)</span>
+│   │   └── assistant/      <span class="comment">// AI intent classification</span>
+│   │
+│   ├── lib/                <span class="comment">// Infrastructure / shared utilities</span>
+│   │   ├── access-control.ts     <span class="comment">// requirePermission() + getTenantPrisma()</span>
+│   │   ├── action.ts             <span class="comment">// withAction() wrapper (NEW in V2)</span>
+│   │   ├── action-response.ts    <span class="comment">// ActionResult&lt;T&gt; unified type</span>
+│   │   ├── org-context.ts        <span class="comment">// resolveOrgContext() helper (NEW in V2)</span>
+│   │   ├── auth.ts               <span class="comment">// NextAuth config</span>
+│   │   ├── prisma.ts             <span class="comment">// Database client singleton</span>
+│   │   ├── errors.ts             <span class="comment">// Error class hierarchy</span>
+│   │   ├── pagination.ts         <span class="comment">// Page size, URL parsing</span>
+│   │   ├── gemini.ts             <span class="comment">// Google Gemini API wrapper</span>
+│   │   ├── email.ts              <span class="comment">// Resend email wrapper</span>
+│   │   ├── prasad-windows.ts     <span class="comment">// Time window calculations</span>
+│   │   ├── organization-mode.ts  <span class="comment">// Festival vs Club type guards</span>
+│   │   └── date-time.ts          <span class="comment">// Date formatting helpers</span>
+│   │
+│   ├── components/         <span class="comment">// Reusable UI components</span>
+│   │   └── ui/             <span class="comment">// Shadcn/ui primitives</span>
+│   │
+│   ├── app/                <span class="comment">// Pages (all use resolveOrgContext)</span>
+│   │   ├── page.tsx                <span class="comment">// Landing page</span>
+│   │   ├── layout.tsx              <span class="comment">// Root layout</span>
+│   │   ├── login/page.tsx          <span class="comment">// Login form</span>
+│   │   ├── signup/page.tsx         <span class="comment">// Registration form</span>
+│   │   ├── dashboard/page.tsx      <span class="comment">// User's organizations list</span>
+│   │   ├── [orgSlug]/page.tsx      <span class="comment">// Public org page (no auth)</span>
+│   │   ├── [orgSlug]/transparency/ <span class="comment">// Public audit trail</span>
+│   │   └── [orgSlug]/dashboard/    <span class="comment">// 9 private dashboard pages</span>
+│   │
+│   ├── middleware.ts       <span class="comment">// Route protection (JWT check)</span>
+│   └── types/
+│       └── next-auth.d.ts  <span class="comment">// TypeScript type augmentation for session</span>
+│
+├── *.test.ts               <span class="comment">// 10 test files, 25 passing tests</span>
+├── package.json
+├── tailwind.config.js
+├── tsconfig.json           <span class="comment">// Zero TypeScript errors</span>
+└── vitest.config.ts
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: REFACTORING PHASES ==================== -->
+<div class="section" id="refactoring">
+  <div class="section-title"><span class="num">5</span> The 6 Refactoring Phases</div>
+
+  <div class="card">
+    <h3>Why Refactor a Working Application?</h3>
+    <div class="decision-box">
+      The original codebase worked but had architectural debt: static class services created unnecessary coupling, every action had repetitive try/catch blocks, dashboard pages had 15+ lines of duplicated context resolution, and there were TypeScript errors. Six focused phases addressed each concern systematically - making the code more testable, more maintainable, and interview-ready.
+    </div>
+  </div>
+
+  <div class="card phase-card phase-1" data-phase="PHASE 1">
+    <h3>Phase 1: Foundation - Unified Types & Authorization</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li><strong>ActionResult&lt;T&gt;</strong> - Created a unified response type in <code>src/lib/action-response.ts</code>. Every server action now returns either <code>{ success: true, data: T }</code> or <code>{ success: false, error: string, code?: string }</code>.</li>
+      <li><strong>requirePermission()</strong> - Replaced the old 3-tier <code>validateAccess()</code> + role-list matching pattern with a single permission-based function in <code>src/lib/access-control.ts</code>. 12 granular permissions across 5 resource types.</li>
+      <li><strong>TenantContext</strong> - Established the pattern for consistent org resolution across all pages.</li>
+    </ul>
+    <div class="callout callout-blue" style="margin-top:12px;">
+      <strong>Impact:</strong> Created the type-safe foundation that all subsequent refactoring built upon. Client components can now pattern-match on <code>result.success</code> for type-safe error handling.
+    </div>
+  </div>
+
+  <div class="card phase-card phase-2" data-phase="PHASE 2">
+    <h3>Phase 2: Services → Plain Functions</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>All <strong>15+ service files</strong> converted from <code>class XService { static async method() {} }</code> to <code>export async function method() {}</code>.</li>
+      <li><strong>53 files changed</strong> in this phase alone (the largest single refactoring step).</li>
+      <li>All imports updated from <code>DonationService.createDonation()</code> to <code>createDonation()</code>.</li>
+    </ul>
+    <div class="before-after" style="margin-top:12px;">
+      <div class="before-col">
+        <h4>Before (Class)</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;font-size:0.78rem;">
+<span class="comment">// donation.service.ts</span>
+<span class="keyword">export class</span> <span class="type">DonationService</span> {
+  <span class="keyword">static async</span> <span class="func">createDonation</span>(
+    organizationId: <span class="type">string</span>,
+    data: <span class="type">CreateDonationInput</span>
+  ) {
+    <span class="keyword">try</span> {
+      <span class="comment">// business logic...</span>
+    } <span class="keyword">catch</span> (error) {
+      <span class="keyword">throw</span> error;
+    }
+  }
+}
+
+<span class="comment">// Usage:</span>
+<span class="keyword">await</span> DonationService.<span class="func">createDonation</span>(id, data);
+        </div>
+      </div>
+      <div class="after-col">
+        <h4>After (Plain Function)</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;font-size:0.78rem;">
+<span class="comment">// donation.service.ts</span>
+<span class="keyword">export async function</span> <span class="func">createDonation</span>(
+  organizationId: <span class="type">string</span>,
+  data: <span class="type">CreateDonationInput</span>
+) {
+  <span class="comment">// business logic...</span>
+}
+
+<span class="comment">// Usage:</span>
+<span class="keyword">await</span> <span class="func">createDonation</span>(id, data);
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-green" style="margin-top:12px;">
+      <strong>Why:</strong> Plain functions are tree-shakeable (unused exports get eliminated by bundlers), have no <code>this</code> binding issues, are easier to mock in tests, and have a simpler mental model. Static classes provide no runtime benefit in TypeScript.
+    </div>
+  </div>
+
+  <div class="card phase-card phase-3" data-phase="PHASE 3">
+    <h3>Phase 3: withAction Wrapper - Eliminate Try/Catch</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Created <code>withAction()</code> and <code>withActionNoReturn()</code> in <code>src/lib/action.ts</code>.</li>
+      <li>Every action file now wraps handlers in <code>withAction(() => handler(), { paths: [...] })</code>.</li>
+      <li>Eliminated <strong>all try/catch/revalidatePath boilerplate</strong> from 11 action files.</li>
+      <li>Reduced action file size by <strong>~40%</strong>.</li>
+    </ul>
+    <div class="code-block">
+<span class="comment">// src/lib/action.ts - The withAction wrapper</span>
+<span class="keyword">export async function</span> <span class="func">withActionNoReturn</span>(
+    handler: () =&gt; Promise&lt;<span class="keyword">void</span>&gt;,
+    options: { paths?: RevalidatePath[] } = {}
+): Promise&lt;<span class="type">ActionResult</span>&lt;<span class="keyword">undefined</span>&gt;&gt; {
+    <span class="keyword">try</span> {
+        <span class="keyword">await</span> handler();
+        <span class="keyword">if</span> (options.paths) {
+            <span class="keyword">for</span> (<span class="keyword">const</span> p <span class="keyword">of</span> options.paths) {
+                <span class="func">revalidatePath</span>(p.path, p.type);
+            }
+        }
+        <span class="keyword">return</span> <span class="func">actionSuccess</span>();
+    } <span class="keyword">catch</span> (error) {
+        <span class="keyword">return</span> <span class="func">actionFailure</span>(error);
+    }
+}
+    </div>
+    <div class="callout callout-green" style="margin-top:12px;">
+      <strong>Why:</strong> Every action before had the same 10-line try/catch pattern. withAction centralizes error handling, ensures every action returns ActionResult&lt;T&gt;, and automatically handles cache revalidation. Single responsibility: actions only define WHAT to do, withAction handles HOW to respond.
+    </div>
+  </div>
+
+  <div class="card phase-card phase-4" data-phase="PHASE 4">
+    <h3>Phase 4: resolveOrgContext - Page Boilerplate Eliminated</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Created <code>resolveOrgContext(orgSlug)</code> in <code>src/lib/org-context.ts</code>.</li>
+      <li>Single call replaces org resolution + validateAccess + isAdmin derivation in all 9 dashboard pages.</li>
+      <li>Net change: <strong>39 lines added, 73 removed (net -34 lines)</strong> across all pages.</li>
+    </ul>
+    <div class="before-after" style="margin-top:12px;">
+      <div class="before-col">
+        <h4>Before (Each Dashboard Page)</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;font-size:0.78rem;">
+<span class="comment">// Repeated in 9 pages</span>
+<span class="keyword">const</span> org = <span class="keyword">await</span> <span class="func">getOrganizationBySlug</span>(params.orgSlug);
+<span class="keyword">if</span> (!org) <span class="keyword">return</span> <span class="func">notFound</span>();
+
+<span class="keyword">const</span> { user, member } = <span class="keyword">await</span> <span class="func">validateAccess</span>(
+  org.id
+);
+<span class="keyword">const</span> isAdmin =
+  member.role === <span class="type">OrganizationRole</span>.ADMIN ||
+  member.role === <span class="type">OrganizationRole</span>.COMMITTEE_MEMBER;
+<span class="keyword">const</span> isFestival =
+  org.type === <span class="string">"FESTIVAL"</span>;
+        </div>
+      </div>
+      <div class="after-col">
+        <h4>After (Single Line)</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;font-size:0.78rem;">
+<span class="keyword">const</span> { organization, member, isAdmin, isFestival } =
+  <span class="keyword">await</span> <span class="func">resolveOrgContext</span>(params.orgSlug);
+
+<span class="comment">// That's it. org resolution, auth check,</span>
+<span class="comment">// membership validation, and role derivation</span>
+<span class="comment">// all in one function call.</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout-purple" style="margin-top:12px;">
+      <strong>Why:</strong> Every dashboard page had 8-12 lines of identical boilerplate. resolveOrgContext encapsulates the entire "who am I and what org am I in?" flow in one call. If the org doesn't exist, it throws. If the user isn't a member, it throws. The page only gets to its rendering logic if everything is valid.
+    </div>
+  </div>
+
+  <div class="card phase-card phase-5" data-phase="PHASE 5">
+    <h3>Phase 5: Dead Code Cleanup & Zero TS Errors</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li><strong>4 files deleted</strong> - unused utilities, deprecated re-exports, orphaned test helpers.</li>
+      <li>All <code>validateAccess()</code> usages in service files migrated to <code>requirePermission()</code> where appropriate.</li>
+      <li><strong>Zero TypeScript errors</strong> across the entire codebase (verified with <code>npx tsc --noEmit</code>).</li>
+      <li>Fixed all <code>any</code> types, missing return types, and implicit <code>undefined</code> issues.</li>
+    </ul>
+    <div class="callout callout-red" style="margin-top:12px;">
+      <strong>Impact:</strong> A clean TypeScript build means the compiler validates your entire codebase at once. Zero errors = zero type-safety holes. This is critical for interview confidence - you can say "our entire codebase compiles with zero errors."
+    </div>
+  </div>
+
+  <div class="card phase-card phase-6" data-phase="PHASE 6">
+    <h3>Phase 6: Tests Passing & Interview-Ready</h3>
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li><strong>25/25 tests passing</strong> across 10 test files (verified with <code>npx vitest run</code>).</li>
+      <li>Tests updated to match new plain function exports (no more mocking class methods).</li>
+      <li>Added tests for the new architectural patterns (withAction, requirePermission, etc.).</li>
+      <li>Interview preparation materials updated (V2 of this document).</li>
+    </ul>
+    <div class="callout callout-green" style="margin-top:12px;">
+      <strong>The result:</strong> A codebase where every architectural decision is intentional, every pattern is consistent, and the code compiles and tests cleanly. This is what "interview-ready" means.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6: DATABASE ==================== -->
+<div class="section" id="database">
+  <div class="section-title"><span class="num">6</span> Database Schema</div>
+
+  <div class="card">
+    <h3>Entity Relationships</h3>
+    <div class="arch-diagram">
+User (1) ──────── (N) OrganizationMember ──────── (N:1) Organization (1)
+                                                              │
+                    ┌─────────────────────────────────────────┤
+                    │              │              │            │
+              (N:1) Donation  (N:1) Expense  (N:1) Event  (N:1) BhogItem
+                    │              │            │
+                    │              │         (1:N)── EventAssignment ── (N:1) Member
+                    │              │         (1:N)── EventRegistration
+                    │              │         (1:N)── VolunteerTask ── (N:1) Member
+                    │              │
+                    │              └── (N:1) Member (addedBy) + (N:1) Member (approvedBy)
+                    │
+                    └── (N:1) Member (addedBy)
+
+Organization (1) ──── (N) AuditLog ──── (N:1) Member (actor)
+Organization (1) ──── (N) OrganizationInvitation ──── (N:1) Member (invitedBy)
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>All 12 Database Models</h3>
+    <table>
+      <thead><tr><th>Model</th><th>Purpose</th><th>Key Fields</th><th>Relations</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">User</span></td><td>Global user identity (exists across all orgs)</td><td>id, email (unique), phone (unique), name, password (bcrypt)</td><td>Has many OrganizationMember</td></tr>
+        <tr><td><span class="badge badge-saffron">Organization</span></td><td>A tenant (festival or club)</td><td>name, slug (unique), type, status, openingBalance, budgetTarget, prasad times, timezone</td><td>Has many: members, donations, expenses, events, bhogItems, tasks, invitations, auditLogs</td></tr>
+        <tr><td><span class="badge badge-green">OrganizationMember</span></td><td>Membership record (who belongs to which org)</td><td>userId+orgId (unique pair), email+orgId (unique pair), role, isArchived</td><td>Belongs to User & Organization</td></tr>
+        <tr><td><span class="badge badge-purple">Donation</span></td><td>Money received from a donor</td><td>donorName, amount (Decimal 12,2), category, receivedAt, isArchived</td><td>Belongs to Organization, addedBy (Member), optional Event</td></tr>
+        <tr><td><span class="badge badge-red">Expense</span></td><td>Money spent (with approval workflow)</td><td>title, amount, category (13 options), status (PENDING/APPROVED/REJECTED)</td><td>Belongs to Organization, addedBy, approvedBy, optional Event</td></tr>
+        <tr><td><span class="badge badge-saffron">Event</span></td><td>A scheduled ceremony or program</td><td>title, startTime, endTime, location, budgetTarget, status</td><td>Has many: assignments, registrations, expenses, donations, tasks</td></tr>
+        <tr><td><span class="badge badge-blue">BhogItem</span></td><td>A food/prasad offering</td><td>name, quantity, status, offeringDate, offeringWindow (MORNING/EVENING)</td><td>Belongs to Organization</td></tr>
+        <tr><td><span class="badge badge-green">VolunteerTask</span></td><td>A task assigned to a volunteer</td><td>title, status (PENDING/IN_PROGRESS/COMPLETED), priority, dueDate</td><td>Belongs to Organization, assignedTo (Member), optional Event</td></tr>
+        <tr><td><span class="badge badge-purple">EventAssignment</span></td><td>Junction table: which member is assigned to which event</td><td>eventId + organizationMemberId (unique pair)</td><td>Belongs to Event and Member</td></tr>
+        <tr><td><span class="badge badge-red">EventRegistration</span></td><td>Public sign-up for an event</td><td>name, email, phone, notes, attended (boolean)</td><td>Belongs to Event</td></tr>
+        <tr><td><span class="badge badge-yellow">OrganizationInvitation</span></td><td>Invitation to join an org</td><td>email, role, token (unique), expiresAt (48h), accepted</td><td>Belongs to Organization, invitedBy (Member)</td></tr>
+        <tr><td><span class="badge badge-saffron">AuditLog</span></td><td>Immutable record of every change</td><td>entityType, entityId, action, before (JSON), after (JSON), visibility (INTERNAL/PUBLIC)</td><td>Belongs to Organization, actor (Member)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Schema Design Patterns</h3>
+    <div class="grid-2">
+      <div class="callout callout-green"><strong>Soft Deletes (<code>isArchived</code>)</strong><br>Instead of deleting records, we set <code>isArchived = true</code>. This preserves data for audit trails, allows "unarchive" operations, and prevents accidental data loss. All queries filter by <code>isArchived: false</code>.</div>
+      <div class="callout callout-blue"><strong>Cascading Deletes</strong><br><code>onDelete: Cascade</code> means deleting an Organization automatically deletes all its members, donations, expenses, events, etc. The database handles this, not application code.</div>
+      <div class="callout callout-purple"><strong>Composite Unique Constraints</strong><br><code>@@unique([userId, organizationId])</code> ensures a user can't join the same org twice. <code>@@unique([email, organizationId])</code> prevents duplicate invite acceptance.</div>
+      <div class="callout callout-saffron"><strong>Decimal for Money</strong><br><code>Decimal(12, 2)</code> stores exact decimal numbers (e.g., 5000.00). Never use floats for money - they have rounding errors like <code>0.1 + 0.2 = 0.30000000000000004</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 7: AUTH ==================== -->
+<div class="section" id="auth">
+  <div class="section-title"><span class="num">7</span> Authentication</div>
+
+  <div class="card">
+    <h3>Login Flow (Step by Step)</h3>
+    <div class="flow">
+      <span class="flow-step">1. User submits<br>email + password</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">2. NextAuth Credentials<br>Provider receives it</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">3. DB lookup:<br>prisma.user.findUnique({ email })</span>
+    </div>
+    <div class="flow">
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">4. bcrypt.compare(password, user.password)<br><small>12 salt rounds, takes ~200ms</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">5. JWT created with { id, email, phone }</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">6. Token stored in HTTP-only cookie<br><small>Can't be read by JavaScript (XSS safe)</small></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why JWT over Database Sessions?</h3>
+    <div class="decision-box">
+      Database sessions require a DB lookup on every request to verify the session is valid. JWTs are self-contained - the token itself contains the user info, cryptographically signed. This means: (1) <strong>No DB round-trip</strong> for session verification (faster). (2) <strong>Works with serverless</strong> (Vercel functions are stateless). (3) <strong>Scales better</strong> - no session table bottleneck.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Route Protection (Middleware)</h3>
+    <div class="explain-box">
+      Middleware runs BEFORE the page loads. NextAuth's <code>withAuth</code> middleware checks if a valid JWT cookie exists. If not, it redirects to <code>/login</code>. This protects all <code>/dashboard</code> and <code>/[slug]/dashboard</code> routes.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Two Levels of Protection</h3>
+    <div class="grid-2">
+      <div class="callout callout-blue">
+        <strong>Level 1: Middleware (JWT check)</strong><br>
+        Runs on EVERY request to protected routes. Simply checks: "Is there a valid token?" If no token → redirect to login. This is fast but coarse-grained.
+      </div>
+      <div class="callout callout-purple">
+        <strong>Level 2: requirePermission() (Granular)</strong><br>
+        Runs inside services. Checks: "Is this user a member? Do they have the right PERMISSION?" Single function call replaces the old 3-tier pattern. Permission-based, not role-list matching.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 8: MULTI-TENANCY ==================== -->
+<div class="section" id="multitenancy">
+  <div class="section-title"><span class="num">8</span> Multi-Tenancy Deep Dive</div>
+  <div class="card">
+    <h3>How Is Data Isolated Between Organizations?</h3>
+    <div class="explain-box">
+      Every table that contains org-specific data (Donation, Expense, Event, etc.) has an <code>organizationId</code> foreign key column. The multi-tenant Prisma extension (<code>getTenantPrisma()</code>) automatically adds this column to every query's WHERE clause, so you <strong>never accidentally read another org's data</strong>.
+    </div>
+    <p style="margin-top:12px;"><strong>Without the extension, every service function would need:</strong></p>
+    <div class="code-block">
+<span class="comment">// Tedious and error-prone - developer could forget organizationId</span>
+<span class="keyword">await</span> prisma.donation.<span class="func">findMany</span>({
+  <span class="func">where</span>: { organizationId: <span class="string">"org_abc"</span>, isArchived: <span class="type">false</span> }
+});
+    </div>
+    <p style="margin-top:12px;"><strong>With the extension, service code just writes:</strong></p>
+    <div class="code-block">
+<span class="comment">// Clean - organizationId is auto-injected by the extension</span>
+<span class="keyword">const</span> tenantPrisma = <span class="func">getTenantPrisma</span>(organizationId);
+<span class="keyword">await</span> tenantPrisma.donation.<span class="func">findMany</span>({
+  <span class="func">where</span>: { isArchived: <span class="type">false</span> }
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The $extends + getTenantPrisma Pattern</h3>
+    <div class="code-block">
+<span class="keyword">export const</span> <span class="func">getTenantPrisma</span> = (organizationId: <span class="type">string</span>) =&gt; {
+  <span class="keyword">return</span> prisma.<span class="func">$extends</span>({
+    <span class="func">query</span>: {
+      $allModels: {
+        <span class="keyword">async</span> <span class="func">$allOperations</span>({ model, operation, args, query }) {
+          <span class="keyword">const</span> tenantModels = [
+            <span class="string">"Donation"</span>, <span class="string">"Expense"</span>, <span class="string">"OrganizationMember"</span>,
+            <span class="string">"BhogItem"</span>, <span class="string">"Event"</span>, <span class="string">"VolunteerTask"</span>,
+            <span class="string">"AuditLog"</span>, <span class="string">"EventAssignment"</span>, <span class="string">"EventRegistration"</span>,
+          ];
+
+          <span class="keyword">if</span> (tenantModels.<span class="func">includes</span>(model)) {
+            <span class="keyword">const</span> anyArgs = args <span class="keyword">as any</span>;
+
+            <span class="comment">// RULE 1: READS - auto-add WHERE organizationId = X</span>
+            <span class="keyword">if</span> (anyArgs.where) {
+              anyArgs.where = { ...anyArgs.where, organizationId };
+            }
+
+            <span class="comment">// RULE 2: CREATES - auto-inject organizationId</span>
+            <span class="keyword">if</span> (operation === <span class="string">'create'</span> &amp;&amp; anyArgs.data) {
+              anyArgs.data = { ...anyArgs.data, organizationId };
+            }
+
+            <span class="comment">// RULE 3: UPDATES - strip organizationId (prevent migration)</span>
+            <span class="keyword">if</span> ((operation === <span class="string">'update'</span>) &amp;&amp; anyArgs.data?.organizationId) {
+              <span class="keyword">delete</span> anyArgs.data.organizationId;
+            }
+          }
+
+          <span class="keyword">return</span> <span class="func">query</span>(args);
+        },
+      },
+    },
+  });
+};
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 9: RBAC ==================== -->
+<div class="section" id="rbac">
+  <div class="section-title"><span class="num">9</span> RBAC & Permissions</div>
+  <div class="card">
+    <h3>The Permission System (V2)</h3>
+    <div class="explain-box">
+      V2 uses a <strong>permission-based</strong> system instead of role-list matching. A single <code>requirePermission(orgId, permission)</code> call checks: (1) Is the user authenticated? (2) Are they a member of this org? (3) Does their role include this permission? This replaces the old <code>validateAccess(orgId, [roles])</code> pattern.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>All 17 Permissions</h3>
+    <table>
+      <thead><tr><th>Permission</th><th>Resource</th><th>What It Allows</th></tr></thead>
+      <tbody>
+        <tr><td><code>finance:read</code></td><td><span class="badge badge-green">Finance</span></td><td>View donations, expenses, financial summaries</td></tr>
+        <tr><td><code>finance:create</code></td><td><span class="badge badge-green">Finance</span></td><td>Record new donations and expenses</td></tr>
+        <tr><td><code>finance:approve</code></td><td><span class="badge badge-green">Finance</span></td><td>Approve or reject expenses</td></tr>
+        <tr><td><code>finance:update</code></td><td><span class="badge badge-green">Finance</span></td><td>Edit existing financial records</td></tr>
+        <tr><td><code>members:read</code></td><td><span class="badge badge-blue">Members</span></td><td>View member list</td></tr>
+        <tr><td><code>members:invite</code></td><td><span class="badge badge-blue">Members</span></td><td>Send invitations to new members</td></tr>
+        <tr><td><code>members:manage</code></td><td><span class="badge badge-blue">Members</span></td><td>Change roles, archive/unarchive members</td></tr>
+        <tr><td><code>events:read</code></td><td><span class="badge badge-purple">Events</span></td><td>View event list</td></tr>
+        <tr><td><code>events:manage</code></td><td><span class="badge badge-purple">Events</span></td><td>Create, edit, delete events</td></tr>
+        <tr><td><code>tasks:manage</code></td><td><span class="badge badge-yellow">Tasks</span></td><td>Create, assign, delete tasks</td></tr>
+        <tr><td><code>tasks:updateOwn</code></td><td><span class="badge badge-yellow">Tasks</span></td><td>Update status of own assigned tasks</td></tr>
+        <tr><td><code>bhog:read</code></td><td><span class="badge badge-saffron">Bhog</span></td><td>View bhog/prasad items</td></tr>
+        <tr><td><code>bhog:manage</code></td><td><span class="badge badge-saffron">Bhog</span></td><td>Create, edit, moderate bhog items</td></tr>
+        <tr><td><code>org:manage</code></td><td><span class="badge badge-red">Org</span></td><td>Update org settings, end festival</td></tr>
+        <tr><td><code>audit:read</code></td><td><span class="badge badge-red">Org</span></td><td>View audit trail</td></tr>
+        <tr><td><code>public:read</code></td><td><span class="badge badge-blue">Public</span></td><td>View public transparency pages</td></tr>
+        <tr><td><code>public:manage</code></td><td><span class="badge badge-blue">Public</span></td><td>Manage public-facing settings</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Permission Matrix (Role → Permissions)</h3>
+    <table class="perm-matrix">
+      <thead><tr><th>Permission</th><th><span class="badge badge-red">ADMIN</span></th><th><span class="badge badge-saffron">TREASURER</span></th><th><span class="badge badge-blue">COMMITTEE</span></th><th><span class="badge badge-green">VOLUNTEER</span></th></tr></thead>
+      <tbody>
+        <tr><td><code>finance:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:create</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:approve</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:update</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>members:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>members:invite</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>members:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>events:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td></tr>
+        <tr><td><code>events:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>tasks:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>tasks:updateOwn</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td></tr>
+        <tr><td><code>bhog:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td></tr>
+        <tr><td><code>bhog:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>org:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>audit:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>public:read</code></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td></tr>
+        <tr><td><code>public:manage</code></td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>requirePermission() in Practice</h3>
+    <div class="code-block">
+<span class="comment">// In donation.service.ts - clean, single-line authorization</span>
+<span class="keyword">export async function</span> <span class="func">createDonation</span>(organizationId: <span class="type">string</span>, data: <span class="type">DonationInput</span>) {
+  <span class="comment">// One line replaces the old validateAccess + role-list pattern</span>
+  <span class="keyword">const</span> { member } = <span class="keyword">await</span> <span class="func">requirePermission</span>(organizationId, <span class="string">"finance:create"</span>);
+
+  <span class="comment">// ... business logic continues ...</span>
+}
+
+<span class="comment">// In expense.service.ts</span>
+<span class="keyword">export async function</span> <span class="func">approveExpense</span>(organizationId: <span class="type">string</span>, expenseId: <span class="type">string</span>) {
+  <span class="keyword">const</span> { member } = <span class="keyword">await</span> <span class="func">requirePermission</span>(organizationId, <span class="string">"finance:approve"</span>);
+  <span class="comment">// ... only TREASURER + ADMIN reach this line ...</span>
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Last Admin Protection</h3>
+    <p>Both <code>updateMemberRoleAction</code> and <code>archiveMemberAction</code> check if the target is the <strong>last ADMIN</strong>. If so, the operation is rejected. This prevents an organization from becoming inaccessible (no one would have admin rights).</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 10: FINANCE ==================== -->
+<div class="section" id="finance">
+  <div class="section-title"><span class="num">10</span> Financial Engine</div>
+
+  <div class="card">
+    <h3>Service Functions (V2 Plain Function API)</h3>
+    <div class="explain-box">
+      After refactoring, all finance functions are plain exports. No class instantiation, no static methods. Import and call directly.
+    </div>
+    <div class="code-block">
+<span class="comment">// Import plain functions directly</span>
+<span class="keyword">import</span> { <span class="func">createDonation</span>, <span class="func">getDonations</span>, <span class="func">getDonationSummary</span> } <span class="keyword">from</span> <span class="string">"@/modules/finance/donation.service"</span>;
+<span class="keyword">import</span> { <span class="func">createExpense</span>, <span class="func">approveExpense</span>, <span class="func">rejectExpense</span> } <span class="keyword">from</span> <span class="string">"@/modules/finance/expense.service"</span>;
+
+<span class="comment">// Call directly - no class namespace needed</span>
+<span class="keyword">await</span> <span class="func">createDonation</span>(orgId, { donorName: <span class="string">"Rajesh"</span>, amount: <span class="type">5000</span>, category: <span class="string">"GENERAL"</span> });
+<span class="keyword">const</span> summary = <span class="keyword">await</span> <span class="func">getDonationSummary</span>(orgId);
+<span class="keyword">await</span> <span class="func">approveExpense</span>(orgId, expenseId);
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Race-Condition-Safe Expense Approval</h3>
+    <div class="explain-box">
+      If two admins click "Approve" on the same expense at the exact same time, we need to prevent double-approval. We use <code>updateMany</code> with a defensive WHERE clause.
+    </div>
+    <div class="code-block">
+<span class="keyword">const</span> result = <span class="keyword">await</span> tenantPrisma.expense.<span class="func">updateMany</span>({
+  <span class="func">where</span>: {
+    id: expenseId,
+    status: <span class="string">'PENDING'</span>,     <span class="comment">// Only match if STILL pending</span>
+  },
+  <span class="func">data</span>: { status: <span class="string">'APPROVED'</span>, approvedById: memberId, approvedAt: <span class="keyword">new</span> <span class="type">Date</span>() },
+});
+
+<span class="keyword">if</span> (result.count === <span class="type">0</span>) {
+  <span class="comment">// No rows matched = expense was already processed by someone else</span>
+  <span class="keyword">throw new</span> <span class="type">ConflictAppError</span>(<span class="string">"This expense was already processed."</span>);
+}
+    </div>
+    <p style="margin-top:12px;"><strong>Why this works:</strong> <code>updateMany</code> is atomic at the database level. Only one transaction will see <code>status = 'PENDING'</code> and update it. The second will see <code>status = 'APPROVED'</code> and get <code>count = 0</code>. No locks, no crashes, no inconsistency.</p>
+  </div>
+
+  <div class="card">
+    <h3>Festival vs Club Financial Models</h3>
+    <div class="grid-2">
+      <div class="callout callout-saffron">
+        <strong>FESTIVAL</strong><br>
+        Total = Opening Balance + Donations + Sponsorships<br>
+        Remaining = Total - Approved Expenses<br>
+        Shows: <code>publicFundraisingTarget</code> publicly<br>
+        "Opening Balance" label on public page
+      </div>
+      <div class="callout callout-blue">
+        <strong>CLUB</strong><br>
+        Total = Starting Allocation + Internal Funds + Sponsorships<br>
+        Remaining = Total - Approved Expenses<br>
+        Shows: <code>internalBudgetLimit</code> privately<br>
+        <strong>Excluded from public transparency pages entirely</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 11: AI ==================== -->
+<div class="section" id="ai">
+  <div class="section-title"><span class="num">11</span> AI Admin Assistant</div>
+  <div class="card">
+    <h3>How It Works</h3>
+    <div class="flow">
+      <span class="flow-step">User asks question<br><small>"How much did we spend on food?"</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Mutation keyword check<br><small>Does it contain add/delete/update? REJECT.</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Gemini classifies intent<br><small>-> EXPENSE_BREAKDOWN</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Service gathers facts<br><small>GROUP BY category, SUM(amount) WHERE category='FOOD'</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Gemini generates answer<br><small>"You've spent Rs 45,000 on food..."</small></span>
+    </div>
+    <div class="callout callout-red" style="margin-top:16px;">
+      <strong>Safety:</strong> The AI is <strong>read-only</strong> (never creates/updates/deletes data), blocks mutation keywords, and only receives pre-aggregated, tenant-scoped facts (never raw DB records).
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 12: CODE EXAMPLES ==================== -->
+<div class="section" id="code-examples">
+  <div class="section-title"><span class="num">12</span> Code Examples (Before & After Refactoring)</div>
+
+  <div class="card">
+    <h3>Complete Donation Flow: Before vs After</h3>
+    <div class="before-after">
+      <div class="before-col">
+        <h4>Before Refactoring</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;">
+<span class="comment">// donation.service.ts (class-based)</span>
+<span class="keyword">export class</span> <span class="type">DonationService</span> {
+  <span class="keyword">static async</span> <span class="func">createDonation</span>(
+    organizationId: <span class="type">string</span>,
+    data: <span class="type">CreateDonationInput</span>
+  ) {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> { member } = <span class="keyword">await</span> <span class="func">validateAccess</span>(
+        organizationId,
+        [<span class="type">ADMIN</span>, <span class="type">TREASURER</span>, <span class="type">COMMITTEE</span>]
+      );
+      <span class="comment">// ... validation, create, audit</span>
+      <span class="keyword">return</span> donation;
+    } <span class="keyword">catch</span> (error) {
+      <span class="keyword">throw</span> error;
+    }
+  }
+}
+
+<span class="comment">// donation.actions.ts (with try/catch)</span>
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(data: FormData) {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> validated = schema.<span class="func">parse</span>(data);
+    <span class="keyword">await</span> DonationService.<span class="func">createDonation</span>(
+      validated.orgId, validated
+    );
+    <span class="func">revalidatePath</span>(<span class="string">"/[orgSlug]/dashboard/donations"</span>);
+    <span class="keyword">return</span> { success: <span class="type">true</span> };
+  } <span class="keyword">catch</span> (error) {
+    <span class="keyword">return</span> { success: <span class="type">false</span>, error: error.message };
+  }
+}
+
+<span class="comment">// dashboard page (15 lines of boilerplate)</span>
+<span class="keyword">const</span> org = <span class="keyword">await</span> getOrganizationBySlug(slug);
+<span class="keyword">if</span> (!org) <span class="keyword">return</span> notFound();
+<span class="keyword">const</span> { user, member } = <span class="keyword">await</span> validateAccess(org.id);
+<span class="keyword">const</span> isAdmin = member.role === ADMIN
+  || member.role === COMMITTEE;
+<span class="keyword">const</span> isFestival = org.type === "FESTIVAL";
+        </div>
+      </div>
+      <div class="after-col">
+        <h4>After Refactoring</h4>
+        <div class="code-block" style="margin:0;border-radius:8px;">
+<span class="comment">// donation.service.ts (plain functions)</span>
+<span class="keyword">export async function</span> <span class="func">createDonation</span>(
+  organizationId: <span class="type">string</span>,
+  data: <span class="type">CreateDonationInput</span>
+) {
+  <span class="keyword">const</span> { member } = <span class="keyword">await</span> <span class="func">requirePermission</span>(
+    organizationId, <span class="string">"finance:create"</span>
+  );
+  <span class="comment">// ... validation, create, audit</span>
+  <span class="keyword">return</span> donation;
+}
+
+<span class="comment">// donation.actions.ts (withAction wrapper)</span>
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(data) {
+  <span class="keyword">return</span> <span class="func">withActionNoReturn</span>(<span class="keyword">async</span> () =&gt; {
+    <span class="keyword">const</span> validated = schema.<span class="func">parse</span>(data);
+    <span class="keyword">await</span> <span class="func">createDonation</span>(
+      validated.orgId, validated
+    );
+  }, { paths: [
+    { path: <span class="string">"/[orgSlug]/dashboard/donations"</span> }
+  ] });
+}
+
+<span class="comment">// dashboard page (1 line)</span>
+<span class="keyword">const</span> { organization, member, isAdmin, isFestival }
+  = <span class="keyword">await</span> <span class="func">resolveOrgContext</span>(params.orgSlug);
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Action File Comparison</h3>
+    <div class="code-block">
+<span class="comment">// expense.actions.ts (V2 - 62 lines, zero try/catch)</span>
+<span class="string">"use server"</span>;
+
+<span class="keyword">import</span> { <span class="func">createExpense</span>, <span class="func">approveExpense</span>, <span class="func">rejectExpense</span> } <span class="keyword">from</span> <span class="string">"@/modules/finance/expense.service"</span>;
+<span class="keyword">import</span> { <span class="func">withActionNoReturn</span> } <span class="keyword">from</span> <span class="string">"@/lib/action"</span>;
+
+<span class="keyword">export async function</span> <span class="func">createExpenseAction</span>(data: z.infer&lt;<span class="keyword">typeof</span> CreateExpenseSchema&gt;) {
+    <span class="keyword">return</span> <span class="func">withActionNoReturn</span>(<span class="keyword">async</span> () =&gt; {
+        <span class="keyword">const</span> validated = CreateExpenseSchema.<span class="func">parse</span>(data);
+        <span class="keyword">await</span> <span class="func">createExpense</span>(validated.organizationId, {
+            ...validated,
+            requestedAt: <span class="keyword">new</span> <span class="type">Date</span>(validated.requestedAt),
+        });
+    }, { paths: [{ path: <span class="string">"/[orgSlug]/dashboard/expenses"</span>, type: <span class="string">"page"</span> }] });
+}
+
+<span class="keyword">export async function</span> <span class="func">approveExpenseAction</span>(organizationId: <span class="type">string</span>, expenseId: <span class="type">string</span>) {
+    <span class="keyword">return</span> <span class="func">withActionNoReturn</span>(<span class="keyword">async</span> () =&gt; {
+        <span class="keyword">await</span> <span class="func">approveExpense</span>(organizationId, expenseId);
+    }, { paths: [{ path: <span class="string">"/[orgSlug]/dashboard/expenses"</span>, type: <span class="string">"page"</span> }] });
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>resolveOrgContext in a Dashboard Page</h3>
+    <div class="code-block">
+<span class="comment">// donations/page.tsx (V2 - clean, concise)</span>
+<span class="keyword">import</span> { <span class="func">resolveOrgContext</span> } <span class="keyword">from</span> <span class="string">"@/lib/org-context"</span>;
+<span class="keyword">import</span> { <span class="func">getPaginatedDonations</span> } <span class="keyword">from</span> <span class="string">"@/modules/finance/donation.service"</span>;
+
+<span class="keyword">export default async function</span> <span class="func">DonationsPage</span>({ params, searchParams }) {
+    <span class="comment">// ONE LINE replaces 8+ lines of boilerplate</span>
+    <span class="keyword">const</span> { organization, member, isFestival } = <span class="keyword">await</span> <span class="func">resolveOrgContext</span>(params.orgSlug);
+
+    <span class="keyword">const</span> query = <span class="func">parsePageQuery</span>(searchParams);
+    <span class="keyword">const</span> donations = <span class="keyword">await</span> <span class="func">getPaginatedDonations</span>(organization.id, query);
+
+    <span class="comment">// ... render JSX with organization, member, donations</span>
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>ActionResult Type Pattern</h3>
+    <div class="code-block">
+<span class="comment">// src/lib/action-response.ts</span>
+<span class="keyword">export type</span> <span class="type">ActionResult</span>&lt;T = <span class="keyword">undefined</span>&gt; =
+    | { success: <span class="type">true</span>; data: T; error?: <span class="keyword">undefined</span>; code?: <span class="keyword">undefined</span> }
+    | { success: <span class="type">false</span>; error: <span class="type">string</span>; code?: <span class="type">string</span>; data?: <span class="keyword">undefined</span> };
+
+<span class="comment">// Client-side pattern matching:</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> <span class="func">recordDonationAction</span>(formData);
+
+<span class="keyword">if</span> (result.success) {
+    <span class="comment">// TypeScript knows result.data exists here</span>
+    <span class="func">toast</span>(<span class="string">"Donation recorded!"</span>);
+} <span class="keyword">else</span> {
+    <span class="comment">// TypeScript knows result.error exists here</span>
+    <span class="func">toast</span>(result.error);
+    <span class="comment">// result.code is available for specific error handling</span>
+}
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 13: DESIGN DECISIONS ==================== -->
+<div class="section" id="decisions">
+  <div class="section-title"><span class="num">13</span> Key Design Decisions</div>
+
+  <div class="card">
+    <h3>Why Plain Functions Over Static Classes?</h3>
+    <div class="decision-box">
+      Static classes in TypeScript provide no runtime benefit over plain functions. They add syntax noise (<code>ClassName.method()</code> vs <code>method()</code>), prevent tree-shaking (bundlers can't eliminate unused static methods), and create unnecessary <code>this</code> binding gotchas. Plain functions are the idiomatic TypeScript pattern. They're simpler, more testable (just mock the import), and bundle-friendly.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why the withAction Wrapper?</h3>
+    <div class="decision-box">
+      Every action file had the same boilerplate: try/catch, parse errors, revalidate paths, return success/failure. WithAction centralizes this in one place. The action file only defines WHAT to do (the business logic), and withAction handles HOW to respond (error handling, cache invalidation, return type). This reduced action file size by ~40% and ensures every action returns a consistent ActionResult&lt;T&gt;.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why resolveOrgContext?</h3>
+    <div class="decision-box">
+      Every dashboard page needed to: (1) resolve slug to org, (2) validate the user is a member, (3) derive isAdmin and isFestival flags. This was 8-12 lines of identical code across 9 pages. resolveOrgContext encapsulates this in one function that either returns the full context or throws (triggering 404). Pages went from boilerplate-heavy to focused on their unique rendering logic.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Separate Services from Server Actions?</h3>
+    <div class="decision-box">
+      Server Actions are entry points (like controllers). Services contain business logic. This separation means: (1) Services can be <strong>tested independently</strong> without HTTP/Server Action overhead. (2) Multiple Server Actions can reuse the same service function. (3) RBAC checks live in services via <code>requirePermission()</code>, ensuring they're <strong>never bypassed</strong>. (4) Business logic is <strong>not coupled</strong> to Next.js specifics.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Server Components by Default?</h3>
+    <div class="decision-box">
+      Most dashboard pages are data-heavy (tables, stats, lists). Server Components send <strong>zero JavaScript</strong> to the browser - just HTML. This means: (1) <strong>Faster page loads</strong> - smaller bundle size. (2) <strong>Better SEO</strong> - content is pre-rendered on the server. (3) <strong>Direct DB access</strong> - no API layer needed for reads. Client Components are only used for forms, modals, and interactive elements.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Prisma $extends for Multi-Tenancy?</h3>
+    <div class="decision-box">
+      Alternatives considered: (1) <strong>Manual WHERE clauses</strong> - error-prone, developer could forget. (2) <strong>Database Row-Level Security</strong> - PostgreSQL RLS is powerful but harder to manage, test, and debug. (3) <strong>Separate databases per tenant</strong> - overkill for this scale. The <code>$extends</code> approach is <strong>transparent</strong> (you can see what it does), <strong>testable</strong>, and <strong>fail-safe</strong> (missing orgId = empty results, not cross-tenant leaks).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Soft Deletes Over Hard Deletes?</h3>
+    <div class="decision-box">
+      Hard deletes are permanent and unrecoverable. Soft deletes via <code>isArchived</code>: (1) Preserve data for <strong>audit trails</strong>. (2) Allow <strong>"unarchive"</strong> operations. (3) Maintain referential integrity. (4) Enable <strong>data recovery</strong> from mistakes. (5) Historical records remain intact for reporting.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Decimal for Money?</h3>
+    <div class="decision-box">
+      Floating-point numbers (IEEE 754) cannot exactly represent decimal fractions. Example: <code>0.1 + 0.2 = 0.30000000000000004</code>. For financial calculations, this causes real bugs. <code>Decimal(12, 2)</code> stores exact base-10 numbers with 2 decimal places, ensuring <code>0.1 + 0.2 = 0.30</code> always.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Extract the Task Module?</h3>
+    <div class="decision-box">
+      Task logic was originally part of <code>member.service.ts</code>, creating a god-file that handled both member management and volunteer task operations. Extracting to <code>modules/tasks/task.service.ts</code> follows the Single Responsibility Principle. Each service file now handles one domain: member.service handles membership, task.service handles tasks. This makes both files smaller, easier to understand, and independently testable.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 14: INTERVIEW Q&A ==================== -->
+<div class="section" id="interview">
+  <div class="section-title"><span class="num">14</span> Interview Questions & Answers</div>
+
+  <div class="card qa-card">
+    <h3>Q1: "Walk me through the architecture"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> UTSAV is a <strong>modular monolith</strong> with 5 layers: (1) <strong>Presentation</strong> - React Server Components + Client Components; (2) <strong>Action</strong> - Server Actions wrapped in <code>withAction()</code>; (3) <strong>Service</strong> - Plain functions organized by domain (finance, events, tasks, etc.) with permission-based authorization; (4) <strong>Data</strong> - Prisma ORM with a custom multi-tenant <code>$extends</code> extension; (5) <strong>Infrastructure</strong> - Auth, errors, pagination, email, AI. After 6 phases of refactoring, services are plain tree-shakeable functions, actions use a centralized wrapper, and dashboard pages use a single <code>resolveOrgContext()</code> call.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q2: "How does multi-tenancy work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every tenant-scoped table has an <code>organizationId</code> column. I built <code>getTenantPrisma(orgId)</code> using Prisma's <code>$extends</code> that intercepts ALL CRUD operations. On reads, it auto-appends <code>WHERE organizationId = X</code>. On creates, it injects <code>organizationId</code>. On updates, it strips <code>organizationId</code> to prevent cross-tenant migration. Cross-tenant data leaks are <strong>structurally impossible</strong> at the data layer. Every service function calls <code>getTenantPrisma(organizationId)</code> as its first step.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q3: "Why did you refactor from static classes to plain functions?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Static classes in TypeScript provide no runtime benefit. They add syntax noise, prevent tree-shaking, and create <code>this</code> binding confusion. Plain functions are the idiomatic pattern. All 15+ service files were converted from <code>class XService { static async method() {} }</code> to <code>export async function method() {}</code>. The result: simpler imports, better bundling, easier testing, and 53 files updated in one focused phase.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q4: "What does the withAction wrapper do?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> <code>withAction(handler, { paths })</code> eliminates try/catch boilerplate from all action files. It: (1) Calls the handler in a try/catch. (2) On success, revalidates specified cache paths. (3) Returns <code>ActionResult&lt;T&gt;</code> - either <code>{ success: true, data }</code> or <code>{ success: false, error, code }</code>. This reduced action file size by ~40% and ensures every action returns a consistent, type-safe response. The action file only defines the business logic - withAction handles error handling and cache management.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q5: "How does the permission system work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> A single <code>requirePermission(orgId, permission)</code> function handles everything: (1) Validates the JWT session. (2) Checks the user is an active member of this org. (3) Looks up their role's permissions in a static map. (4) Throws <code>AuthorizationError</code> if not allowed. 17 permissions across 5 resource types (finance, members, events, tasks, bhog, org, public). This replaced the old pattern of <code>validateAccess(orgId, [ADMIN, TREASURER])</code> which mixed auth + membership + role checking in one call.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q6: "How does resolveOrgContext simplify dashboard pages?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every dashboard page used to have 8-12 lines of identical boilerplate: resolve slug, check membership, derive isAdmin, derive isFestival. <code>resolveOrgContext(orgSlug)</code> does all of this in one call. It either returns <code>{ organization, member, isAdmin, isFestival }</code> or throws (triggering 404). This reduced dashboard pages by 34 net lines across 9 pages, and each page is now focused on its unique rendering logic.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q7: "How does multi-tenancy work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every tenant-scoped table has an <code>organizationId</code> column. I built a custom Prisma Client extension using <code>$extends</code> that intercepts ALL CRUD operations. On reads, it auto-appends <code>WHERE organizationId = X</code>. On creates, it injects <code>organizationId</code>. On updates, it strips <code>organizationId</code> to prevent cross-tenant migration. Cross-tenant data leaks are <strong>structurally impossible</strong> at the data layer.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q8: "How do you handle race conditions?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> For expense approval, we use <code>updateMany</code> with a WHERE clause that includes <code>status: 'PENDING'</code>. This is atomic at the DB level. If two admins approve simultaneously, only one gets <code>count === 1</code>. The second gets <code>count === 0</code> because status is no longer PENDING, and we throw a <code>ConflictAppError</code>. No distributed locks needed, works perfectly with serverless.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q9: "Why did you choose this tech stack?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Next.js 14 for Server Components (zero-JS pages) + Server Actions (no API boilerplate). PostgreSQL for ACID compliance and complex relations. Prisma for type-safe queries and the $extends API. NextAuth for JWT strategy (stateless, serverless-friendly). Tailwind + shadcn for rapid, consistent UI. After refactoring, all services are plain functions - each choice optimizes for developer experience, performance, or scalability.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q10: "How does the AI assistant work safely?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Three safety layers: (1) <strong>Read-only architecture</strong> - the service only uses <code>findMany</code> and aggregation, never create/update/delete. (2) <strong>Mutation keyword blocking</strong> - questions with words like "add", "delete", "create" are immediately rejected. (3) <strong>Prompt injection guardrails</strong> - system prompt instructs Gemini to never execute commands. Data fed to Gemini is pre-aggregated, tenant-scoped facts.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q11: "How does the slug/URL system work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Each organization has a unique slug. The database enforces uniqueness with <code>@unique</code> + <code>@@index</code>. In Next.js, the <code>[orgSlug]</code> dynamic route captures the URL parameter. A memoized <code>getOrganizationBySlug()</code> resolves slug to org (cached with React's <code>cache()</code>). If slug doesn't exist, 404 is returned. In V2, <code>resolveOrgContext()</code> wraps this resolution along with auth and membership checks.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q12: "How do you handle the invitation system securely?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> <code>crypto.randomBytes(32)</code> generates a 256-bit unguessable token. 48-hour expiry. Strict email matching - the logged-in user's email must match the invite email. If wrong account is logged in, a warning is shown. If a member was previously archived, the system restores instead of creating duplicates. Admins can also skip email delivery and share the link via WhatsApp.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q13: "What is the audit trail system?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every mutation calls <code>record()</code> from audit.service, which stores: entity type, entity ID, action (CREATE/UPDATE/APPROVE/etc.), before/after JSON snapshots, actor ID, and visibility level (INTERNAL or PUBLIC). The public transparency page filters for PUBLIC visibility only, showing citizens how funds were spent without exposing internal operations.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q14: "Why not use raw SQL instead of Prisma?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Prisma gives us: (1) <strong>Type safety</strong> - every query result is fully typed. (2) <strong>Schema as code</strong> - one file defines all tables, version-controlled. (3) <strong>Auto-generated client</strong> - no hand-written queries. (4) <strong>$extends</strong> - enabled the multi-tenancy pattern. (5) <strong>Migrations</strong> - schema changes sync automatically. (6) <strong>Works with plain functions</strong> - after refactoring, services are clean exports. Raw SQL would lose all of these benefits.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q15: "What would you improve next?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>E2E tests</strong> with Playwright for critical flows. (2) <strong>Real-time updates</strong> via WebSockets for live expense approvals. (3) <strong>PDF/Excel exports</strong> for financial reports. (4) <strong>CI/CD pipeline</strong> with GitHub Actions. (5) <strong>Mobile PWA</strong> for volunteer task management. (6) <strong>Complete migration</strong> from deprecated <code>validateAccess()</code> to <code>requirePermission()</code> across all services.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q16: "How does the task module extraction work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Task logic was extracted from <code>member.service.ts</code> into a dedicated <code>modules/tasks/task.service.ts</code>. This follows the Single Responsibility Principle. The task service exports 6 plain functions: <code>createTask()</code>, <code>getAllTasks()</code>, <code>getMyTasks()</code>, <code>updateTask()</code>, <code>updateTaskStatus()</code>, <code>deleteTask()</code>, and <code>getVolunteerWorkload()</code>. Each service file now handles one domain. This made both files smaller, independently testable, and easier to navigate.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q17: "Explain the 6 refactoring phases"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>Foundation</strong> - Created ActionResult&lt;T&gt;, requirePermission(), TenantContext pattern. (2) <strong>Services → Functions</strong> - Converted 15+ class-based services to plain exports (53 files). (3) <strong>withAction wrapper</strong> - Eliminated try/catch from all 11 action files. (4) <strong>resolveOrgContext</strong> - Replaced 8+ lines of boilerplate in 9 pages with one call. (5) <strong>Dead code cleanup</strong> - Deleted 4 files, achieved zero TS errors. (6) <strong>Tests passing</strong> - 25/25 tests, interview-ready codebase. Each phase built on the previous one.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="card">
+    <h3>File Locations Quick Reference</h3>
+    <table>
+      <thead><tr><th>What</th><th>File</th><th>Key Function</th></tr></thead>
+      <tbody>
+        <tr><td>ActionResult type</td><td>src/lib/action-response.ts</td><td>actionSuccess() / actionFailure()</td></tr>
+        <tr><td>withAction wrapper</td><td>src/lib/action.ts</td><td>withAction() / withActionNoReturn()</td></tr>
+        <tr><td>Org context helper</td><td>src/lib/org-context.ts</td><td>resolveOrgContext()</td></tr>
+        <tr><td>Permission system</td><td>src/lib/access-control.ts</td><td>requirePermission()</td></tr>
+        <tr><td>Tenant Prisma Extension</td><td>src/lib/access-control.ts</td><td>getTenantPrisma()</td></tr>
+        <tr><td>Auth config</td><td>src/lib/auth.ts</td><td>authOptions</td></tr>
+        <tr><td>Error classes</td><td>src/lib/errors.ts</td><td>AppError hierarchy</td></tr>
+        <tr><td>Prisma singleton</td><td>src/lib/prisma.ts</td><td>prisma</td></tr>
+        <tr><td>Slug resolution</td><td>src/modules/core/organization.service.ts</td><td>getOrganizationBySlug()</td></tr>
+        <tr><td>Donation functions</td><td>src/modules/finance/donation.service.ts</td><td>createDonation(), getDonations(), etc.</td></tr>
+        <tr><td>Expense functions</td><td>src/modules/finance/expense.service.ts</td><td>approveExpense() with atomic updateMany</td></tr>
+        <tr><td>Task module</td><td>src/modules/tasks/task.service.ts</td><td>createTask(), updateTaskStatus(), etc.</td></tr>
+        <tr><td>Audit trail</td><td>src/modules/core/audit.service.ts</td><td>record()</td></tr>
+        <tr><td>AI assistant</td><td>src/modules/assistant/admin-assistant.service.ts</td><td>classifyIntent()</td></tr>
+        <tr><td>Route protection</td><td>src/middleware.ts</td><td>withAuth()</td></tr>
+        <tr><td>Database schema</td><td>prisma/schema.prisma</td><td>12 models + 12 enums</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== SECTION 15: METRICS ==================== -->
+<div class="section" id="metrics">
+  <div class="section-title"><span class="num">15</span> Refactoring Metrics</div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--saffron);">6</div>
+      <div class="metric-label">Refactoring Phases</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--blue);">53</div>
+      <div class="metric-label">Files Changed (Phase 2)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--green);">15+</div>
+      <div class="metric-label">Service Files Converted</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--purple);">11</div>
+      <div class="metric-label">Action Files Simplified</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--red);">-34</div>
+      <div class="metric-label">Net Lines (Phase 4)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--yellow);">4</div>
+      <div class="metric-label">Dead Files Deleted</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--green);">0</div>
+      <div class="metric-label">TypeScript Errors</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--blue);">25/25</div>
+      <div class="metric-label">Tests Passing</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-value" style="color:var(--saffron);">~40%</div>
+      <div class="metric-label">Action File Size Reduction</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Phase-by-Phase Impact</h3>
+    <table>
+      <thead><tr><th>Phase</th><th>What Changed</th><th>Files</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">Phase 1</span></td><td>ActionResult, requirePermission, TenantContext</td><td>3 new files</td><td>Created the type-safe foundation</td></tr>
+        <tr><td><span class="badge badge-saffron">Phase 2</span></td><td>15+ services from classes to plain functions</td><td>53 files</td><td>Tree-shakeable, simpler imports, no this binding</td></tr>
+        <tr><td><span class="badge badge-green">Phase 3</span></td><td>withAction wrapper for all actions</td><td>11 action files</td><td>~40% smaller, consistent error handling</td></tr>
+        <tr><td><span class="badge badge-purple">Phase 4</span></td><td>resolveOrgContext in all dashboard pages</td><td>9 pages</td><td>39 added, 73 removed (net -34)</td></tr>
+        <tr><td><span class="badge badge-yellow">Phase 5</span></td><td>Dead code cleanup, zero TS errors</td><td>4 deleted + all TS files</td><td>Clean build, no type-safety holes</td></tr>
+        <tr><td><span class="badge badge-red">Phase 6</span></td><td>Tests passing, interview prep V2</td><td>10 test files</td><td>25/25 passing, documented architecture</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div style="text-align:center; padding: 40px 20px; color: var(--slate-500); font-size: 0.85rem;">
+  <div style="font-weight: 800; color: var(--saffron); font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">UTSAV Interview Prep V2</div>
+  <div style="margin-top: 8px;">Built by Vedant Mehta</div>
+  <div style="margin-top: 4px;">Next.js 14 &bull; Prisma &bull; PostgreSQL &bull; NextAuth &bull; Gemini AI &bull; Shadcn/ui</div>
+  <div style="margin-top: 8px; font-size: 0.78rem; color: var(--slate-400);">Post-Refactoring Edition: 6 Phases &bull; Plain Functions &bull; withAction Wrapper &bull; resolveOrgContext &bull; Permission-Based RBAC</div>
+</div>
+
+</div>
+</body>
+</html>

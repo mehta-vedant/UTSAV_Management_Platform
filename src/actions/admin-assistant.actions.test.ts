@@ -13,10 +13,9 @@ describe("admin assistant actions", () => {
         });
 
         expect(result).toMatchObject({
-            ok: false,
             success: false,
             code: "VALIDATION_ERROR",
-            message: "Ask a slightly more detailed question.",
+            error: "Ask a slightly more detailed question.",
         });
     });
 });

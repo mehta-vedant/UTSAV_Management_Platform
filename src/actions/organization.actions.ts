@@ -60,12 +60,7 @@ export async function createOrganizationAction(data: CreateOrganizationInput) {
             type: validatedData.type,
         }, session.user.id);
 
-        return {
-            ok: true as const,
-            success: true as const,
-            slug: Organization.slug,
-            data: { slug: Organization.slug },
-        };
+        return actionSuccess({ slug: Organization.slug });
     } catch (error: any) {
         return actionFailure(error, "Failed to create organization.");
     }

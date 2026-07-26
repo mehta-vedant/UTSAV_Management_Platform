@@ -50,7 +50,7 @@ export default function CreateOrganizationPage() {
         });
 
         if (result.success) {
-            router.push(`/${result.slug}/dashboard`);
+            router.push(`/${result.data.slug}/dashboard`);
         } else {
             setError(result.error);
             setIsLoading(false);
@@ -58,18 +58,18 @@ export default function CreateOrganizationPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-            <div className="w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+        <div className="flex min-h-screen items-center justify-center overflow-x-hidden bg-slate-50 p-3 sm:p-6">
+            <div className="w-full max-w-2xl overflow-hidden rounded-[3rem] border border-slate-100 bg-white shadow-2xl shadow-slate-200/50 animate-in fade-in zoom-in-95 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-5 h-full">
                     {/* Visual Sidebar */}
-                    <div className="md:col-span-2 bg-slate-900 p-10 text-white flex flex-col justify-between relative overflow-hidden">
+                    <div className="relative flex flex-col justify-between overflow-hidden bg-slate-900 p-6 text-white sm:p-8 md:col-span-2 md:p-10">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-saffron-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
 
                         <div className="relative z-10">
                             <div className="w-12 h-12 bg-saffron-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-saffron-500/20">
                                 <Sparkles className="w-6 h-6 text-white" />
                             </div>
-                            <h1 className="text-3xl font-black tracking-tighter leading-none mb-4 uppercase">
+                            <h1 className="mb-4 text-2xl font-black uppercase leading-none tracking-tight sm:text-3xl sm:tracking-tighter">
                                 Start Your <br />
                                 <span className="text-saffron-500">Legacy.</span>
                             </h1>
@@ -91,14 +91,14 @@ export default function CreateOrganizationPage() {
                     </div>
 
                     {/* Form Content */}
-                    <div className="md:col-span-3 p-10 lg:p-12">
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="p-5 sm:p-8 md:col-span-3 lg:p-12">
+                        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                             {/* Type Selector */}
                             <div className="space-y-4">
                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                                     Entity Architecture
                                 </label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <button
                                         type="button"
                                         onClick={() => setType("FESTIVAL")}

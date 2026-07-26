@@ -5,9 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { createOrganization, updateOrganization, endFestival, deleteOrganization } from "@/modules/core/organization.service";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
-import { actionFailure, actionSuccess } from "@/lib/action-response";
+import { actionFailure } from "@/lib/action-response";
 import { assertValidPrasadWindowConfig } from "@/lib/prasad-windows";
+import { withAction, withActionNoReturn } from "@/lib/action";
 
 function toPrasadWindowConfig(data: {
     prasadMorningStart?: string;
@@ -44,12 +44,9 @@ export type CreateOrganizationInput = z.infer<typeof CreateOrganizationSchema>;
 
 export async function createOrganizationAction(data: CreateOrganizationInput) {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return actionFailure(new Error("Please sign in to continue."));
 
-    if (!session?.user?.id) {
-        return actionFailure(new Error("Please sign in to continue."));
-    }
-
-    try {
+    return withAction(async () => {
         const validatedData = CreateOrganizationSchema.parse(data);
         assertValidPrasadWindowConfig(toPrasadWindowConfig(validatedData));
 
@@ -60,11 +57,10 @@ export async function createOrganizationAction(data: CreateOrganizationInput) {
             type: validatedData.type,
         }, session.user.id);
 
-        return actionSuccess({ slug: Organization.slug });
-    } catch (error: any) {
-        return actionFailure(error, "Failed to create organization.");
-    }
+        return { slug: Organization.slug };
+    });
 }
+
 const UpdateOrganizationSchema = z.object({
     organizationId: z.string(),
     name: z.string().min(3).optional(),
@@ -83,12 +79,9 @@ const UpdateOrganizationSchema = z.object({
 
 export async function updateOrganizationAction(data: z.infer<typeof UpdateOrganizationSchema>) {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return actionFailure(new Error("Please sign in to continue."));
 
-    if (!session?.user?.id) {
-        return actionFailure(new Error("Please sign in to continue."));
-    }
-
-    try {
+    return withActionNoReturn(async () => {
         const { organizationId, ...updateData } = UpdateOrganizationSchema.parse(data);
         assertValidPrasadWindowConfig(toPrasadWindowConfig(updateData));
 
@@ -97,63 +90,50 @@ export async function updateOrganizationAction(data: z.infer<typeof UpdateOrgani
             startDate: updateData.startDate ? new Date(updateData.startDate) : undefined,
             endDate: updateData.endDate ? new Date(updateData.endDate) : undefined,
         });
-
-        revalidatePath(`/[orgSlug]/dashboard`, "layout");
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to update organization.");
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard", type: "layout" }] });
 }
 
 export async function endFestivalAction(organizationId: string) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return actionFailure(new Error("Please sign in to continue."));
 
-    try {
-        const member = await prisma.organizationMember.findFirst({
-            where: {
-                organizationId,
-                userId: session.user.id,
-                role: "ADMIN",
-                isArchived: false,
-            },
-        });
+    const member = await prisma.organizationMember.findFirst({
+        where: {
+            organizationId,
+            userId: session.user.id,
+            role: "ADMIN",
+            isArchived: false,
+        },
+    });
+    if (!member) return actionFailure(new Error("Only an admin can end a festival."));
 
-        if (!member) return actionFailure(new Error("Only an admin can end a festival."));
+    const organization = await prisma.organization.findUnique({
+        where: { id: organizationId },
+        select: { slug: true },
+    });
 
-        const organization = await endFestival(organizationId, member.id);
-        revalidatePath(`/${organization.slug}`);
-        revalidatePath(`/${organization.slug}/dashboard`, "layout");
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to end festival.");
-    }
+    return withActionNoReturn(async () => {
+        await endFestival(organizationId, member.id);
+    }, { paths: [{ path: `/${organization?.slug}` }, { path: `/${organization?.slug}/dashboard`, type: "layout" }] });
 }
 
 export async function deleteOrganizationAction(organizationId: string) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return actionFailure(new Error("Please sign in to continue."));
 
-    try {
-        // Strict ADMIN check
-        const member = await prisma.organizationMember.findFirst({
-            where: {
-                organizationId,
-                userId: session.user.id,
-                role: "ADMIN",
-                isArchived: false
-            }
-        });
+    const member = await prisma.organizationMember.findFirst({
+        where: {
+            organizationId,
+            userId: session.user.id,
+            role: "ADMIN",
+            isArchived: false
+        }
+    });
+    if (!member) return actionFailure(new Error("Only an admin can delete an organization."));
 
-        if (!member) return actionFailure(new Error("Only an admin can delete an organization."));
-
+    return withActionNoReturn(async () => {
         await deleteOrganization(organizationId);
-
-        revalidatePath("/dashboard", "page");
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to delete organization.");
-    }
+    }, { paths: [{ path: "/dashboard", type: "page" }] });
 }
 
 export async function getOrganizationCountAction() {

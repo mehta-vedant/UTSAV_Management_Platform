@@ -2,9 +2,9 @@
 
 import { createBhogItem, updateBhogStatus, archiveBhog, updateBhogItem } from "@/modules/festival/bhog.service";
 import { BhogOfferingWindow, BhogStatus } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { parseDateInput } from "@/lib/prasad-windows";
+import { withActionNoReturn } from "@/lib/action";
 
 const CreateBhogSchema = z.object({
     organizationId: z.string(),
@@ -17,38 +17,27 @@ const CreateBhogSchema = z.object({
 });
 
 export async function createBhogAction(data: z.infer<typeof CreateBhogSchema>) {
-    try {
+    return withActionNoReturn(async () => {
         const validated = CreateBhogSchema.parse(data);
         await createBhogItem(validated.organizationId, {
             ...validated,
             offeringDate: parseDateInput(validated.offeringDate),
         });
-        revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
-        return { success: true };
-    } catch (error: any) {
-        return { error: error.message || "Failed to create bhog item" };
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/bhog", type: "page" }] });
 }
 
 export async function updateBhogStatusAction(organizationId: string, itemId: string, status: BhogStatus) {
-    try {
+    return withActionNoReturn(async () => {
         await updateBhogStatus(organizationId, itemId, status);
-        revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
-        return { success: true };
-    } catch (error: any) {
-        return { error: error.message || "Failed to update bhog status" };
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/bhog", type: "page" }] });
 }
 
 export async function archiveBhogAction(organizationId: string, itemId: string) {
-    try {
+    return withActionNoReturn(async () => {
         await archiveBhog(organizationId, itemId);
-        revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
-        return { success: true };
-    } catch (error: any) {
-        return { error: error.message || "Failed to archive bhog item" };
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/bhog", type: "page" }] });
 }
+
 const UpdateBhogSchema = z.object({
     organizationId: z.string(),
     itemId: z.string(),
@@ -61,13 +50,9 @@ const UpdateBhogSchema = z.object({
 });
 
 export async function updateBhogItemAction(data: z.infer<typeof UpdateBhogSchema>) {
-    try {
+    return withActionNoReturn(async () => {
         const validated = UpdateBhogSchema.parse(data);
         const { organizationId, itemId, ...updateData } = validated;
         await updateBhogItem(organizationId, itemId, updateData);
-        revalidatePath(`/[orgSlug]/dashboard/bhog`, "page");
-        return { success: true };
-    } catch (error: any) {
-        return { error: error.message || "Failed to update bhog item" };
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/bhog", type: "page" }] });
 }

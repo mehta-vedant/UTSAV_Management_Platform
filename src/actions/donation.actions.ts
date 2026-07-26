@@ -3,8 +3,7 @@
 import { z } from "zod";
 import { createDonation, updateDonation, archiveDonation } from "@/modules/finance/donation.service";
 import { DonationCategory } from "@prisma/client";
-import { revalidatePath } from "next/cache";
-import { actionFailure, actionSuccess } from "@/lib/action-response";
+import { withActionNoReturn } from "@/lib/action";
 
 const RecordDonationSchema = z.object({
     organizationId: z.string(),
@@ -17,20 +16,15 @@ const RecordDonationSchema = z.object({
 });
 
 export async function recordDonationAction(data: z.infer<typeof RecordDonationSchema>) {
-    try {
+    return withActionNoReturn(async () => {
         const validated = RecordDonationSchema.parse(data);
         await createDonation(validated.organizationId, {
             ...validated,
             receivedAt: new Date(validated.receivedAt),
         });
-
-        revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
-        revalidatePath(`/`, "layout"); // Update total collection on landing if needed
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to record donation.");
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/donations", type: "page" }, { path: "/", type: "layout" }] });
 }
+
 const UpdateDonationSchema = z.object({
     organizationId: z.string(),
     donationId: z.string(),
@@ -42,24 +36,15 @@ const UpdateDonationSchema = z.object({
 });
 
 export async function updateDonationAction(data: z.infer<typeof UpdateDonationSchema>) {
-    try {
+    return withActionNoReturn(async () => {
         const validated = UpdateDonationSchema.parse(data);
         const { organizationId, donationId, ...updateData } = validated;
         await updateDonation(organizationId, donationId, updateData);
-
-        revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to update donation.");
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/donations", type: "page" }] });
 }
 
 export async function archiveDonationAction(organizationId: string, donationId: string) {
-    try {
+    return withActionNoReturn(async () => {
         await archiveDonation(organizationId, donationId);
-        revalidatePath(`/[orgSlug]/dashboard/donations`, "page");
-        return actionSuccess();
-    } catch (error: any) {
-        return actionFailure(error, "Failed to archive donation.");
-    }
+    }, { paths: [{ path: "/[orgSlug]/dashboard/donations", type: "page" }] });
 }

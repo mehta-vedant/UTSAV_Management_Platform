@@ -1,5 +1,5 @@
 import { getTenantPrisma, requirePermission } from "@/lib/access-control";
-import { ExpenseCategory, ExpenseStatus, Prisma } from "@prisma/client";
+import { ExpenseCategory, ExpenseStatus, PaymentMode, Prisma } from "@prisma/client";
 import { record as recordAudit } from "@/modules/core/audit.service";
 import { ConflictAppError, ValidationAppError } from "@/lib/errors";
 import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
@@ -14,6 +14,7 @@ export async function createExpense(
         title: string;
         amount: number | Prisma.Decimal;
         category: ExpenseCategory;
+        paymentMode?: PaymentMode;
         notes?: string;
         eventId?: string;
         requestedAt?: Date;
@@ -44,6 +45,7 @@ export async function createExpense(
             title: title,
             amount: amount,
             category: data.category,
+            paymentMode: data.paymentMode || PaymentMode.CASH,
             notes: data.notes,
             status: ExpenseStatus.PENDING,
             requestedAt: data.requestedAt || new Date(),
@@ -63,6 +65,7 @@ export async function createExpense(
             title,
             amount: amount.toString(),
             category: data.category,
+            paymentMode: data.paymentMode || PaymentMode.CASH,
             status: ExpenseStatus.PENDING,
         },
     });
@@ -208,6 +211,7 @@ export async function updateExpense(
         title?: string;
         amount?: number | Prisma.Decimal;
         category?: ExpenseCategory;
+        paymentMode?: PaymentMode;
         notes?: string;
         eventId?: string;
     }
@@ -231,8 +235,8 @@ export async function updateExpense(
         entityType: "Expense",
         entityId: expenseId,
         action: "update",
-        before: before ? { amount: before.amount.toString(), status: before.status } : undefined,
-        after: { amount: expense.amount.toString(), status: expense.status },
+        before: before ? { amount: before.amount.toString(), status: before.status, paymentMode: before.paymentMode } : undefined,
+        after: { amount: expense.amount.toString(), status: expense.status, paymentMode: expense.paymentMode },
     });
 
     return expense;
@@ -288,6 +292,37 @@ export async function getExpenseSummary(organizationId: string) {
     });
 
     return summary;
+}
+
+export async function getExpensePaymentModeSummary(organizationId: string) {
+    await requirePermission(organizationId, "finance:read");
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    const [aggregates, breakdown] = await Promise.all([
+        tenantPrisma.expense.aggregate({
+            where: { status: ExpenseStatus.APPROVED, isArchived: false },
+            _sum: { amount: true },
+        }),
+        tenantPrisma.expense.groupBy({
+            by: ["paymentMode"],
+            where: { status: ExpenseStatus.APPROVED, isArchived: false },
+            _sum: { amount: true },
+        }),
+    ]);
+
+    const raw = Object.fromEntries(
+        breakdown.map((b) => [b.paymentMode, Number(b._sum.amount || 0)])
+    );
+
+    return {
+        total: Number(aggregates._sum.amount || 0),
+        breakdown: {
+            CASH: raw[PaymentMode.CASH] || 0,
+            UPI: raw[PaymentMode.UPI] || 0,
+            BANK_TRANSFER: raw[PaymentMode.BANK_TRANSFER] || 0,
+        },
+    };
 }
 
 /**

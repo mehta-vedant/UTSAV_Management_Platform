@@ -1,5 +1,5 @@
 import { validateAccess, getTenantPrisma, requirePermission } from "@/lib/access-control";
-import { DonationCategory, Prisma } from "@prisma/client";
+import { DonationCategory, PaymentMode, Prisma } from "@prisma/client";
 import { record as recordAudit } from "@/modules/core/audit.service";
 import { ValidationAppError } from "@/lib/errors";
 import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
@@ -13,6 +13,7 @@ export async function createDonation(
         donorName: string;
         amount: number | Prisma.Decimal;
         category: DonationCategory;
+        paymentMode?: PaymentMode;
         receivedAt?: Date;
         notes?: string;
         eventId?: string;
@@ -45,6 +46,7 @@ export async function createDonation(
             donorName: donorName,
             amount: amount,
             category: data.category,
+            paymentMode: data.paymentMode || PaymentMode.CASH,
             notes: data.notes,
             date: data.receivedAt || new Date(),
             receivedAt: data.receivedAt || new Date(),
@@ -76,6 +78,7 @@ export async function createDonation(
             donorName,
             amount: amount.toString(),
             category: data.category,
+            paymentMode: data.paymentMode || PaymentMode.CASH,
         },
     });
 
@@ -160,6 +163,37 @@ export async function getPaginatedDonations(organizationId: string, query: PageQ
     return paginate(items, totalItems, query);
 }
 
+export async function getDonationPaymentModeSummary(organizationId: string) {
+    await requirePermission(organizationId, "finance:read");
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    const [aggregates, breakdown] = await Promise.all([
+        tenantPrisma.donation.aggregate({
+            where: { isArchived: false },
+            _sum: { amount: true },
+        }),
+        tenantPrisma.donation.groupBy({
+            by: ["paymentMode"],
+            where: { isArchived: false },
+            _sum: { amount: true },
+        }),
+    ]);
+
+    const raw = Object.fromEntries(
+        breakdown.map((b) => [b.paymentMode, Number(b._sum.amount || 0)])
+    );
+
+    return {
+        total: Number(aggregates._sum.amount || 0),
+        breakdown: {
+            CASH: raw[PaymentMode.CASH] || 0,
+            UPI: raw[PaymentMode.UPI] || 0,
+            BANK_TRANSFER: raw[PaymentMode.BANK_TRANSFER] || 0,
+        },
+    };
+}
+
 /**
  * Get financial summary of donations (Aggregate)
  */
@@ -206,6 +240,7 @@ export async function updateDonation(
         donorName?: string;
         amount?: number | Prisma.Decimal;
         category?: DonationCategory;
+        paymentMode?: PaymentMode;
         notes?: string;
         eventId?: string;
     }
@@ -229,8 +264,8 @@ export async function updateDonation(
         entityType: "Donation",
         entityId: donationId,
         action: "update",
-        before: before ? { amount: before.amount.toString(), category: before.category } : undefined,
-        after: { amount: donation.amount.toString(), category: donation.category },
+        before: before ? { amount: before.amount.toString(), category: before.category, paymentMode: before.paymentMode } : undefined,
+        after: { amount: donation.amount.toString(), category: donation.category, paymentMode: donation.paymentMode },
     });
 
     return donation;

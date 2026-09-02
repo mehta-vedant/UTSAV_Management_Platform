@@ -8,8 +8,9 @@ import { PaginationControls } from "@/components/dashboard/shared/PaginationCont
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import EditExpenseModal from "@/components/dashboard/expenses/EditExpenseModal";
 import ExpenseApprovalActions from "@/components/dashboard/expenses/ExpenseApprovalActions";
-import { getPaginatedExpenses } from "@/modules/finance/expense.service";
-import { ExpenseCategory, ExpenseStatus, OrganizationRole } from "@prisma/client";
+import PaymentModeSummary from "@/components/dashboard/shared/PaymentModeSummary";
+import { getPaginatedExpenses, getExpensePaymentModeSummary } from "@/modules/finance/expense.service";
+import { ExpenseCategory, ExpenseStatus, OrganizationRole, PaymentMode } from "@prisma/client";
 import { AlertCircle, CheckCircle2, Landmark, Receipt, ShoppingBag, XCircle } from "lucide-react";
 
 export default async function ExpensesPage({
@@ -21,7 +22,10 @@ export default async function ExpensesPage({
 }) {
     const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
-    const expenses = await getPaginatedExpenses(organization.id, query);
+    const [expenses, paymentSummary] = await Promise.all([
+        getPaginatedExpenses(organization.id, query),
+        getExpensePaymentModeSummary(organization.id),
+    ]);
 
     const isTreasurer = member.role === OrganizationRole.TREASURER || member.role === OrganizationRole.ADMIN;
     const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.COMMITTEE_MEMBER, OrganizationRole.TREASURER] as string[]).includes(member.role);
@@ -41,6 +45,11 @@ export default async function ExpensesPage({
                 {canAdd && <AddExpenseModal organizationId={organization.id} isFestival={isFestival} />}
             </div>
 
+            <PaymentModeSummary
+                title="Approved Expenses by Payment Mode"
+                data={paymentSummary}
+            />
+
             <DashboardFilters
                 searchPlaceholder="Search expenses"
                 current={query}
@@ -58,6 +67,7 @@ export default async function ExpensesPage({
                             <tr className="border-b border-slate-100 bg-slate-50/50">
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Expense Detail</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Payment</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Operational Context</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
@@ -79,6 +89,11 @@ export default async function ExpensesPage({
                                     <td className="px-8 py-6">
                                         <div className="w-fit rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-slate-600">
                                             {expense.category.replace("_", " ")}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="w-fit rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-slate-600">
+                                            {(expense.paymentMode || PaymentMode.CASH).replace("_", " ")}
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">

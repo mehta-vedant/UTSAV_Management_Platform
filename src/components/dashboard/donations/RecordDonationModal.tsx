@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Loader2, X, IndianRupee, Heart } from "lucide-react";
-import { DonationCategory } from "@prisma/client";
+import { Plus, Loader2, X, IndianRupee, Heart, Banknote } from "lucide-react";
+import { DonationCategory, PaymentMode } from "@prisma/client";
 import { recordDonationAction } from "@/actions/donation.actions";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ export default function RecordDonationModal({
             donorName: formData.get("donorName") as string,
             amount: Number(formData.get("amount")),
             category: (formData.get("category") as DonationCategory) || defaultCategory,
+            paymentMode: (formData.get("paymentMode") as PaymentMode) || PaymentMode.CASH,
             receivedAt: toIsoDateTime(formData.get("receivedAt") as string),
             eventId,
             notes: formData.get("notes") as string,
@@ -134,6 +135,28 @@ export default function RecordDonationModal({
                                         )}
                                     </select>
                                 )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="paymentMode" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                                Payment Mode
+                            </Label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {[
+                                    { value: PaymentMode.CASH, label: "Cash", icon: Banknote },
+                                    { value: PaymentMode.UPI, label: "UPI", icon: IndianRupee },
+                                    { value: PaymentMode.BANK_TRANSFER, label: "Bank", icon: IndianRupee },
+                                ].map(({ value, label, icon: Icon }) => (
+                                    <label
+                                        key={value}
+                                        className="flex items-center justify-center gap-2 h-12 rounded-xl border border-slate-200 bg-white px-4 text-xs font-black uppercase tracking-tighter cursor-pointer transition-all hover:border-saffron-300 has-[:checked]:border-saffron-500 has-[:checked]:bg-saffron-50 has-[:checked]:text-saffron-700"
+                                    >
+                                        <input type="radio" name="paymentMode" value={value} defaultChecked={value === PaymentMode.CASH} className="sr-only" />
+                                        <Icon className="w-3.5 h-3.5" />
+                                        {label}
+                                    </label>
+                                ))}
                             </div>
                         </div>
 

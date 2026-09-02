@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createDonation, updateDonation, archiveDonation } from "@/modules/finance/donation.service";
-import { DonationCategory } from "@prisma/client";
+import { DonationCategory, PaymentMode } from "@prisma/client";
 import { withActionNoReturn } from "@/lib/action";
 
 const RecordDonationSchema = z.object({
@@ -10,6 +10,7 @@ const RecordDonationSchema = z.object({
     donorName: z.string().min(1, "Name is required"),
     amount: z.number().gt(0, "Amount must be greater than zero"),
     category: z.nativeEnum(DonationCategory),
+    paymentMode: z.nativeEnum(PaymentMode).default(PaymentMode.CASH),
     receivedAt: z.string().datetime("Date and time received are required."),
     notes: z.string().optional(),
     eventId: z.string().optional(),
@@ -31,6 +32,7 @@ const UpdateDonationSchema = z.object({
     donorName: z.string().min(1).optional(),
     amount: z.number().gt(0).optional(),
     category: z.nativeEnum(DonationCategory).optional(),
+    paymentMode: z.nativeEnum(PaymentMode).optional(),
     notes: z.string().optional(),
     eventId: z.string().optional(),
 });

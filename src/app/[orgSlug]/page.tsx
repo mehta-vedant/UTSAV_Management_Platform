@@ -6,15 +6,14 @@ import { getPublicApprovedExpenses } from "@/modules/festival/public-expense.ser
 import { getPublicBhogList } from "@/modules/festival/public-bhog.service";
 import { getPublicEvents } from "@/modules/festival/public-event.service";
 
-// Premium Modular Components
+// Public Components
 import SectionWrapper from "@/components/public/SectionWrapper";
 import FinancialHero from "@/components/public/FinancialHero";
-import FinancialCharts from "@/components/public/FinancialCharts";
 import DonationList from "@/components/public/DonationList";
 import ExpenseList from "@/components/public/ExpenseList";
 import BhogSection from "@/components/public/BhogSection";
 import EventTimeline from "@/components/public/EventTimeline";
-import { ShieldCheck, Calendar as CalendarIcon, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, MapPin } from "lucide-react";
 import { isFestivalOrganization } from "@/lib/organization-mode";
 
 interface PublicPageProps {
@@ -53,7 +52,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 <div className="max-w-7xl mx-auto relative z-10">
                     <SectionWrapper delay={0.1}>
                         <div className="flex flex-col items-center text-center">
-                            <h1 className="mobile-safe-text mt-6 mb-6 max-w-full text-4xl font-black tracking-tight text-slate-900 sm:mt-8 sm:text-5xl md:text-7xl md:tracking-tighter">
+                            <h1 className="mobile-safe-text mt-6 mb-6 max-w-full text-4xl font-black tracking-tight text-slate-900 sm:mt-8 sm:text-5xl md:text-6xl">
                                 {organization.name}
                             </h1>
 
@@ -76,7 +75,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
 
                             {organization.status === "ENDED" && (
                                 <div className="mt-8 rounded-2xl border border-amber-100 bg-amber-50 px-5 py-3 text-sm font-bold text-amber-700">
-                                    This festival has ended. The page remains available as a read-only transparency archive.
+                                    This festival has ended.
                                 </div>
                             )}
                         </div>
@@ -88,16 +87,7 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 {/* 1. Statistics Cards */}
                 <FinancialHero financials={financials} />
 
-                {/* 2. Visual Analytics Section */}
-                <SectionWrapper delay={0.6}>
-                    <FinancialCharts
-                        totalDonations={financials.totalDonations}
-                        totalExpenses={financials.totalExpenses}
-                        expenses={expenses}
-                    />
-                </SectionWrapper>
-
-                {/* 3. Primary Data Grids */}
+                {/* 2. Primary Data Grids */}
                 <div className="mb-12 grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-3">
                     <SectionWrapper className="lg:col-span-1" delay={0.7}>
                         <DonationList donations={donations} />
@@ -136,18 +126,16 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                         <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-xl">U</div>
                         <div>
                             <p className="font-black text-slate-900 leading-none">UTSAV</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Platform for Faith & Clarity</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Transparent Community Finance</p>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-black uppercase tracking-widest text-slate-400 sm:gap-8">
-                        <button className="hover:text-saffron-600 transition-colors">Contact</button>
-                        <button className="hover:text-saffron-600 transition-colors">Volunteers</button>
-                        <button className="hover:text-saffron-600 transition-colors">Audit</button>
-                    </div>
+                    <a href={`/${orgSlug}/transparency`} className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-saffron-500">
+                        View Audit Trail
+                    </a>
                 </div>
                 <p className="text-center text-[10px] font-bold text-slate-300 mt-10 uppercase tracking-[0.3em]">
-                    © 2026 {organization.name} • DIGITAL TRANSPARENCY BY UTSAV
+                    © 2026 {organization.name} • UTSAV
                 </p>
             </footer>
         </div>

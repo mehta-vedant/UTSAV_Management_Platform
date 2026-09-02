@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createExpense, approveExpense, rejectExpense, updateExpense, archiveExpense } from "@/modules/finance/expense.service";
-import { ExpenseCategory, ExpenseStatus } from "@prisma/client";
+import { ExpenseCategory, ExpenseStatus, PaymentMode } from "@prisma/client";
 import { withActionNoReturn } from "@/lib/action";
 
 const CreateExpenseSchema = z.object({
@@ -10,6 +10,7 @@ const CreateExpenseSchema = z.object({
     title: z.string().min(1, "Title is required"),
     amount: z.number().gt(0, "Amount must be greater than zero"),
     category: z.nativeEnum(ExpenseCategory),
+    paymentMode: z.nativeEnum(PaymentMode).default(PaymentMode.CASH),
     requestedAt: z.string().datetime("Expense date and time are required."),
     notes: z.string().optional(),
     eventId: z.string().optional(),
@@ -43,6 +44,7 @@ const UpdateExpenseSchema = z.object({
     title: z.string().min(1).optional(),
     amount: z.number().gt(0).optional(),
     category: z.nativeEnum(ExpenseCategory).optional(),
+    paymentMode: z.nativeEnum(PaymentMode).optional(),
     notes: z.string().optional(),
     eventId: z.string().optional(),
 });

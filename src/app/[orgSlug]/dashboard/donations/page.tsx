@@ -6,8 +6,9 @@ import { DashboardFilters } from "@/components/dashboard/shared/DashboardFilters
 import { PaginationControls } from "@/components/dashboard/shared/PaginationControls";
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
-import { getPaginatedDonations } from "@/modules/finance/donation.service";
-import { DonationCategory, OrganizationRole } from "@prisma/client";
+import PaymentModeSummary from "@/components/dashboard/shared/PaymentModeSummary";
+import { getPaginatedDonations, getDonationPaymentModeSummary } from "@/modules/finance/donation.service";
+import { DonationCategory, OrganizationRole, PaymentMode } from "@prisma/client";
 import { Heart } from "lucide-react";
 
 export default async function DonationsPage({
@@ -19,7 +20,10 @@ export default async function DonationsPage({
 }) {
     const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
-    const donations = await getPaginatedDonations(organization.id, query);
+    const [donations, paymentSummary] = await Promise.all([
+        getPaginatedDonations(organization.id, query),
+        getDonationPaymentModeSummary(organization.id),
+    ]);
 
     const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(member.role);
     const term = isFestival ? "Donation" : "Funds";
@@ -45,6 +49,11 @@ export default async function DonationsPage({
                 {canAdd && <RecordDonationModal organizationId={organization.id} isFestival={isFestival} />}
             </div>
 
+            <PaymentModeSummary
+                title="Donations by Payment Mode"
+                data={paymentSummary}
+            />
+
             <DashboardFilters
                 searchPlaceholder={`Search ${pluralTerm.toLowerCase()}`}
                 current={query}
@@ -61,6 +70,7 @@ export default async function DonationsPage({
                             <tr className="border-b border-slate-100 bg-slate-50/50">
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">{contributorTerm}</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Payment</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Date & Time</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Recorded By</th>
@@ -76,6 +86,11 @@ export default async function DonationsPage({
                                     <td className="px-8 py-6">
                                         <div className="w-fit rounded-lg bg-saffron-50 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-saffron-600">
                                             {donation.category.replace("_", " ")}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="w-fit rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-slate-600">
+                                            {(donation.paymentMode || PaymentMode.CASH).replace("_", " ")}
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 font-black text-slate-900">Rs {Number(donation.amount).toLocaleString()}</td>

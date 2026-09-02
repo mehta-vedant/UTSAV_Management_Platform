@@ -1,6 +1,6 @@
 import { getTenantPrisma } from "@/lib/access-control";
 import { resolveOrgContext } from "@/lib/org-context";
-import { OrganizationRole } from "@prisma/client";
+import { OrganizationRole, PaymentMode } from "@prisma/client";
 import { Handshake, Plus, Calendar, Coins, Landmark, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
@@ -55,6 +55,7 @@ export default async function SponsorshipsPage({ params }: { params: { orgSlug: 
                         <thead>
                             <tr className="border-b border-slate-100 bg-slate-50/50">
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Sponsor Name</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Payment</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Date Received</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Notes</th>
@@ -64,7 +65,7 @@ export default async function SponsorshipsPage({ params }: { params: { orgSlug: 
                         <tbody className="divide-y divide-slate-50">
                             {sponsorships.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-8 py-12 text-center text-slate-400 font-medium">
+                                    <td colSpan={6} className="px-8 py-12 text-center text-slate-400 font-medium">
                                         No sponsorships recorded yet.
                                     </td>
                                 </tr>
@@ -73,6 +74,11 @@ export default async function SponsorshipsPage({ params }: { params: { orgSlug: 
                                     <tr key={sponsorship.id} className="group hover:bg-slate-50/50 transition-colors">
                                         <td className="px-8 py-6">
                                             <div className="font-bold text-slate-900 uppercase tracking-tight">{sponsorship.donorName}</div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="w-fit rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-tighter text-slate-600">
+                                                {(sponsorship.paymentMode || PaymentMode.CASH).replace("_", " ")}
+                                            </div>
                                         </td>
                                         <td className="px-8 py-6 font-black text-slate-900">
                                             ₹{Number(sponsorship.amount).toLocaleString()}

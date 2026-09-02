@@ -175,7 +175,7 @@ export default function AuditTable({ entries }: AuditTableProps) {
             {/* Table Footer */}
             <div className="p-8 bg-slate-50/50 border-t border-slate-100 text-center">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                    Digital Audit Trail Provided by UTSAV Platform • Real-time Data
+                    Audit Trail by UTSAV • Real-time Data
                 </p>
             </div>
         </div>

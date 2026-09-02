@@ -1,4 +1,4 @@
-import { PrismaClient, OrganizationRole, ExpenseStatus, DonationCategory, ExpenseCategory, BhogStatus } from "@prisma/client";
+import { PrismaClient, OrganizationRole, ExpenseStatus, DonationCategory, ExpenseCategory, BhogStatus, PaymentMode } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -53,6 +53,7 @@ async function main() {
                 donorName: "Rahul Sharma",
                 amount: 10000,
                 category: DonationCategory.GENERAL,
+                paymentMode: PaymentMode.CASH,
                 organizationId: organization.id,
                 addedById: devMember.id,
                 date: new Date(),
@@ -61,6 +62,7 @@ async function main() {
                 donorName: "Pooja Patel",
                 amount: 5000,
                 category: DonationCategory.GENERAL,
+                paymentMode: PaymentMode.UPI,
                 organizationId: organization.id,
                 addedById: devMember.id,
                 date: new Date(),
@@ -77,6 +79,7 @@ async function main() {
                 title: "Idol Decoration & Flowers",
                 amount: 20000,
                 category: ExpenseCategory.DECORATION,
+                paymentMode: PaymentMode.BANK_TRANSFER,
                 status: ExpenseStatus.APPROVED,
                 organizationId: organization.id,
                 addedById: devMember.id,
@@ -87,6 +90,7 @@ async function main() {
                 title: "Prasad Distribution",
                 amount: 10000,
                 category: ExpenseCategory.FOOD,
+                paymentMode: PaymentMode.CASH,
                 status: ExpenseStatus.APPROVED,
                 organizationId: organization.id,
                 addedById: devMember.id,

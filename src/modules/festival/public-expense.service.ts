@@ -14,6 +14,7 @@ export async function getPublicApprovedExpenses(organizationId: string, limit = 
             title: true,
             amount: true,
             category: true,
+            paymentMode: true,
             createdAt: true,
         },
         orderBy: { createdAt: "desc" },

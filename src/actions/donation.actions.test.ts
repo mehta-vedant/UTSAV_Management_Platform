@@ -16,6 +16,7 @@ describe("donation actions", () => {
             donorName: "Asha",
             amount: 0,
             category: "GENERAL",
+            paymentMode: "CASH",
             receivedAt: new Date().toISOString(),
         });
 

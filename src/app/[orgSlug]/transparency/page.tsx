@@ -4,7 +4,7 @@ import { getFullAuditTrail, getTransparencyStats, getPublicSchedule } from "@/mo
 import AuditTable from "@/components/public/transparency/AuditTable";
 import PublicSchedule from "@/components/public/transparency/PublicSchedule";
 import SectionWrapper from "@/components/public/SectionWrapper";
-import { ShieldCheck, Info, ArrowLeft, Download } from "lucide-react";
+import { ShieldCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 interface TransparencyPageProps {
@@ -59,28 +59,20 @@ export default async function TransparencyPage({ params }: TransparencyPageProps
 
                 {/* Quick Stats Grid */}
                 <SectionWrapper delay={0.2}>
-                    <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6 lg:mb-12">
+                    <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6 lg:mb-12">
                         <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Total Collections</p>
                             <h3 className="text-3xl font-black text-slate-900 tracking-tighter">₹{stats.totalDonations.toLocaleString()}</h3>
-                            <p className="text-xs text-emerald-500 font-bold mt-1 uppercase tracking-tight">{stats.donationCount} Verified Donors</p>
+                            <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tight">{stats.donationCount} Donations</p>
                         </div>
                         <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Total Expenditures</p>
                             <h3 className="text-3xl font-black text-slate-900 tracking-tighter text-rose-600">₹{stats.totalExpenses.toLocaleString()}</h3>
-                            <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tight">{stats.expenseCount} Audited Items</p>
+                            <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tight">{stats.expenseCount} Expenses</p>
                         </div>
                         <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm sm:p-8">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Remaining Balance</p>
                             <h3 className="text-3xl font-black text-slate-900 tracking-tighter text-emerald-600">₹{(stats.totalDonations - stats.totalExpenses).toLocaleString()}</h3>
-                            <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-tight">Funds in Trust</p>
-                        </div>
-                        <div className="flex flex-col justify-between rounded-[2rem] border border-saffron-600 bg-saffron-500 p-5 shadow-lg shadow-saffron-100 sm:p-8">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Audit Integrity</p>
-                            <div className="flex items-end justify-between">
-                                <h3 className="text-3xl font-black text-white tracking-tighter">100%</h3>
-                                <ShieldCheck className="w-8 h-8 text-white/50" />
-                            </div>
                         </div>
                     </div>
                 </SectionWrapper>
@@ -89,16 +81,11 @@ export default async function TransparencyPage({ params }: TransparencyPageProps
                     {/* Left: Financial Audit Trail */}
                     <div className="lg:col-span-2 space-y-12">
                         <SectionWrapper delay={0.3}>
-                            <div className="mb-6 flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
-                                        <ShieldCheck className="w-4 h-4" />
-                                    </div>
-                                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Verified Ledger</h3>
+                            <div className="mb-6 flex items-center gap-2 px-1">
+                                <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+                                    <ShieldCheck className="w-4 h-4" />
                                 </div>
-                                <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
-                                    <Download className="w-4 h-4" /> Export Audit
-                                </button>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Verified Ledger</h3>
                             </div>
                             <AuditTable entries={auditTrail as any} />
                         </SectionWrapper>
@@ -106,21 +93,6 @@ export default async function TransparencyPage({ params }: TransparencyPageProps
 
                     {/* Right: Public Schedule */}
                     <div className="space-y-12">
-                        <SectionWrapper delay={0.5}>
-                            <div className="bg-blue-50 border border-blue-100 rounded-[2rem] p-6 flex flex-col gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                                        <Info className="w-4 h-4 text-blue-500" />
-                                    </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-900">Integrity Note</span>
-                                </div>
-                                <p className="text-xs text-blue-700/80 font-medium leading-relaxed">
-                                    Every transaction and scheduled event is directly mirrored from our internal management systems.
-                                    Full transparency ensures a community-driven pavilion.
-                                </p>
-                            </div>
-                        </SectionWrapper>
-
                         <SectionWrapper delay={0.6}>
                             <PublicSchedule events={schedule as any} />
                         </SectionWrapper>

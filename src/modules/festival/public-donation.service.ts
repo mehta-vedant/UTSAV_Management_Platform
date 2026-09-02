@@ -10,6 +10,7 @@ export async function getPublicDonations(organizationId: string, limit = 50) {
             donorName: true,
             amount: true,
             category: true,
+            paymentMode: true,
             date: true,
         },
         orderBy: { date: "desc" },

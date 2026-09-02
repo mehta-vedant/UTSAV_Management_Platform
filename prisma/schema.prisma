@@ -84,6 +84,7 @@ model Donation {
   donorName      String
   amount         Decimal             @db.Decimal(12, 2)
   category       DonationCategory    @default(GENERAL)
+  paymentMode    PaymentMode         @default(CASH)
   date           DateTime            @default(now())
   receivedAt     DateTime            @default(now())
   notes          String?
@@ -109,6 +110,7 @@ model Expense {
   title          String
   amount         Decimal             @db.Decimal(12, 2)
   category       ExpenseCategory     @default(MISCELLANEOUS)
+  paymentMode    PaymentMode         @default(CASH)
   status         ExpenseStatus       @default(PENDING)
   notes          String?
   isArchived     Boolean             @default(false)
@@ -379,4 +381,10 @@ enum EventStatus {
 enum AuditVisibility {
   INTERNAL
   PUBLIC
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  BANK_TRANSFER
 }

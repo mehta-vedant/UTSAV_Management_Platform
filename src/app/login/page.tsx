@@ -77,7 +77,7 @@ function LoginForm() {
                 <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
                         <Label htmlFor="password" className="text-slate-400 font-bold">Password</Label>
-                        <button type="button" className="text-xs text-saffron-500 hover:text-saffron-400 font-bold">Forgot?</button>
+                        <span className="text-xs text-slate-500 font-medium">Forgot? Contact your org admin</span>
                     </div>
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />

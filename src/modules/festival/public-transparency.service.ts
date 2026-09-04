@@ -39,8 +39,8 @@ export async function getFullAuditTrail(organizationId: string, limit = 500) {
     const normalizedDonations = donations.map(d => ({
         id: d.id,
         type: "INCOME" as const,
-        source: d.donorName,
-        title: `Donation: ${d.donorName}`,
+        source: "Donation",
+        title: "Donation",
         amount: Number(d.amount),
         date: d.receivedAt,
         category: d.category || "General",

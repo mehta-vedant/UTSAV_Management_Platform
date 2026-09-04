@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { Calendar } from "lucide-react";
+import { Calendar, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,9 +12,10 @@ interface ExpenseListProps {
         paymentMode: string | null;
         createdAt: Date;
     }[];
+    orgSlug: string;
 }
 
-export default function ExpenseList({ expenses }: ExpenseListProps) {
+export default function ExpenseList({ expenses, orgSlug }: ExpenseListProps) {
     return (
         <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white h-full flex flex-col">
             <CardHeader className="pb-4">
@@ -54,6 +55,14 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
                         </div>
                     )}
                 </div>
+
+                <a
+                    href={`/${orgSlug}/expenses`}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 transition-colors hover:border-saffron-300 hover:text-saffron-600 hover:bg-saffron-50"
+                >
+                    View All Expenses
+                    <ArrowRight className="h-3.5 w-3.5" />
+                </a>
             </CardContent>
         </Card>
     );

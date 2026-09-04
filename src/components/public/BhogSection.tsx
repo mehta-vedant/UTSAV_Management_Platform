@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BhogSponsorshipDialog from "./BhogSponsorshipDialog";
 import { BhogOfferingWindow, OrganizationStatus } from "@prisma/client";
-import { formatOfferingWindow, PrasadWindowConfig, getPrasadWindowOptions } from "@/lib/prasad-windows";
+import { formatOfferingWindow, PrasadWindowConfig, getPrasadWindowOptions, isPrasadWindowAvailable } from "@/lib/prasad-windows";
 
 interface BhogSectionProps {
     organizationId: string;
@@ -36,6 +36,19 @@ export default function BhogSection({
 }: BhogSectionProps) {
     const windowSummary = getPrasadWindowOptions(prasadWindowConfig).map((option) => option.label).join(" and ");
 
+    // Only show approved offerings whose time window has not yet ended.
+    // Past offerings disappear automatically once their window is over.
+    const visibleBhog = bhogList.filter((b) =>
+        isPrasadWindowAvailable({
+            selectedDate: b.offeringDate,
+            window: b.offeringWindow,
+            festivalStartDate,
+            festivalEndDate,
+            status: festivalStatus,
+            config: prasadWindowConfig,
+        })
+    );
+
     return (
         <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white h-full flex flex-col">
             <CardHeader className="pb-4">
@@ -64,7 +77,7 @@ export default function BhogSection({
                     />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[520px] overflow-y-auto pr-1">
-                    {bhogList.map((b) => (
+                    {visibleBhog.map((b) => (
                         <div
                             key={b.id}
                             className="p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:bg-white hover:shadow-lg hover:border-saffron-100 transition-all duration-300"
@@ -74,7 +87,7 @@ export default function BhogSection({
                                     <Soup className="w-4 h-4" />
                                 </div>
                                 <div className="flex items-center space-x-1">
-                                    <span className={`w-2 h-2 rounded-full ${b.status === 'READY' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+                                    <span className={`w-2 h-2 rounded-full ${b.status === 'PREPARED' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{b.status}</span>
                                 </div>
                             </div>
@@ -105,7 +118,7 @@ export default function BhogSection({
                         </div>
                     ))}
 
-                    {bhogList.length === 0 && (
+                    {visibleBhog.length === 0 && (
                         <div className="col-span-full py-12 flex flex-col items-center justify-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                             <p className="text-sm text-slate-400 font-bold tracking-tight uppercase">No records found</p>
                         </div>

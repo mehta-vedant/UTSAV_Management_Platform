@@ -50,7 +50,7 @@ export default function AuditTable({ entries }: AuditTableProps) {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                         type="text"
-                        placeholder="Search donors, items, or categories..."
+                        placeholder="Search items or categories..."
                         className="w-full pl-12 pr-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all shadow-sm"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -133,9 +133,11 @@ export default function AuditTable({ entries }: AuditTableProps) {
                                             <div className="text-sm font-black text-slate-900 group-hover:text-saffron-600 transition-colors uppercase tracking-tight">
                                                 {entry.title}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                                                By {entry.source}
-                                            </div>
+                                            {entry.type === "EXPENSE" && (
+                                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                                    By {entry.source}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </td>

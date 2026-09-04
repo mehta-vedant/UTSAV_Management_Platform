@@ -37,8 +37,10 @@ export default async function OrganizationDashboardLayout({
     if (!organization) redirect("/dashboard");
 
     // Check membership
+    let memberRole;
     try {
-        await validateAccess(organization.id);
+        const access = await validateAccess(organization.id);
+        memberRole = access.member.role;
     } catch (error) {
         redirect("/dashboard");
     }
@@ -47,6 +49,7 @@ export default async function OrganizationDashboardLayout({
         <ResponsiveDashboardLayout
             organization={organization as any}
             orgSlug={params.orgSlug}
+            role={memberRole as any}
         >
             {children}
         </ResponsiveDashboardLayout>

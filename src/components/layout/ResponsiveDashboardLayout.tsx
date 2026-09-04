@@ -19,8 +19,11 @@ import {
     ChevronRight,
     LayoutDashboard,
     PanelLeftClose,
-    PanelLeftOpen
+    PanelLeftOpen,
+    FileSearch,
+    BarChart3
 } from "lucide-react";
+import { OrganizationRole } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import AdminAssistantPanel from "@/components/dashboard/assistant/AdminAssistantPanel";
 
@@ -33,12 +36,14 @@ interface ResponsiveDashboardLayoutProps {
         type: "FESTIVAL" | "CLUB";
     };
     orgSlug: string;
+    role: OrganizationRole;
 }
 
 export default function ResponsiveDashboardLayout({
     children,
     organization,
-    orgSlug
+    orgSlug,
+    role
 }: ResponsiveDashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [sidebarSize, setSidebarSize] = useState<"collapsed" | "normal">("normal");
@@ -76,12 +81,18 @@ export default function ResponsiveDashboardLayout({
             icon: Heart
         },
         { name: "Expenses", href: `/${orgSlug}/dashboard/expenses`, icon: Activity },
+        ...((role === OrganizationRole.ADMIN || role === OrganizationRole.TREASURER || role === OrganizationRole.COMMITTEE_MEMBER) ? [
+            { name: "Reports", href: `/${orgSlug}/dashboard/reports`, icon: BarChart3 }
+        ] : []),
         ...(organization.type === "FESTIVAL" ? [
             { name: "Bhog", href: `/${orgSlug}/dashboard/bhog`, icon: Utensils }
         ] : []),
         { name: "Volunteers", href: `/${orgSlug}/dashboard/volunteers`, icon: ClipboardList },
         { name: "Events", href: `/${orgSlug}/dashboard/events`, icon: Calendar },
         { name: "Members", href: `/${orgSlug}/dashboard/members`, icon: Users },
+        ...((role === OrganizationRole.ADMIN || role === OrganizationRole.TREASURER) ? [
+            { name: "Audit Trail", href: `/${orgSlug}/dashboard/audit-trail`, icon: FileSearch }
+        ] : []),
     ];
 
     const toggleSidebarSize = () => {

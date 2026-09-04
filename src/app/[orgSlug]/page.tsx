@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getOrganizationBySlug } from "@/modules/core/organization.service";
 import { getPublicFinancialOverview } from "@/modules/festival/public-financial.service";
-import { getPublicDonations } from "@/modules/festival/public-donation.service";
 import { getPublicApprovedExpenses } from "@/modules/festival/public-expense.service";
 import { getPublicBhogList } from "@/modules/festival/public-bhog.service";
 import { getPublicEvents } from "@/modules/festival/public-event.service";
@@ -9,7 +8,6 @@ import { getPublicEvents } from "@/modules/festival/public-event.service";
 // Public Components
 import SectionWrapper from "@/components/public/SectionWrapper";
 import FinancialHero from "@/components/public/FinancialHero";
-import DonationList from "@/components/public/DonationList";
 import ExpenseList from "@/components/public/ExpenseList";
 import BhogSection from "@/components/public/BhogSection";
 import EventTimeline from "@/components/public/EventTimeline";
@@ -33,10 +31,9 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
     }
 
     // 2. Parallel Data Fetching
-    const [financials, donations, expenses, bhogList, events] = await Promise.all([
+    const [financials, expenses, bhogList, events] = await Promise.all([
         getPublicFinancialOverview(organization.id),
-        getPublicDonations(organization.id),
-        getPublicApprovedExpenses(organization.id),
+        getPublicApprovedExpenses(organization.id, 5),
         getPublicBhogList(organization.id),
         getPublicEvents(organization.id),
     ]);
@@ -88,14 +85,11 @@ export default async function PublicOrganizationPage({ params }: PublicPageProps
                 <FinancialHero financials={financials} />
 
                 {/* 2. Primary Data Grids */}
-                <div className="mb-12 grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-3">
+                <div className="mb-12 grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-2">
                     <SectionWrapper className="lg:col-span-1" delay={0.7}>
-                        <DonationList donations={donations} />
+                        <ExpenseList expenses={expenses} orgSlug={orgSlug} />
                     </SectionWrapper>
                     <SectionWrapper className="lg:col-span-1" delay={0.8}>
-                        <ExpenseList expenses={expenses} />
-                    </SectionWrapper>
-                    <SectionWrapper className="lg:col-span-1" delay={0.9}>
                         <BhogSection
                             bhogList={bhogList}
                             organizationId={organization.id}

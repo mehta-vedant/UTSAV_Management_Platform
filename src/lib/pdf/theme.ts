@@ -15,7 +15,9 @@ export const PDF_COLORS = {
     emerald: "#10b981",
     rose: "#f43f5e",
     blue: "#3b82f6",
+    indigo: "#6366f1",
     violet: "#8b5cf6",
+    sky: "#0ea5e9",
     white: "#ffffff",
 };
 

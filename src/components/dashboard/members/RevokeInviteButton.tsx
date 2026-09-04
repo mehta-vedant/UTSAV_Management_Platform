@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 import { revokeInvitationAction } from "@/actions/member.actions";
 import { toast } from "sonner";
@@ -29,6 +30,7 @@ export default function RevokeInviteButton({
 }: RevokeInviteButtonProps) {
     const [isRevoking, setIsRevoking] = useState(false);
     const [open, setOpen] = useState(false);
+    const router = useRouter();
 
     const handleRevoke = async () => {
         setIsRevoking(true);
@@ -37,6 +39,7 @@ export default function RevokeInviteButton({
             if (result.success) {
                 toast.success(`Invitation for ${email} revoked`);
                 setOpen(false);
+                router.refresh();
             } else {
                 toast.error(result.error || "Failed to revoke invitation");
             }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Loader2, X, Utensils, User } from "lucide-react";
 import { createBhogAction } from "@/actions/bhog.actions";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ export default function AddBhogModal({ organizationId }: { organizationId: strin
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -33,6 +35,8 @@ export default function AddBhogModal({ organizationId }: { organizationId: strin
 
         if (result.success) {
             setIsOpen(false);
+            setIsLoading(false);
+            router.refresh();
         } else {
             setError(result.error);
             setIsLoading(false);

@@ -299,3 +299,113 @@ export async function archiveDonation(organizationId: string, donationId: string
 function isDonationCategory(value: string): value is DonationCategory {
     return Object.values(DonationCategory).includes(value as DonationCategory);
 }
+
+export interface DonationExportRow {
+    id: string;
+    donorName: string;
+    amount: number;
+    category: string;
+    paymentMode: string;
+    receivedAt: Date;
+    notes: string | null;
+    eventTitle: string | null;
+    recordedBy: string | null;
+}
+
+export interface DonationExportSummary {
+    totalAmount: number;
+    count: number;
+    byCategory: { category: string; amount: number; count: number }[];
+    byPaymentMode: { paymentMode: string; amount: number; count: number }[];
+}
+
+export interface DonationExportData {
+    rows: DonationExportRow[];
+    summary: DonationExportSummary;
+}
+
+/**
+ * Fetch every non-archived donation matching the active filters (ignores pagination)
+ * so CSV/PDF exports capture the full filtered dataset.
+ * Gated by "finance:read".
+ */
+export async function getDonationsForExport(organizationId: string, query: Partial<PageQuery> = {}): Promise<DonationExportData> {
+    await requirePermission(organizationId, "finance:read");
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    const where: Prisma.DonationWhereInput = {
+        isArchived: false,
+        ...(query.category && isDonationCategory(query.category) ? { category: query.category } : {}),
+        ...(query.search ? {
+            OR: [
+                { donorName: { contains: query.search, mode: "insensitive" } },
+                { notes: { contains: query.search, mode: "insensitive" } },
+            ],
+        } : {}),
+        ...(query.dateFrom || query.dateTo ? {
+            receivedAt: {
+                ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                ...(query.dateTo ? { lte: query.dateTo } : {}),
+            },
+        } : {}),
+    };
+
+    const donations = await tenantPrisma.donation.findMany({
+        where,
+        include: {
+            addedBy: { select: { user: { select: { name: true } } } },
+            event: { select: { title: true } },
+        },
+        orderBy: { receivedAt: "desc" },
+    });
+
+    const rows: DonationExportRow[] = donations.map((d) => ({
+        id: d.id,
+        donorName: d.donorName,
+        amount: Number(d.amount),
+        category: d.category.replace("_", " "),
+        paymentMode: d.paymentMode.replace("_", " "),
+        receivedAt: d.receivedAt,
+        notes: d.notes || null,
+        eventTitle: d.event?.title || null,
+        recordedBy: d.addedBy?.user?.name || null,
+    }));
+
+    const categoryMap = new Map<string, { amount: number; count: number }>();
+    const paymentModeMap = new Map<string, { amount: number; count: number }>();
+    let totalAmount = 0;
+
+    for (const r of rows) {
+        totalAmount += r.amount;
+        const c = categoryMap.get(r.category) || { amount: 0, count: 0 };
+        c.amount += r.amount;
+        c.count += 1;
+        categoryMap.set(r.category, c);
+        const p = paymentModeMap.get(r.paymentMode) || { amount: 0, count: 0 };
+        p.amount += r.amount;
+        p.count += 1;
+        paymentModeMap.set(r.paymentMode, p);
+    }
+
+    const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, v]) => ({
+        category,
+        amount: v.amount,
+        count: v.count,
+    }));
+    const paymentModeBreakdown = Array.from(paymentModeMap.entries()).map(([paymentMode, v]) => ({
+        paymentMode,
+        amount: v.amount,
+        count: v.count,
+    }));
+
+    return {
+        rows,
+        summary: {
+            totalAmount,
+            count: rows.length,
+            byCategory: categoryBreakdown,
+            byPaymentMode: paymentModeBreakdown,
+        },
+    };
+}

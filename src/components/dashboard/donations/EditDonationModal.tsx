@@ -43,6 +43,7 @@ export default function EditDonationModal({
         if (result.success) {
             toast.success("Donation record deleted");
             setIsOpen(false);
+            setIsLoading(false);
             router.refresh();
         } else {
             setError(result.error);
@@ -71,6 +72,7 @@ export default function EditDonationModal({
         if (result.success) {
             toast.success("Donation record updated");
             setIsOpen(false);
+            setIsLoading(false);
             router.refresh();
         } else {
             setError(result.error);

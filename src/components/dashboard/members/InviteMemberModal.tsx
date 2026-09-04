@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, UserPlus, X, Loader2 } from "lucide-react";
 import { OrganizationRole } from "@prisma/client";
 import { inviteMemberAction } from "@/actions/member.actions";
@@ -20,6 +21,7 @@ export default function InviteMemberModal({
     const [error, setError] = useState<string | null>(null);
     const [selectedEventId, setSelectedEventId] = useState<string>("");
     const [skipEmail, setSkipEmail] = useState(true); // Default to true for faster bypass
+    const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -40,6 +42,8 @@ export default function InviteMemberModal({
 
         if (result.success) {
             setIsOpen(false);
+            setIsLoading(false);
+            router.refresh();
         } else {
             setError(result.error || "Failed to invite member");
             setIsLoading(false);

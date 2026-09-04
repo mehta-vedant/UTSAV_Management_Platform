@@ -47,6 +47,7 @@ export default async function AuditTrailPage({
             <AuditTrailTable
                 entries={data.items as any}
                 totals={data.totals}
+                organizationName={organization.name}
                 isFestival={isFestival}
                 canApprove={canApprove}
             />

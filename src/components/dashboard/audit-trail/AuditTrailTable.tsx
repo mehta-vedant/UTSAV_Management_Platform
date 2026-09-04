@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { csvDownloadBlob, downloadBlob, toCsv, formatAmountForCsv, formatDateForCsv } from "@/lib/export";
+import { downloadPdfDocument, pdfFilename } from "@/lib/pdf/download";
+import AuditTrailDocument from "@/lib/pdf/AuditTrailDocument";
 import type { AuditTrailEntry } from "@/modules/finance/audit-trail.service";
 
 interface AuditTrailTableProps {
@@ -22,13 +24,14 @@ interface AuditTrailTableProps {
         expense: number;
         balance: number;
     };
+    organizationName: string;
     isFestival: boolean;
     canApprove: boolean;
 }
 
 const PAGE_SIZE = 12;
 
-export default function AuditTrailTable({ entries, totals, isFestival, canApprove }: AuditTrailTableProps) {
+export default function AuditTrailTable({ entries, totals, organizationName, isFestival, canApprove }: AuditTrailTableProps) {
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
     const [page, setPage] = useState(1);
@@ -67,6 +70,37 @@ export default function AuditTrailTable({ entries, totals, isFestival, canApprov
             amount: formatAmountForCsv(e.amount),
         }));
         downloadBlob(csvDownloadBlob(toCsv(rows, columns)), `audit-trail-${new Date().toISOString().slice(0, 10)}.csv`);
+    };
+
+    const containerPdfData = {
+        totals,
+        entries: filtered.map((e) => ({
+            date: new Date(e.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+            time: new Date(e.date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+            type: e.type,
+            title: e.title,
+            detail: e.detail,
+            category: e.category,
+            paymentMode: e.paymentMode,
+            status: e.status,
+            source: e.source,
+            actor: e.actor,
+            eventTitle: e.eventTitle,
+            amount: e.amount,
+        })),
+    };
+
+    const handleDownloadPdf = () => {
+        void downloadPdfDocument(
+            <AuditTrailDocument
+                organizationName={organizationName}
+                incomeLabel={incomeLabel}
+                generatedAt={new Date()}
+                totals={containerPdfData.totals}
+                entries={containerPdfData.entries as any}
+            />,
+            pdfFilename("audit-trail")
+        );
     };
 
     return (
@@ -114,6 +148,14 @@ export default function AuditTrailTable({ entries, totals, isFestival, canApprov
                         >
                             <Download className="w-3.5 h-3.5" />
                             Export CSV
+                        </button>
+                        <button
+                            onClick={handleDownloadPdf}
+                            disabled={filtered.length === 0}
+                            className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 flex-shrink-0"
+                        >
+                            <Download className="w-3.5 h-3.5" />
+                            Download PDF
                         </button>
                         {(["ALL", "INCOME", "EXPENSE"] as const).map((f) => (
                             <button

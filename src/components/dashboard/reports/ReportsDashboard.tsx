@@ -19,11 +19,14 @@ import {
 import { Download, TrendingUp, TrendingDown, Wallet, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { csvDownloadBlob, downloadBlob, toCsv, formatAmountForCsv } from "@/lib/export";
+import { downloadPdfDocument, pdfFilename } from "@/lib/pdf/download";
+import ReportsDocument from "@/lib/pdf/ReportsDocument";
 import type { ReportsData } from "@/modules/finance/reports.service";
 
 interface ReportsDashboardProps {
     data: ReportsData;
     orgSlug: string;
+    organizationName: string;
     currentBucket: "daily" | "weekly" | "monthly";
     isFestival: boolean;
 }
@@ -45,7 +48,7 @@ function fmt(value: number) {
     return `₹${Math.round(value).toLocaleString("en-IN")}`;
 }
 
-export default function ReportsDashboard({ data, orgSlug, currentBucket, isFestival }: ReportsDashboardProps) {
+export default function ReportsDashboard({ data, orgSlug, organizationName, currentBucket, isFestival }: ReportsDashboardProps) {
     const incomeLabel = isFestival ? "Donations" : "Income";
     const { totals } = data;
 
@@ -107,7 +110,22 @@ export default function ReportsDashboard({ data, orgSlug, currentBucket, isFesti
         },
     ];
 
-return (
+    const bucketLabel = currentBucket === "monthly" ? "Monthly" : currentBucket === "weekly" ? "Weekly" : "Daily";
+
+    const handleDownloadPdf = () => {
+        void downloadPdfDocument(
+            <ReportsDocument
+                organizationName={organizationName}
+                incomeLabel={incomeLabel}
+                bucketLabel={bucketLabel}
+                generatedAt={new Date()}
+                data={data as any}
+            />,
+            pdfFilename("financial-reports")
+        );
+    };
+
+    return (
         <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -152,6 +170,13 @@ return (
                             {action.label} · CSV
                         </button>
                     ))}
+                    <button
+                        onClick={handleDownloadPdf}
+                        className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-slate-800 transition-colors flex items-center gap-1.5"
+                    >
+                        <Download className="w-3.5 h-3.5" />
+                        Download Report PDF
+                    </button>
                 </div>
             </div>
 

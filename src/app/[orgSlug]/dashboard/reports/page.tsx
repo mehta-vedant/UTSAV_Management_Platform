@@ -34,6 +34,7 @@ export default async function ReportsPage({
             <ReportsDashboard
                 data={data as any}
                 orgSlug={params.orgSlug}
+                organizationName={organization.name}
                 currentBucket={bucket}
                 isFestival={isFestival}
             />

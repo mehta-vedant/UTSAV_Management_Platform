@@ -357,3 +357,116 @@ function isExpenseStatus(value: string): value is ExpenseStatus {
 function isExpenseCategory(value: string): value is ExpenseCategory {
     return Object.values(ExpenseCategory).includes(value as ExpenseCategory);
 }
+
+export interface ExpenseExportRow {
+    id: string;
+    title: string;
+    amount: number;
+    category: string;
+    paymentMode: string;
+    status: string;
+    requestedAt: Date;
+    notes: string | null;
+    eventTitle: string | null;
+    requestedBy: string | null;
+}
+
+export interface ExpenseExportSummary {
+    totalAmount: number;
+    count: number;
+    byStatus: { status: string; amount: number; count: number }[];
+    byCategory: { category: string; amount: number; count: number }[];
+}
+
+export interface ExpenseExportData {
+    rows: ExpenseExportRow[];
+    summary: ExpenseExportSummary;
+}
+
+/**
+ * Fetch every non-archived expense matching the active filters (ignores pagination)
+ * so CSV/PDF exports capture the full filtered dataset.
+ * Gated by "finance:read".
+ */
+export async function getExpensesForExport(organizationId: string, query: Partial<PageQuery> = {}): Promise<ExpenseExportData> {
+    await requirePermission(organizationId, "finance:read");
+
+    const tenantPrisma = getTenantPrisma(organizationId);
+
+    const where: Prisma.ExpenseWhereInput = {
+        isArchived: false,
+        ...(query.status && isExpenseStatus(query.status) ? { status: query.status } : {}),
+        ...(query.category && isExpenseCategory(query.category) ? { category: query.category } : {}),
+        ...(query.search ? {
+            OR: [
+                { title: { contains: query.search, mode: "insensitive" } },
+                { notes: { contains: query.search, mode: "insensitive" } },
+            ],
+        } : {}),
+        ...(query.dateFrom || query.dateTo ? {
+            requestedAt: {
+                ...(query.dateFrom ? { gte: query.dateFrom } : {}),
+                ...(query.dateTo ? { lte: query.dateTo } : {}),
+            },
+        } : {}),
+    };
+
+    const expenses = await tenantPrisma.expense.findMany({
+        where,
+        include: {
+            addedBy: { select: { user: { select: { name: true } } } },
+            event: { select: { title: true } },
+        },
+        orderBy: { requestedAt: "desc" },
+    });
+
+    const rows: ExpenseExportRow[] = expenses.map((e) => ({
+        id: e.id,
+        title: e.title,
+        amount: Number(e.amount),
+        category: e.category.replace("_", " "),
+        paymentMode: e.paymentMode.replace("_", " "),
+        status: e.status,
+        requestedAt: e.requestedAt,
+        notes: e.notes || null,
+        eventTitle: e.event?.title || null,
+        requestedBy: e.addedBy?.user?.name || null,
+    }));
+
+    const statusMap = new Map<string, { amount: number; count: number }>();
+    const categoryMap = new Map<string, { amount: number; count: number }>();
+    let totalAmount = 0;
+
+    for (const r of rows) {
+        totalAmount += r.amount;
+        const st = statusMap.get(r.status) || { amount: 0, count: 0 };
+        st.amount += r.amount;
+        st.count += 1;
+        statusMap.set(r.status, st);
+        const cat = categoryMap.get(r.category) || { amount: 0, count: 0 };
+        cat.amount += r.amount;
+        cat.count += 1;
+        categoryMap.set(r.category, cat);
+    }
+
+    const statusBreakdown = Array.from(statusMap.entries()).map(([status, v]) => ({
+        status,
+        amount: v.amount,
+        count: v.count,
+    }));
+    const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, v]) => ({
+        category,
+        amount: v.amount,
+        count: v.count,
+    }));
+
+    return {
+        rows,
+        summary: {
+            totalAmount,
+            count: rows.length,
+            byStatus: statusBreakdown,
+            byCategory: categoryBreakdown,
+        },
+    };
+}

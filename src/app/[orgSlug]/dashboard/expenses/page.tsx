@@ -9,7 +9,9 @@ import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import EditExpenseModal from "@/components/dashboard/expenses/EditExpenseModal";
 import ExpenseApprovalActions from "@/components/dashboard/expenses/ExpenseApprovalActions";
 import PaymentModeSummary from "@/components/dashboard/shared/PaymentModeSummary";
-import { getPaginatedExpenses, getExpensePaymentModeSummary } from "@/modules/finance/expense.service";
+import ExportActions from "@/components/dashboard/shared/ExportActions";
+import { getPaginatedExpenses, getExpensePaymentModeSummary, getExpensesForExport } from "@/modules/finance/expense.service";
+import { formatDateForCsv } from "@/lib/export";
 import { ExpenseCategory, ExpenseStatus, OrganizationRole, PaymentMode } from "@prisma/client";
 import { AlertCircle, CheckCircle2, Landmark, Receipt, ShoppingBag, XCircle } from "lucide-react";
 
@@ -22,13 +24,31 @@ export default async function ExpensesPage({
 }) {
     const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
-    const [expenses, paymentSummary] = await Promise.all([
+    const [expenses, paymentSummary, exportData] = await Promise.all([
         getPaginatedExpenses(organization.id, query),
         getExpensePaymentModeSummary(organization.id),
+        getExpensesForExport(organization.id, query),
     ]);
 
     const isTreasurer = member.role === OrganizationRole.TREASURER || member.role === OrganizationRole.ADMIN;
     const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.COMMITTEE_MEMBER, OrganizationRole.TREASURER] as string[]).includes(member.role);
+
+    const csvColumns = ["date", "title", "category", "paymentMode", "amount", "status", "event", "notes", "requestedBy"];
+    const csvRows = exportData.rows.map((r) => ({
+        date: formatDateForCsv(r.requestedAt),
+        title: r.title,
+        category: r.category,
+        paymentMode: r.paymentMode,
+        amount: Math.round(r.amount),
+        status: r.status,
+        event: r.eventTitle ?? "",
+        notes: r.notes ?? "",
+        requestedBy: r.requestedBy ?? "",
+    }));
+    const expensesDataSerialized = {
+        rows: exportData.rows.map((r) => ({ ...r, requestedAt: r.requestedAt.toISOString() })),
+        summary: exportData.summary,
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -42,7 +62,20 @@ export default async function ExpensesPage({
                     <p className="mt-1 font-medium text-slate-500">Track and approve all expenditures for the pavilion.</p>
                 </div>
 
-                {canAdd && <AddExpenseModal organizationId={organization.id} isFestival={isFestival} />}
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                    {canAdd && <AddExpenseModal organizationId={organization.id} isFestival={isFestival} />}
+                    <ExportActions
+                        variant="expenses"
+                        organizationName={organization.name}
+                        generatedAt={new Date().toISOString()}
+                        csvColumns={csvColumns}
+                        csvRows={csvRows}
+                        csvFilename={`expenses-${new Date().toISOString().slice(0, 10)}.csv`}
+                        pdfFilename="expense-register.pdf"
+                        expensesData={expensesDataSerialized}
+                        disabled={exportData.rows.length === 0}
+                    />
+                </div>
             </div>
 
             <PaymentModeSummary

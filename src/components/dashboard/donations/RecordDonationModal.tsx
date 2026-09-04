@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Loader2, X, IndianRupee, Heart, Banknote } from "lucide-react";
 import { DonationCategory, PaymentMode } from "@prisma/client";
 import { recordDonationAction } from "@/actions/donation.actions";
@@ -23,6 +24,7 @@ export default function RecordDonationModal({
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     // Simplified categories for Clubs
     const categories = isFestival
@@ -50,6 +52,8 @@ export default function RecordDonationModal({
 
         if (result.success) {
             setIsOpen(false);
+            setIsLoading(false);
+            router.refresh();
         } else {
             setError(result.error);
             setIsLoading(false);

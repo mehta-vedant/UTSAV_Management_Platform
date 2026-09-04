@@ -7,7 +7,9 @@ import { PaginationControls } from "@/components/dashboard/shared/PaginationCont
 import RecordDonationModal from "@/components/dashboard/donations/RecordDonationModal";
 import EditDonationModal from "@/components/dashboard/donations/EditDonationModal";
 import PaymentModeSummary from "@/components/dashboard/shared/PaymentModeSummary";
-import { getPaginatedDonations, getDonationPaymentModeSummary } from "@/modules/finance/donation.service";
+import ExportActions from "@/components/dashboard/shared/ExportActions";
+import { getPaginatedDonations, getDonationPaymentModeSummary, getDonationsForExport } from "@/modules/finance/donation.service";
+import { formatDateForCsv } from "@/lib/export";
 import { DonationCategory, OrganizationRole, PaymentMode } from "@prisma/client";
 import { Heart } from "lucide-react";
 
@@ -20,15 +22,32 @@ export default async function DonationsPage({
 }) {
     const { organization, member, isFestival } = await resolveOrgContext(params.orgSlug);
     const query = parsePageQuery(searchParams);
-    const [donations, paymentSummary] = await Promise.all([
+    const [donations, paymentSummary, exportData] = await Promise.all([
         getPaginatedDonations(organization.id, query),
         getDonationPaymentModeSummary(organization.id),
+        getDonationsForExport(organization.id, query),
     ]);
 
     const canAdd = ([OrganizationRole.ADMIN, OrganizationRole.TREASURER, OrganizationRole.COMMITTEE_MEMBER] as string[]).includes(member.role);
     const term = isFestival ? "Donation" : "Funds";
     const pluralTerm = isFestival ? "Donations" : "Fund Records";
     const contributorTerm = isFestival ? "Donor Name" : "Source";
+
+    const csvColumns = ["date", "donorName", "category", "paymentMode", "amount", "event", "notes", "recordedBy"];
+    const csvRows = exportData.rows.map((r) => ({
+        date: formatDateForCsv(r.receivedAt),
+        donorName: r.donorName,
+        category: r.category,
+        paymentMode: r.paymentMode,
+        amount: Math.round(r.amount),
+        event: r.eventTitle ?? "",
+        notes: r.notes ?? "",
+        recordedBy: r.recordedBy ?? "",
+    }));
+    const donationsDataSerialized = {
+        rows: exportData.rows.map((r) => ({ ...r, receivedAt: r.receivedAt.toISOString() })),
+        summary: exportData.summary,
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -46,7 +65,21 @@ export default async function DonationsPage({
                     </p>
                 </div>
 
-                {canAdd && <RecordDonationModal organizationId={organization.id} isFestival={isFestival} />}
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                    {canAdd && <RecordDonationModal organizationId={organization.id} isFestival={isFestival} />}
+                    <ExportActions
+                        variant="donations"
+                        organizationName={organization.name}
+                        incomeLabel={isFestival ? "Donations" : "Income"}
+                        generatedAt={new Date().toISOString()}
+                        csvColumns={csvColumns}
+                        csvRows={csvRows}
+                        csvFilename={`donations-${new Date().toISOString().slice(0, 10)}.csv`}
+                        pdfFilename="donations-register.pdf"
+                        donationsData={donationsDataSerialized}
+                        disabled={exportData.rows.length === 0}
+                    />
+                </div>
             </div>
 
             <PaymentModeSummary

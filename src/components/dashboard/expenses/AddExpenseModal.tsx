@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Loader2, X, IndianRupee, Banknote } from "lucide-react";
 import { ExpenseCategory, PaymentMode } from "@prisma/client";
 import { createExpenseAction } from "@/actions/expense.actions";
@@ -19,6 +20,7 @@ export default function AddExpenseModal({
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -41,6 +43,8 @@ export default function AddExpenseModal({
 
         if (result.success) {
             setIsOpen(false);
+            setIsLoading(false);
+            router.refresh();
         } else {
             setError(result.error);
             setIsLoading(false);

@@ -44,6 +44,7 @@ export default function EditExpenseModal({
         if (result.success) {
             toast.success("Expense record deleted");
             setIsOpen(false);
+            setIsLoading(false);
             router.refresh();
         } else {
             setError(result.error);
@@ -73,6 +74,7 @@ export default function EditExpenseModal({
         if (result.success) {
             toast.success("Expense updated successfully");
             setIsOpen(false);
+            setIsLoading(false);
             router.refresh();
         } else {
             setError(result.error);

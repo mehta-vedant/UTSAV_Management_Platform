@@ -38,6 +38,7 @@ export default function AuditTrailDocument({ organizationName, incomeLabel, gene
         { header: "Description", key: "title" },
         { header: "Category", key: "category" },
         { header: "Payment", key: "paymentMode" },
+        { header: "Amount", key: "amount", align: "right" as const },
         { header: "Status", key: "status" },
         { header: "Activity By", key: "activityBy" },
     ];
@@ -73,64 +74,40 @@ export default function AuditTrailDocument({ organizationName, incomeLabel, gene
 
                 {entries.length === 0 ? (
                     <Text style={{ fontSize: 8, color: PDF_COLORS.slate500 }}>No records found.</Text>
-                ) : hasTooMany ? (
+                ) : (
                     <PdfTable
                         columns={columns}
-                        rows={entries.map((e) => ({
+                        rows={page1Rows.map((e) => ({
                             date: e.date,
                             title: `${e.title}${e.eventTitle ? ` (${e.eventTitle})` : ""}`,
                             category: e.category,
                             paymentMode: e.paymentMode || "—",
+                            amount: `${e.type === "INCOME" ? "+" : "-"} ${fmtRupee(e.amount)}`,
                             status: e.status || (e.type === "INCOME" ? "Received" : "—"),
                             activityBy: e.source,
-                        }))}
-                    />
-                ) : (
-                    <PdfTable
-                        columns={[
-                            { header: "Date", key: "date" },
-                            { header: "Description", key: "title" },
-                            { header: "Category", key: "category" },
-                            { header: "Payment", key: "paymentMode" },
-                            { header: "Status", key: "status" },
-                            { header: "Amount", key: "amount", align: "right" },
-                        ]}
-                        rows={page1Rows.map((e) => ({
-                            date: e.date,
-                            title: e.title,
-                            category: e.category,
-                            paymentMode: e.paymentMode || "—",
-                            status: e.status || (e.type === "INCOME" ? "Received" : "—"),
-                            amount: `${e.type === "INCOME" ? "+" : "-"} ${fmtRupee(e.amount)}`,
                         }))}
                     />
                 )}
             </Page>
 
             {hasTooMany && (
-                <Page size="A4" style={styles.page}>
-                    <PdfHeader organizationName={organizationName} title="Audit Trail Ledger" docType="Financial Ledger · Continued" generatedAt={generatedAt} />
-                    <PdfSectionTitle title="Transactions (continued)" subtitle={`${entries.length} record(s)`} />
-                    <PdfTable
-                        columns={[
-                            { header: "Date", key: "date" },
-                            { header: "Description", key: "title" },
-                            { header: "Category", key: "category" },
-                            { header: "Payment", key: "paymentMode" },
-                            { header: "Status", key: "status" },
-                            { header: "Amount", key: "amount", align: "right" },
-                        ]}
-                        rows={page2Rows.map((e) => ({
-                            date: e.date,
-                            title: e.title,
-                            category: e.category,
-                            paymentMode: e.paymentMode || "—",
-                            status: e.status || (e.type === "INCOME" ? "Received" : "—"),
-                            amount: `${e.type === "INCOME" ? "+" : "-"} ${fmtRupee(e.amount)}`,
-                        }))}
-                    />
-                </Page>
-            )}
+                    <Page size="A4" style={styles.page}>
+                        <PdfHeader organizationName={organizationName} title="Audit Trail Ledger" docType="Financial Ledger · Continued" generatedAt={generatedAt} />
+                        <PdfSectionTitle title="Transactions (continued)" subtitle={`${entries.length} record(s)`} />
+                        <PdfTable
+                            columns={columns}
+                            rows={page2Rows.map((e) => ({
+                                date: e.date,
+                                title: `${e.title}${e.eventTitle ? ` (${e.eventTitle})` : ""}`,
+                                category: e.category,
+                                paymentMode: e.paymentMode || "—",
+                                amount: `${e.type === "INCOME" ? "+" : "-"} ${fmtRupee(e.amount)}`,
+                                status: e.status || (e.type === "INCOME" ? "Received" : "—"),
+                                activityBy: e.source,
+                            }))}
+                        />
+                    </Page>
+                )}
         </Document>
     );
 }

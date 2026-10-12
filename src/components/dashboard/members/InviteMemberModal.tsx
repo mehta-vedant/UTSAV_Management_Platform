@@ -8,6 +8,7 @@ import { inviteMemberAction } from "@/actions/member.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function InviteMemberModal({
     organizationId,
@@ -20,7 +21,7 @@ export default function InviteMemberModal({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedEventId, setSelectedEventId] = useState<string>("");
-    const [skipEmail, setSkipEmail] = useState(true); // Default to true for faster bypass
+    const [skipEmail, setSkipEmail] = useState(false);
     const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -43,6 +44,13 @@ export default function InviteMemberModal({
         if (result.success) {
             setIsOpen(false);
             setIsLoading(false);
+            if (result.data.skippedEmail) {
+                toast.success("Invitation created without sending an email");
+            } else if (result.data.emailSent) {
+                toast.success("Invitation email sent");
+            } else {
+                toast.error("Invitation created, but the email could not be delivered. Copy the pending invite link instead.");
+            }
             router.refresh();
         } else {
             setError(result.error || "Failed to invite member");
@@ -140,8 +148,8 @@ export default function InviteMemberModal({
 
                         <div className="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 italic">
                             <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                                <strong>Note:</strong> Due to email service (Resend) restrictions in dev mode, emails might not reach every inbox.
-                                You can always copy the invite link manually from the "Pending Invitations" section below.
+                                <strong>Note:</strong> Due to AWS SES sandbox restrictions in dev mode, emails might not reach every inbox.
+                                You can always copy the invite link manually from the &quot;Pending Invitations&quot; section below.
                             </p>
                             <p className="text-[10px] text-amber-600 font-bold mt-2 leading-relaxed bg-amber-50 p-2 rounded-lg border border-amber-100">
                                 ⚠️ SAFETY: Share links ONLY with the recipient. We have now added strict email matching to prevent account hijacking.

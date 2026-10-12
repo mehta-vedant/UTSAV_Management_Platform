@@ -52,18 +52,16 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 const email = credentials.email.trim().toLowerCase();
+                const user = await prisma.user.findUnique({ where: { email } });
+                if (!user) {
+                    throw new Error("No account exists for this email. Please create an account first.");
+                }
+
                 const verified = await verifyOtp(email, credentials.code);
 
                 if (!verified.ok) {
                     throw new Error(verified.error);
                 }
-
-                // Passwordless: auto-provision the account on first successful OTP.
-                const user = await prisma.user.upsert({
-                    where: { email },
-                    update: {},
-                    create: { email },
-                });
 
                 return user;
             }

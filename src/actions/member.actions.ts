@@ -6,7 +6,6 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { validateAccess, requirePermission, getTenantPrisma } from "@/lib/access-control";
 import { OrganizationRole } from "@prisma/client";
-import { sendInvitationEmail } from "@/lib/email";
 import { inviteMember } from "@/modules/core/invitation.service";
 import { actionFailure } from "@/lib/action-response";
 import { withAction, withActionNoReturn } from "@/lib/action";
@@ -23,7 +22,7 @@ export async function inviteMemberAction(data: z.infer<typeof InviteMemberSchema
     const { user, member } = await validateAccess(data.organizationId, [OrganizationRole.ADMIN]);
     if (!user) return actionFailure(new Error("Not authenticated"));
 
-    return withActionNoReturn(async () => {
+    return withAction(async () => {
         const validated = InviteMemberSchema.parse(data);
         const normalizedEmail = validated.email.toLowerCase();
 
@@ -43,7 +42,7 @@ export async function inviteMemberAction(data: z.infer<typeof InviteMemberSchema
         });
         if (!organization) throw new Error("Organization not found");
 
-        await inviteMember({
+        const result = await inviteMember({
             organizationId: validated.organizationId,
             email: normalizedEmail,
             role: validated.role,
@@ -51,6 +50,7 @@ export async function inviteMemberAction(data: z.infer<typeof InviteMemberSchema
             eventId: validated.eventId,
             skipEmail: validated.skipEmail,
         });
+        return { emailSent: result.emailSent, skippedEmail: validated.skipEmail };
     }, { paths: [{ path: "/[orgSlug]/dashboard/members", type: "page" }] });
 }
 

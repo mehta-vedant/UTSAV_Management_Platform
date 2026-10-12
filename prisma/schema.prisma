@@ -19,6 +19,23 @@ model User {
   memberships OrganizationMember[]
 }
 
+model EmailOtp {
+  email      String    @id
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model OtpRequestLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  requests        Int      @default(1)
+  updatedAt       DateTime @updatedAt
+}
+
 model Organization {
   id                      String                   @id @default(cuid())
   name                    String
@@ -137,25 +154,25 @@ model Expense {
 }
 
 model BhogItem {
-  id             String       @id @default(cuid())
+  id             String             @id @default(cuid())
   name           String
   quantity       String
-  status         BhogStatus   @default(PENDING)
+  status         BhogStatus         @default(PENDING)
   sponsorName    String?
-  offeringDate   DateTime     @default(now())
+  offeringDate   DateTime           @default(now())
   offeringWindow BhogOfferingWindow @default(MORNING)
   storage        String?
-  estimatedCost  Decimal?     @db.Decimal(12, 2)
+  estimatedCost  Decimal?           @db.Decimal(12, 2)
   notes          String?
-  isArchived     Boolean      @default(false)
+  isArchived     Boolean            @default(false)
   organizationId String
-  submittedAt    DateTime     @default(now())
-  approvedAt      DateTime?
-  preparedAt      DateTime?
-  archivedAt      DateTime?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  submittedAt    DateTime           @default(now())
+  approvedAt     DateTime?
+  preparedAt     DateTime?
+  archivedAt     DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@index([organizationId, offeringDate])
@@ -212,8 +229,8 @@ model VolunteerTask {
   priority       TaskPriority       @default(MEDIUM)
   dueDate        DateTime?
   isArchived     Boolean            @default(false)
-  completedAt     DateTime?
-  archivedAt      DateTime?
+  completedAt    DateTime?
+  archivedAt     DateTime?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   assignedTo     OrganizationMember @relation(fields: [assignedToId], references: [id], onDelete: Cascade)
@@ -263,8 +280,8 @@ model OrganizationInvitation {
   accepted       Boolean             @default(false)
   eventId        String?
   invitedById    String?
-  acceptedAt      DateTime?
-  revokedAt       DateTime?
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
   event          Event?              @relation(fields: [eventId], references: [id])
@@ -276,7 +293,7 @@ model OrganizationInvitation {
 }
 
 model AuditLog {
-  id             String       @id @default(cuid())
+  id             String          @id @default(cuid())
   organizationId String
   actorMemberId  String?
   entityType     String
@@ -286,9 +303,9 @@ model AuditLog {
   after          Json?
   metadata       Json?
   visibility     AuditVisibility @default(INTERNAL)
-  occurredAt      DateTime     @default(now())
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  occurredAt     DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@index([actorMemberId])

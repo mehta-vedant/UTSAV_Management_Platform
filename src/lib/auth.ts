@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { verifyOtp } from "@/lib/otp";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
@@ -34,6 +35,35 @@ export const authOptions: NextAuthOptions = {
                 if (!isValid) {
                     throw new Error("Invalid credentials");
                 }
+
+                return user;
+            }
+        }),
+        CredentialsProvider({
+            id: "otp",
+            name: "Email OTP",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                code: { label: "Verification Code", type: "text" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.code) {
+                    throw new Error("Missing email or verification code");
+                }
+
+                const email = credentials.email.trim().toLowerCase();
+                const verified = await verifyOtp(email, credentials.code);
+
+                if (!verified.ok) {
+                    throw new Error(verified.error);
+                }
+
+                // Passwordless: auto-provision the account on first successful OTP.
+                const user = await prisma.user.upsert({
+                    where: { email },
+                    update: {},
+                    create: { email },
+                });
 
                 return user;
             }

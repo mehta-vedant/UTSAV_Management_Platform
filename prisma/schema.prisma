@@ -36,6 +36,27 @@ model OtpRequestLimit {
   updatedAt       DateTime @updatedAt
 }
 
+model AiRequestLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  requests        Int      @default(1)
+  updatedAt       DateTime @updatedAt
+}
+
+model IdempotencyRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  key            String
+  operation      String
+  requestHash    String
+  entityId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, key])
+  @@index([organizationId, operation])
+}
+
 model PendingRegistration {
   email               String    @id
   name                String?
@@ -77,7 +98,10 @@ model Organization {
   bhogItems               BhogItem[]
   donations               Donation[]
   events                  Event[]
+  eventAssignments        EventAssignment[]
+  eventRegistrations      EventRegistration[]
   expenses                Expense[]
+  expenseReceipts         ExpenseReceipt[]
   invitations             OrganizationInvitation[]
   members                 OrganizationMember[]
   volunteers              Volunteer[]
@@ -97,6 +121,7 @@ model OrganizationMember {
   updatedAt        DateTime                 @updatedAt
   donationsAdded   Donation[]
   eventAssignments EventAssignment[]
+  receiptsUploaded ExpenseReceipt[] @relation("ReceiptUploadedBy")
   expensesAdded    Expense[]                @relation("ExpenseAddedBy")
   expensesApproved Expense[]                @relation("ExpenseApprovedBy")
   invitationsSent  OrganizationInvitation[]
@@ -106,6 +131,8 @@ model OrganizationMember {
 
   @@unique([userId, organizationId])
   @@unique([email, organizationId])
+  // Lets PostgreSQL enforce that an assignment's member belongs to the same tenant.
+  @@unique([id, organizationId])
   @@index([userId])
   @@index([organizationId])
 }
@@ -161,6 +188,7 @@ model Expense {
   approvedBy     OrganizationMember? @relation("ExpenseApprovedBy", fields: [approvedById], references: [id])
   event          Event?              @relation(fields: [eventId], references: [id])
   organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  receipts       ExpenseReceipt[]
 
   @@index([organizationId])
   @@index([eventId])
@@ -230,6 +258,8 @@ model Event {
   tasks          VolunteerTask[]
 
   @@index([organizationId])
+  // Lets PostgreSQL enforce that event children stay in the event's tenant.
+  @@unique([id, organizationId])
 }
 
 model VolunteerTask {
@@ -258,19 +288,23 @@ model VolunteerTask {
 
 model EventAssignment {
   id                   String             @id @default(cuid())
+  organizationId       String
   eventId              String
   organizationMemberId String
   createdAt            DateTime           @default(now())
   event                Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
   member               OrganizationMember @relation(fields: [organizationMemberId], references: [id], onDelete: Cascade)
+  organization         Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, organizationMemberId])
   @@index([eventId])
   @@index([organizationMemberId])
+  @@index([organizationId])
 }
 
 model EventRegistration {
   id        String   @id @default(cuid())
+  organizationId String
   eventId   String
   name      String
   email     String
@@ -280,8 +314,38 @@ model EventRegistration {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
+  @@index([organizationId])
+}
+
+model ExpenseReceipt {
+  id                   String                  @id @default(cuid())
+  organizationId       String
+  expenseId            String
+  uploadedById         String
+  objectKey            String                  @unique
+  originalFileName     String
+  contentType          String
+  byteSize             Int
+  status               ReceiptUploadStatus     @default(PENDING_UPLOAD)
+  uploadExpiresAt      DateTime?
+  uploadedAt           DateTime?
+  failedAt             DateTime?
+  failureReason        String?
+  extractionStatus     ReceiptExtractionStatus @default(NOT_REQUESTED)
+  extractionConsentAt  DateTime?
+  extraction           Json?
+  extractionReviewedAt DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  organization         Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  expense              Expense                  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  uploadedBy           OrganizationMember       @relation("ReceiptUploadedBy", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, expenseId])
+  @@index([uploadedById])
 }
 
 model OrganizationInvitation {
@@ -418,4 +482,18 @@ enum PaymentMode {
   CASH
   UPI
   BANK_TRANSFER
+}
+
+enum ReceiptUploadStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  FAILED
+}
+
+enum ReceiptExtractionStatus {
+  NOT_REQUESTED
+  PENDING
+  COMPLETED
+  FAILED
+  REVIEWED
 }

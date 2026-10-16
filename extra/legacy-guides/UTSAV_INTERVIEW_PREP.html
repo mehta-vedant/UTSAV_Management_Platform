@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTSAV - Complete Interview Preparation Guide</title>
+<style>
+  :root {
+    --saffron: #FF6B2B;
+    --saffron-dark: #E55A1B;
+    --saffron-light: #FFF3ED;
+    --navy: #0F172A;
+    --slate-800: #1E293B;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-500: #64748B;
+    --slate-400: #94A3B8;
+    --slate-300: #CBD5E1;
+    --slate-200: #E2E8F0;
+    --slate-100: #F1F5F9;
+    --slate-50: #F8FAFC;
+    --green: #10B981;
+    --green-light: #ECFDF5;
+    --blue: #3B82F6;
+    --blue-light: #EFF6FF;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --yellow: #F59E0B;
+    --yellow-light: #FFFBEB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--slate-50); color: var(--slate-800); line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--slate-800) 50%, #1a1a2e 100%); color: white; padding: 60px 40px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,107,43,0.1) 0%, transparent 50%); animation: pulse 8s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .hero h1 { font-size: 3rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; position: relative; }
+  .hero h1 span { color: var(--saffron); }
+  .hero .subtitle { font-size: 1.1rem; color: var(--slate-400); margin-top: 12px; position: relative; }
+  .hero .tagline { margin-top: 20px; font-size: 0.9rem; color: var(--saffron); position: relative; font-weight: 600; }
+  .nav-bar { background: white; border-bottom: 2px solid var(--slate-200); padding: 12px 20px; position: sticky; top: 0; z-index: 100; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .nav-bar a { text-decoration: none; color: var(--slate-600); font-size: 0.75rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav-bar a:hover { background: var(--saffron); color: white; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .section { margin-bottom: 50px; }
+  .section-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid var(--saffron); display: flex; align-items: center; gap: 10px; }
+  .section-title .num { background: var(--saffron); color: white; width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .card { background: white; border-radius: 16px; padding: 28px; margin-bottom: 20px; border: 1px solid var(--slate-200); box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .card h3 { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+  .card p, .card li { font-size: 0.92rem; color: var(--slate-600); line-height: 1.7; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { margin-bottom: 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead th { background: var(--navy); color: white; padding: 12px 16px; text-align: left; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.78rem; }
+  thead th:first-child { border-radius: 10px 0 0 0; }
+  thead th:last-child { border-radius: 0 10px 0 0; }
+  tbody td { padding: 10px 16px; border-bottom: 1px solid var(--slate-200); color: var(--slate-700); }
+  tbody tr:hover { background: var(--saffron-light); }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  .badge-saffron { background: var(--saffron-light); color: var(--saffron); }
+  .badge-green { background: var(--green-light); color: #059669; }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-yellow { background: var(--yellow-light); color: #D97706; }
+  .code-block { background: var(--navy); color: #E2E8F0; padding: 20px; border-radius: 12px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.82rem; line-height: 1.6; overflow-x: auto; margin: 12px 0; white-space: pre-wrap; }
+  .code-block .keyword { color: #C084FC; }
+  .code-block .string { color: #34D399; }
+  .code-block .comment { color: #64748B; font-style: italic; }
+  .code-block .func { color: #60A5FA; }
+  .code-block .type { color: #FBBF24; }
+  .stat-box { background: white; border-radius: 16px; padding: 24px; text-align: center; border: 1px solid var(--slate-200); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-box .stat-num { font-size: 2.2rem; font-weight: 900; color: var(--saffron); }
+  .stat-box .stat-label { font-size: 0.78rem; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; font-weight: 600; }
+  .callout { padding: 18px 22px; border-radius: 12px; margin: 16px 0; font-size: 0.9rem; border-left: 4px solid; }
+  .callout-saffron { background: var(--saffron-light); border-color: var(--saffron); }
+  .callout-green { background: var(--green-light); border-color: var(--green); }
+  .callout-blue { background: var(--blue-light); border-color: var(--blue); }
+  .callout-purple { background: var(--purple-light); border-color: var(--purple); }
+  .callout-red { background: var(--red-light); border-color: var(--red); }
+  .callout strong { color: var(--navy); }
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 16px 0; font-size: 0.85rem; }
+  .flow-step { background: var(--slate-100); border: 2px solid var(--slate-300); padding: 8px 16px; border-radius: 10px; font-weight: 600; color: var(--slate-700); white-space: nowrap; }
+  .flow-arrow { color: var(--saffron); font-weight: 900; font-size: 1.1rem; }
+  .perm-matrix td:not(:first-child) { text-align: center; font-size: 1rem; }
+  .arch-diagram { background: var(--slate-100); border: 2px solid var(--slate-200); border-radius: 16px; padding: 30px; text-align: left; font-family: 'Cascadia Code', monospace; font-size: 0.8rem; line-height: 1.8; color: var(--slate-700); overflow-x: auto; white-space: pre; }
+  .divider { border: none; border-top: 2px dashed var(--slate-200); margin: 30px 0; }
+  .explain-box { background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 16px 20px; margin: 12px 0; font-size: 0.88rem; }
+  .explain-box strong { color: #92400E; }
+  .explain-box::before { content: "LEARNING: "; font-weight: 900; color: #D97706; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .decision-box { background: #F0F9FF; border: 2px solid #BAE6FD; border-radius: 12px; padding: 16px 20px; margin: 12px 0; font-size: 0.88rem; }
+  .decision-box strong { color: #0C4A6E; }
+  .decision-box::before { content: "WHY THIS DECISION: "; font-weight: 900; color: #0284C7; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .qa-card { border-left: 4px solid var(--saffron); }
+  .qa-card h3 { color: var(--saffron); }
+  @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } .container { padding: 20px 14px; } .card { padding: 20px; } table { font-size: 0.8rem; } }
+  @media print { .nav-bar { display: none; } .hero { padding: 30px; } .card:hover { transform: none; box-shadow: none; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>UTSAV <span>Interview Prep</span></h1>
+  <div class="subtitle">Organization Governance & Pavilion Intelligence Platform</div>
+  <div class="tagline">Built by Vedant Mehta &bull; Full-Stack Production Application</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#overview">Overview</a>
+  <a href="#concepts">Key Concepts</a>
+  <a href="#stack">Tech Stack</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#prisma-deep">Prisma Deep-Dive</a>
+  <a href="#slugs">Slugs & URLs</a>
+  <a href="#database">Database</a>
+  <a href="#auth">Auth</a>
+  <a href="#multitenancy">Multi-Tenancy</a>
+  <a href="#rbac">RBAC</a>
+  <a href="#finance">Finance</a>
+  <a href="#ai">AI</a>
+  <a href="#features">Features</a>
+  <a href="#testing">Testing</a>
+  <a href="#decisions">Design Decisions</a>
+  <a href="#interview">Interview Q&A</a>
+</div>
+
+<div class="container">
+
+<!-- ==================== SECTION 1: OVERVIEW ==================== -->
+<div class="section" id="overview">
+  <div class="section-title"><span class="num">1</span> Project Overview</div>
+  <div class="card">
+    <h3>What is UTSAV?</h3>
+    <p><strong>UTSAV</strong> is a <strong>production-grade web application</strong> built to help organizations manage large-scale cultural events like Ganeshotsav festivals and community clubs. Think of it as a specialized management tool that handles:</p>
+    <ul style="margin-top:12px;">
+      <li><strong>Money tracking</strong> - Who donated how much, what was spent where, approval workflows for expenses</li>
+      <li><strong>Event management</strong> - Schedule ceremonies, assign team members, track registrations</li>
+      <li><strong>Volunteer coordination</strong> - Create tasks, assign them, track completion</li>
+      <li><strong>Public transparency</strong> - Let the public see how funds are used (without logging in)</li>
+      <li><strong>AI-powered insights</strong> - Ask questions like "How much have we spent on decoration?" in plain English</li>
+    </ul>
+    <p style="margin-top:12px;">The key word is <strong>"multi-tenant"</strong> - one codebase serves hundreds of different organizations, and each organization's data is completely isolated from others.</p>
+  </div>
+
+  <div class="grid-4">
+    <div class="stat-box"><div class="stat-num">13</div><div class="stat-label">Database Tables</div></div>
+    <div class="stat-box"><div class="stat-num">11</div><div class="stat-label">Server Actions</div></div>
+    <div class="stat-box"><div class="stat-num">4</div><div class="stat-label">RBAC Roles</div></div>
+    <div class="stat-box"><div class="stat-num">50+</div><div class="stat-label">React Components</div></div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 2: KEY CONCEPTS ==================== -->
+<div class="section" id="concepts">
+  <div class="section-title"><span class="num">2</span> Key Concepts (Learn Before Interview)</div>
+
+  <div class="card">
+    <h3>What is an ORM? (Object-Relational Mapper)</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> An ORM lets you write code like <code>prisma.donation.findMany()</code> instead of writing raw SQL like <code>SELECT * FROM "Donation" WHERE "organizationId" = 'abc123'</code>. It maps your code's objects/tables to actual database tables. You define your schema in code, and the ORM generates the SQL for you.
+    </div>
+    <p style="margin-top:12px;"><strong>Prisma</strong> is the specific ORM used in UTSAV. It has 3 parts:</p>
+    <ol>
+      <li><strong>Prisma Schema</strong> (<code>prisma/schema.prisma</code>) - A file where you define all your database tables, their fields, and relationships. This is your "database blueprint."</li>
+      <li><strong>Prisma Client</strong> - Auto-generated TypeScript code from the schema. You use it to talk to the database: <code>prisma.user.findMany()</code>, <code>prisma.donation.create()</code>, etc.</li>
+      <li><strong>Prisma Migrations</strong> - Commands to sync your schema changes to the actual database. Run <code>prisma db push</code> and Prisma alters the real PostgreSQL tables to match your schema.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>What are Server Components vs Client Components?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> In Next.js 14, React components run on the server by default (Server Components). They can directly access databases, read files, and do heavy work WITHOUT sending JavaScript to the browser. Only add <code>"use client"</code> at the top of a file if you need interactivity (clicks, forms, state, animations). This means most of UTSAV's pages send ZERO JavaScript to the browser - they just send finished HTML.
+    </div>
+    <table style="margin-top:16px;">
+      <thead><tr><th>Server Component (default)</th><th>Client Component ("use client")</th></tr></thead>
+      <tbody>
+        <tr><td>Runs on the server only</td><td>Runs in the browser</td></tr>
+        <tr><td>Can directly call database, services</td><td>Cannot directly access DB</td></tr>
+        <tr><td>No useState, useEffect, onClick</td><td>Full React hooks support</td></tr>
+        <tr><td>Sends HTML to browser (small bundle)</td><td>Sends JavaScript to browser</td></tr>
+        <tr><td>Used for: Dashboards, data tables, public pages</td><td>Used for: Forms, modals, animated landing page</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>What are Server Actions?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> Server Actions are functions that run on the server, called directly from client components. Instead of creating a separate API endpoint (like <code>/api/donations</code>), you write a function with <code>"use server"</code> at the top, and the client can call it like a regular function. Next.js handles the HTTP behind the scenes. This eliminates boilerplate API routes.
+    </div>
+    <div class="code-block">
+<span class="comment">// Example: A Server Action in UTSAV</span>
+<span class="string">"use server"</span>
+
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(formData: FormData) {
+  <span class="comment">// This runs on the SERVER, not in the browser</span>
+  <span class="comment">// 1. Validate input with Zod</span>
+  <span class="comment">// 2. Check permissions (RBAC)</span>
+  <span class="comment">// 3. Save to database via Prisma</span>
+  <span class="comment">// 4. Return success/failure response</span>
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is JWT (JSON Web Token)?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> JWT is a way to keep users logged in. When you log in, the server creates a small encrypted token (like a digital ID card) and stores it in your browser's cookie. Every time you make a request, the browser sends this token back. The server decrypts it to know who you are WITHOUT looking up the database every time. It's "stateless" - the server doesn't need to remember your session.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is Multi-Tenancy?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> Multi-tenancy means one application instance (one codebase, one database) serves multiple organizations ("tenants"). Think of it like Gmail - one Google servers handle millions of different users' emails, but each person's data is isolated. In UTSAV, the same app serves Festival A, Festival B, and Club C, but none can see each other's data.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What is RBAC (Role-Based Access Control)?</h3>
+    <div class="explain-box">
+      <strong>Plain English:</strong> RBAC means different users get different permissions based on their role. In UTSAV: an ADMIN can do everything, a TREASURER can manage finances, a COMMITTEE_MEMBER can manage events, and a VOLUNTEER can only update their own tasks. The system checks permissions BEFORE allowing any operation.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: TECH STACK ==================== -->
+<div class="section" id="stack">
+  <div class="section-title"><span class="num">3</span> Technology Stack</div>
+  <div class="card">
+    <h3>Core Technologies</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Technology</th><th>What It Does</th><th>Why This Choice?</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">Framework</span></td><td>Next.js 14 (App Router)</td><td>Full-stack React framework with file-based routing</td><td>Server Components, Server Actions, built-in middleware, best Vercel deployment</td></tr>
+        <tr><td><span class="badge badge-blue">Language</span></td><td>TypeScript</td><td>JavaScript with type checking</td><td>Catches bugs at compile time, better IDE autocomplete, industry standard for large projects</td></tr>
+        <tr><td><span class="badge badge-saffron">UI</span></td><td>React 18</td><td>Component-based UI library</td><td>Server Components support, massive ecosystem, component reusability</td></tr>
+        <tr><td><span class="badge badge-green">Database</span></td><td>PostgreSQL</td><td>Relational database</td><td>ACID compliance, JSON support, mature, great for multi-tenant with complex relations</td></tr>
+        <tr><td><span class="badge badge-green">ORM</span></td><td>Prisma 5.10</td><td>Type-safe database client</td><td>Auto-generated types from schema, migrations, developer experience, $extends for multi-tenancy</td></tr>
+        <tr><td><span class="badge badge-purple">Auth</span></td><td>NextAuth.js 4.24</td><td>Authentication library</td><td>JWT strategy, Prisma adapter, Credentials provider, Next.js integration</td></tr>
+        <tr><td><span class="badge badge-red">Styling</span></td><td>Tailwind CSS + shadcn/ui</td><td>Utility CSS + pre-built components</td><td>Fast styling, consistent design system, accessible components, New York variant</td></tr>
+        <tr><td><span class="badge badge-yellow">AI</span></td><td>Google Gemini 2.5 Flash</td><td>AI language model</td><td>Fast inference, good at code/data, generous free tier, easy API</td></tr>
+        <tr><td><span class="badge badge-blue">Email</span></td><td>Resend</td><td>Email delivery service</td><td>Simple API, reliable delivery, React email support</td></tr>
+        <tr><td><span class="badge badge-green">Validation</span></td><td>Zod + React Hook Form</td><td>Schema validation + form management</td><td>Type inference, composable schemas, great DX with TypeScript</td></tr>
+        <tr><td><span class="badge badge-purple">Animation</span></td><td>Framer Motion</td><td>Animation library</td><td>Declarative API, layout animations, gesture support</td></tr>
+        <tr><td><span class="badge badge-red">Testing</span></td><td>Vitest</td><td>Test runner</td><td>Vite-native speed, Jest-compatible, works with TypeScript out of the box</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Why Prisma over Raw SQL or other ORMs?</h3>
+    <div class="decision-box">
+      We chose Prisma because: (1) <strong>Type safety</strong> - Every query result is fully typed, so your IDE catches errors before runtime. (2) <strong>Schema as code</strong> - The database schema lives in a single file (<code>schema.prisma</code>), making it easy to review and version control. (3) <strong>Migrations</strong> - <code>prisma db push</code> syncs schema changes to the DB automatically. (4) <strong>$extends</strong> - Prisma's client extension API enabled the multi-tenancy pattern (auto-injecting organizationId into queries), which would be very verbose with raw SQL. (5) <strong>Relations</strong> - Easy <code>include</code>/<code>select</code> for nested queries without writing JOINs.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: ARCHITECTURE ==================== -->
+<div class="section" id="architecture">
+  <div class="section-title"><span class="num">4</span> System Architecture</div>
+
+  <div class="card">
+    <h3>High-Level Architecture</h3>
+    <div class="arch-diagram">
+Browser (User Interface)
+  |
+  |-- Landing Page (Client Component, Framer Motion animations)
+  |-- Login/Signup (Client Component, React Hook Form)
+  |-- Dashboard Pages (Server Components - zero JS sent to browser)
+  |
+  v
+Next.js Server (Node.js Runtime)
+  |
+  |-- Middleware (JWT token check on protected routes)
+  |     Protects: /dashboard/* and /[slug]/dashboard/*
+  |
+  |-- NextAuth.js (Credentials provider + JWT strategy)
+  |     Login -> bcrypt.compare() -> Create JWT -> Set cookie
+  |
+  |-- Server Actions ("use server" functions)
+  |     Each action: validate input -> check permissions -> call service -> return response
+  |
+  |-- Service Layer (Business Logic)
+  |     core/     -> Organization, Member, Invitation, Audit, Overview
+  |     finance/  -> Donation, Expense, Financial analytics
+  |     events/   -> Event CRUD + team management
+  |     festival/ -> Bhog, Public pages, Transparency
+  |     assistant/ -> AI intent classification + Gemini
+  |
+  |-- Access Control Layer
+  |     validateAccess() -> Auth check + membership + role check
+  |     requirePermission() -> Granular permission lookup
+  |     getTenantPrisma() -> Auto-isolated database client
+  |
+  |-- Prisma ORM (Type-safe database queries)
+  |     Singleton pattern (one instance, hot-reload safe)
+  |     $extends for automatic multi-tenancy
+  |
+  v
+PostgreSQL Database
+  |-- User, Organization, OrganizationMember
+  |-- Donation, Expense, Event, BhogItem
+  |-- VolunteerTask, EventAssignment, EventRegistration
+  |-- OrganizationInvitation, AuditLog
+
+External Services:
+  -> Resend (invitation emails)
+  -> Google Gemini (AI assistant questions)
+  -> Vercel (hosting + deployment)
+  -> Neon/Railway (PostgreSQL hosting)
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How a Typical Request Flows (Step by Step)</h3>
+    <p>Let's trace what happens when an admin approves an expense:</p>
+    <div class="flow" style="margin-top:12px;">
+      <span class="flow-step">1. Admin clicks "Approve"<br><small>Browser sends request</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">2. Middleware runs<br><small>Checks JWT cookie exists</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">3. Server Action runs<br><small>expense.actions.ts</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step">4. Zod validates input<br><small>expenseId is valid?</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">5. requirePermission()<br><small>Does user have "finance:approve"?</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">6. ExpenseService.approve()<br><small>Business logic runs</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step">7. TenantPrisma.updateMany()<br><small>WHERE status = 'PENDING' (race-safe)</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">8. AuditService.record()<br><small>Before/after snapshots saved</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">9. revalidatePath()<br><small>Cache busted, UI refreshes</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-step" style="margin-left:180px;">10. ActionResponse returned<br><small>{ success: true, data: {...} }</small></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>File Structure</h3>
+    <div class="code-block">
+UTSAV/
+├── prisma/
+│   ├── schema.prisma       <span class="comment">// Database blueprint (all tables, relations, enums)</span>
+│   └── seed.ts             <span class="comment">// Fills database with test data</span>
+│
+├── src/
+│   ├── actions/            <span class="comment">// Server Actions (entry points for mutations)</span>
+│   │   ├── auth.actions.ts          <span class="comment">// User registration</span>
+│   │   ├── donation.actions.ts      <span class="comment">// Record/update/archive donations</span>
+│   │   ├── expense.actions.ts       <span class="comment">// Create/approve/reject expenses</span>
+│   │   ├── event.actions.ts         <span class="comment">// CRUD + team assignments</span>
+│   │   ├── member.actions.ts        <span class="comment">// Invite/role-change/archive members</span>
+│   │   ├── volunteer.actions.ts     <span class="comment">// Task CRUD + status updates</span>
+│   │   ├── organization.actions.ts  <span class="comment">// Create/update/delete orgs</span>
+│   │   ├── bhog.actions.ts          <span class="comment">// Bhog moderation</span>
+│   │   ├── public-bhog.actions.ts   <span class="comment">// Public bhog sponsorship (no auth)</span>
+│   │   ├── registration.actions.ts  <span class="comment">// Event attendance</span>
+│   │   └── admin-assistant.actions.ts <span class="comment">// AI assistant</span>
+│   │
+│   ├── modules/            <span class="comment">// Business logic (Domain Services)</span>
+│   │   ├── core/           <span class="comment">// Cross-cutting: org, member, invitation, audit, overview</span>
+│   │   ├── finance/        <span class="comment">// donation, expense, financial analytics</span>
+│   │   ├── events/         <span class="comment">// event service</span>
+│   │   ├── festival/       <span class="comment">// bhog, public pages, transparency, org/event financials</span>
+│   │   └── assistant/      <span class="comment">// AI intent classification</span>
+│   │
+│   ├── lib/                <span class="comment">// Infrastructure / shared utilities</span>
+│   │   ├── access-control.ts     <span class="comment">// RBAC + Tenant Prisma Extension</span>
+│   │   ├── auth.ts               <span class="comment">// NextAuth config</span>
+│   │   ├── prisma.ts             <span class="comment">// Database client singleton</span>
+│   │   ├── errors.ts             <span class="comment">// Error class hierarchy</span>
+│   │   ├── action-response.ts    <span class="comment">// Standardized OK/Error responses</span>
+│   │   ├── pagination.ts         <span class="comment">// Page size, URL parsing</span>
+│   │   ├── gemini.ts             <span class="comment">// Google Gemini API wrapper</span>
+│   │   ├── email.ts              <span class="comment">// Resend email wrapper</span>
+│   │   ├── prasad-windows.ts     <span class="comment">// Time window calculations</span>
+│   │   ├── organization-mode.ts  <span class="comment">// Festival vs Club type guards</span>
+│   │   └── date-time.ts          <span class="comment">// Date formatting helpers</span>
+│   │
+│   ├── components/         <span class="comment">// Reusable UI components</span>
+│   │   └── ui/             <span class="comment">// Shadcn/ui primitives (Button, Card, Dialog, etc.)</span>
+│   │
+│   ├── app/                <span class="comment">// Pages (file-based routing)</span>
+│   │   ├── page.tsx                <span class="comment">// Landing page</span>
+│   │   ├── layout.tsx              <span class="comment">// Root layout (providers, fonts)</span>
+│   │   ├── login/page.tsx          <span class="comment">// Login form</span>
+│   │   ├── signup/page.tsx         <span class="comment">// Registration form</span>
+│   │   ├── dashboard/page.tsx      <span class="comment">// User's organizations list</span>
+│   │   ├── [orgSlug]/page.tsx      <span class="comment">// Public org page (no auth)</span>
+│   │   ├── [orgSlug]/transparency/ <span class="comment">// Public audit trail</span>
+│   │   └── [orgSlug]/dashboard/    <span class="comment">// Private org dashboard</span>
+│   │       ├── page.tsx            <span class="comment">// Overview with stats</span>
+│   │       ├── donations/          <span class="comment">// Donation management</span>
+│   │       ├── expenses/           <span class="comment">// Expense management</span>
+│   │       ├── members/            <span class="comment">// Member management</span>
+│   │       ├── events/             <span class="comment">// Event management</span>
+│   │       ├── bhog/               <span class="comment">// Bhog/prasad management</span>
+│   │       └── volunteers/         <span class="comment">// Volunteer tasks</span>
+│   │
+│   ├── middleware.ts       <span class="comment">// Route protection (JWT check)</span>
+│   └── types/
+│       └── next-auth.d.ts  <span class="comment">// TypeScript type augmentation for session</span>
+│
+├── package.json            <span class="comment">// Dependencies + scripts</span>
+├── tailwind.config.js      <span class="comment">// Tailwind CSS config (custom saffron colors)</span>
+├── tsconfig.json           <span class="comment">// TypeScript config</span>
+└── vitest.config.ts        <span class="comment">// Test runner config</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: PRISMA DEEP DIVE ==================== -->
+<div class="section" id="prisma-deep">
+  <div class="section-title"><span class="num">5</span> Prisma Deep-Dive</div>
+
+  <div class="card">
+    <h3>How the Prisma Singleton Works</h3>
+    <div class="explain-box">
+      In development, Next.js hot-reloads your code on every file change. If you create a new <code>PrismaClient</code> every time, you'll exhaust database connections. The singleton pattern ensures only ONE instance exists across hot reloads.
+    </div>
+    <div class="code-block">
+<span class="comment">// src/lib/prisma.ts</span>
+<span class="keyword">import</span> { PrismaClient } <span class="keyword">from</span> <span class="string">'@prisma/client'</span>;
+
+<span class="comment">// In dev: store the client on globalThis so it survives hot reloads</span>
+<span class="comment">// In prod: just create one instance (no hot reload)</span>
+<span class="keyword">const</span> globalForPrisma = globalThis <span class="keyword">as unknown as</span> {
+  prisma: <span class="type">PrismaClient</span> | <span class="keyword">undefined</span>;
+};
+
+<span class="keyword">export const</span> prisma = globalForPrisma.prisma ?? <span class="keyword">new</span> <span class="type">PrismaClient</span>();
+
+<span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">"production"</span>) {
+  globalForPrisma.prisma = prisma;
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How the Multi-Tenant Extension Works (Line by Line)</h3>
+    <div class="explain-box">
+      This is the most impressive piece of code in the project. It uses Prisma's <code>$extends</code> to create a "filtered" version of the database client that automatically adds <code>organizationId</code> to every query. Here's how it works:
+    </div>
+    <div class="code-block">
+<span class="keyword">export const</span> <span class="func">getTenantPrisma</span> = (organizationId: <span class="type">string</span>) => {
+  <span class="keyword">return</span> prisma.<span class="func">$extends</span>({
+    <span class="func">query</span>: {
+      <span class="comment">// $allModels = applies to EVERY model (Donation, Expense, Event, etc.)</span>
+      <span class="comment">// $allOperations = applies to EVERY operation (findMany, create, update, etc.)</span>
+      $allModels: {
+        <span class="keyword">async</span> <span class="func">$allOperations</span>({ model, operation, args, query }) {
+          
+          <span class="comment">// Only intercept tenant-scoped models (not User, not Organization itself)</span>
+          <span class="keyword">const</span> tenantModels = [<span class="string">"Donation"</span>, <span class="string">"Expense"</span>, <span class="string">"OrganizationMember"</span>, ...];
+          
+          <span class="keyword">if</span> (tenantModels.<span class="func">includes</span>(model)) {
+            <span class="keyword">const</span> anyArgs = args <span class="keyword">as any</span>;
+            
+            <span class="comment">// RULE 1: For READS - auto-add WHERE organizationId = X</span>
+            <span class="keyword">if</span> (anyArgs.where) {
+              anyArgs.where = { ...anyArgs.where, organizationId };
+            }
+            
+            <span class="comment">// RULE 2: For CREATES - auto-inject organizationId into data</span>
+            <span class="keyword">if</span> (operation === <span class="string">'create'</span> && anyArgs.data) {
+              anyArgs.data = { ...anyArgs.data, organizationId };
+            }
+            
+            <span class="comment">// RULE 3: For UPDATES - DELETE organizationId from data</span>
+            <span class="comment">// (prevents someone from moving a record to another org)</span>
+            <span class="keyword">if</span> ((operation === <span class="string">'update'</span>) && anyArgs.data?.organizationId) {
+              <span class="keyword">delete</span> anyArgs.data.organizationId;
+            }
+          }
+          
+          <span class="keyword">return</span> <span class="func">query</span>(args); <span class="comment">// Execute the modified query</span>
+        },
+      },
+    },
+  });
+};
+    </div>
+    <p style="margin-top:12px;"><strong>In SQL terms, this is equivalent to:</strong></p>
+    <div class="code-block">
+<span class="comment">-- Without extension (developer writes manually):</span>
+SELECT * FROM "Donation" WHERE "donorName" = 'Rajesh' AND <span class="string">"organizationId" = 'org_abc123'</span>;
+
+<span class="comment">-- With extension (auto-injected):</span>
+SELECT * FROM "Donation" WHERE "donorName" = 'Rajesh';
+<span class="comment">-- ↑ The extension silently adds: AND "organizationId" = 'org_abc123'</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How the Schema Defines Tables (Prisma Syntax Explained)</h3>
+    <div class="explain-box">
+      The <code>prisma/schema.prisma</code> file uses Prisma's own language (not SQL, not TypeScript). Each <code>model</code> block defines a database table. Fields have types and decorators like <code>@id</code>, <code>@unique</code>, <code>@default</code>.
+    </div>
+    <div class="code-block">
+<span class="comment">// This Prisma schema...</span>
+model Donation {
+  id             String              @id @default(cuid())
+  donorName      String
+  amount         Decimal             @db.Decimal(12, 2)
+  category       DonationCategory    @default(GENERAL)
+  organizationId String
+  addedById      String?
+  isArchived     Boolean             @default(false)
+  organization   Organization        @relation(fields: [organizationId], references: [id])
+  addedBy        OrganizationMember? @relation(fields: [addedById], references: [id])
+  
+  @@index([organizationId])
+}
+
+<span class="comment">// ...generates this SQL table:</span>
+CREATE TABLE "Donation" (
+  "id"             TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  "donorName"      TEXT NOT NULL,
+  "amount"         DECIMAL(12, 2),
+  "category"       TEXT DEFAULT 'GENERAL',
+  "organizationId" TEXT NOT NULL REFERENCES "Organization"("id") ON DELETE CASCADE,
+  "addedById"      TEXT REFERENCES "OrganizationMember"("id"),
+  "isArchived"     BOOLEAN DEFAULT false
+);
+CREATE INDEX idx_donation_org ON "Donation"("organizationId");
+    </div>
+    <p style="margin-top:12px;"><strong>Key Prisma syntax:</strong></p>
+    <table>
+      <thead><tr><th>Syntax</th><th>Meaning</th><th>SQL Equivalent</th></tr></thead>
+      <tbody>
+        <tr><td><code>@id</code></td><td>Primary key</td><td><code>PRIMARY KEY</code></td></tr>
+        <tr><td><code>@default(cuid())</code></td><td>Auto-generate unique ID</td><td><code>DEFAULT gen_random_uuid()</code></td></tr>
+        <tr><td><code>@unique</code></td><td>No duplicate values</td><td><code>UNIQUE</code></td></tr>
+        <tr><td><code>@db.Decimal(12, 2)</code></td><td>Decimal with 12 digits, 2 after decimal</td><td><code>DECIMAL(12, 2)</code></td></tr>
+        <tr><td><code>String?</code></td><td>Optional field (nullable)</td><td><code>TEXT</code> (no NOT NULL)</td></tr>
+        <tr><td><code>@default("08:00")</code></td><td>Default value</td><td><code>DEFAULT '08:00'</code></td></tr>
+        <tr><td><code>@relation(fields: [x], references: [id])</code></td><td>Foreign key</td><td><code>REFERENCES Table("id")</code></td></tr>
+        <tr><td><code>onDelete: Cascade</code></td><td>Delete children when parent deleted</td><td><code>ON DELETE CASCADE</code></td></tr>
+        <tr><td><code>@@index([field])</code></td><td>Create database index</td><td><code>CREATE INDEX</code></td></tr>
+        <tr><td><code>@@unique([a, b])</code></td><td>Composite unique constraint</td><td><code>UNIQUE(a, b)</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Common Prisma Queries Used in UTSAV</h3>
+    <div class="code-block">
+<span class="comment">// FIND ONE record</span>
+<span class="keyword">await</span> prisma.user.<span class="func">findUnique</span>({ <span class="func">where</span>: { email: <span class="string">"user@example.com"</span> } });
+
+<span class="comment">// FIND MANY records with filtering</span>
+<span class="keyword">await</span> prisma.donation.<span class="func">findMany</span>({
+  <span class="func">where</span>: { organizationId, isArchived: <span class="type">false</span>, category: <span class="string">"GENERAL"</span> },
+  <span class="func">include</span>: { addedBy: <span class="type">true</span> }, <span class="comment">// JOIN with OrganizationMember</span>
+  <span class="func">orderBy</span>: { createdAt: <span class="string">"desc"</span> },
+  <span class="func">skip</span>: <span class="type">0</span>, <span class="func">take</span>: <span class="type">10</span>, <span class="comment">// Pagination</span>
+});
+
+<span class="comment">// CREATE a record</span>
+<span class="keyword">await</span> prisma.donation.<span class="func">create</span>({
+  <span class="func">data</span>: { donorName: <span class="string">"Rajesh"</span>, amount: <span class="type">5000</span>, organizationId },
+});
+
+<span class="comment">// UPDATE many records atomically (used for expense approval)</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> prisma.expense.<span class="func">updateMany</span>({
+  <span class="func">where</span>: { id: expenseId, status: <span class="string">"PENDING"</span> },
+  <span class="func">data</span>: { status: <span class="string">"APPROVED"</span>, approvedById: memberId },
+});
+<span class="comment">// result.count tells how many rows were actually updated</span>
+
+<span class="comment">// COUNT records</span>
+<span class="keyword">const</span> total = <span class="keyword">await</span> prisma.donation.<span class="func">count</span>({ <span class="func">where</span>: { organizationId } });
+
+<span class="comment">// TRANSACTION (multiple operations, all succeed or all fail)</span>
+<span class="keyword">await</span> prisma.<span class="func">$transaction</span>(<span class="keyword">async</span> (tx) => {
+  <span class="keyword">const</span> org = <span class="keyword">await</span> tx.organization.<span class="func">create</span>({ ... });
+  <span class="keyword">await</span> tx.organizationMember.<span class="func">create</span>({ ... });
+  <span class="keyword">return</span> org;
+});
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6: SLUGS & URLS ==================== -->
+<div class="section" id="slugs">
+  <div class="section-title"><span class="num">6</span> Slugs & URL Routing</div>
+
+  <div class="card">
+    <h3>What is a Slug?</h3>
+    <div class="explain-box">
+      A <strong>slug</strong> is a URL-friendly version of a name. Instead of <code>/organization?id=abc123</code>, you get <code>/ganesh-mandal-pune</code>. It's lowercase, uses hyphens instead of spaces, and has no special characters. In UTSAV, each organization gets a unique slug that becomes part of the URL.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How Slugs Are Created</h3>
+    <div class="code-block">
+<span class="comment">// 1. User enters organization name: "Ganesh Mandir Trust"</span>
+<span class="comment">// 2. Frontend converts to slug: "ganesh-mandir-trust"</span>
+<span class="comment">// 3. Backend checks uniqueness before saving:</span>
+
+<span class="comment">// In organization.service.ts - createOrganization()</span>
+<span class="keyword">const</span> existingSlug = <span class="keyword">await</span> prisma.organization.<span class="func">findUnique</span>({
+  <span class="func">where</span>: { slug: data.slug },  <span class="comment">// Slug has @@unique constraint</span>
+  <span class="func">select</span>: { id: <span class="type">true</span> },
+});
+
+<span class="keyword">if</span> (existingSlug) {
+  <span class="keyword">throw new</span> <span class="type">ConflictAppError</span>(<span class="string">"This slug is already taken."</span>);
+}
+
+<span class="comment">// 4. If unique, create org + assign creator as ADMIN (in a transaction)</span>
+    </div>
+    <p style="margin-top:12px;"><strong>The database enforces uniqueness:</strong></p>
+    <div class="code-block">
+<span class="comment">// In schema.prisma:</span>
+model Organization {
+  slug String @unique   <span class="comment">// PostgreSQL UNIQUE constraint</span>
+  @@index([slug])        <span class="comment">// Index for fast lookups</span>
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How Slugs Are Used in URLs (Next.js Dynamic Routes)</h3>
+    <div class="explain-box">
+      Next.js App Router uses <strong>square brackets</strong> in folder names to create dynamic segments. The folder <code>[orgSlug]</code> means "this part of the URL can be anything." Next.js passes it as a parameter to your page component.
+    </div>
+    <div class="code-block">
+<span class="comment">// File: src/app/[orgSlug]/page.tsx</span>
+<span class="comment">// URL: https://utsav.com/ganesh-mandir-pune</span>
+
+<span class="keyword">export default async function</span> <span class="func">PublicPage</span>({ params }) {
+  <span class="comment">// params.orgSlug = "ganesh-mandir-pune"</span>
+  
+  <span class="comment">// Resolve slug to organization</span>
+  <span class="keyword">const</span> org = <span class="keyword">await</span> OrganizationService.<span class="func">getOrganizationBySlug</span>(params.orgSlug);
+  
+  <span class="keyword">if</span> (!org) <span class="keyword">return</span> <span class="type">notFound</span>();  <span class="comment">// 404 if slug doesn't exist</span>
+  
+  <span class="comment">// Now use org.id for all queries</span>
+  <span class="keyword">return</span> <span class="func">PublicPortal</span>({ organization: org });
+}
+    </div>
+    <p style="margin-top:12px;"><strong>URL structure:</strong></p>
+    <table>
+      <thead><tr><th>URL Pattern</th><th>What It Shows</th><th>Auth Required?</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>Landing page</td><td>No</td></tr>
+        <tr><td><code>/login</code></td><td>Login form</td><td>No</td></tr>
+        <tr><td><code>/signup</code></td><td>Registration form</td><td>No</td></tr>
+        <tr><td><code>/dashboard</code></td><td>User's list of organizations</td><td>Yes</td></tr>
+        <tr><td><code>/[orgSlug]</code></td><td>Public org page (read-only, no auth)</td><td>No</td></tr>
+        <tr><td><code>/[orgSlug]/transparency</code></td><td>Public audit trail</td><td>No</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard</code></td><td>Org overview + stats</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/donations</code></td><td>Donation management</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/expenses</code></td><td>Expense management</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/members</code></td><td>Member management</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/events</code></td><td>Event management</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/bhog</code></td><td>Bhog/prasad management</td><td>Yes + membership</td></tr>
+        <tr><td><code>/[orgSlug]/dashboard/volunteers</code></td><td>Volunteer tasks</td><td>Yes + membership</td></tr>
+        <tr><td><code>/accept-invite?token=xxx</code></td><td>Accept invitation</td><td>Yes (must match email)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Slug Memoization (Performance Optimization)</h3>
+    <div class="explain-box">
+      Every time a page loads, it needs to resolve the slug to an organization. Instead of hitting the database multiple times for the same slug in one request, we use React's <code>cache()</code> function to memoize the result.
+    </div>
+    <div class="code-block">
+<span class="comment">// organization.service.ts</span>
+<span class="keyword">import</span> { cache } <span class="keyword">from</span> <span class="string">"react"</span>;
+
+<span class="comment">// cache() ensures: if getOrganizationBySlug("ganesh-mandir-pune") is called</span>
+<span class="comment">// 5 times in one request, the DB is only queried ONCE.</span>
+<span class="keyword">static</span> getOrganizationBySlug = <span class="func">cache</span>(<span class="keyword">async</span> (slug: <span class="type">string</span>) => {
+  <span class="keyword">return await</span> prisma.organization.<span class="func">findUnique</span>({ <span class="func">where</span>: { slug } });
+});
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 7: DATABASE ==================== -->
+<div class="section" id="database">
+  <div class="section-title"><span class="num">7</span> Database Schema</div>
+
+  <div class="card">
+    <h3>Entity Relationships</h3>
+    <div class="arch-diagram">
+User (1) ──────── (N) OrganizationMember ──────── (N:1) Organization (1)
+                                                              │
+                    ┌─────────────────────────────────────────┤
+                    │              │              │            │
+              (N:1) Donation  (N:1) Expense  (N:1) Event  (N:1) BhogItem
+                    │              │            │
+                    │              │         (1:N)── EventAssignment ── (N:1) Member
+                    │              │         (1:N)── EventRegistration
+                    │              │         (1:N)── VolunteerTask ── (N:1) Member
+                    │              │
+                    │              └── (N:1) Member (addedBy) + (N:1) Member (approvedBy)
+                    │
+                    └── (N:1) Member (addedBy)
+
+Organization (1) ──── (N) AuditLog ──── (N:1) Member (actor)
+Organization (1) ──── (N) OrganizationInvitation ──── (N:1) Member (invitedBy)
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>All 12 Database Models</h3>
+    <table>
+      <thead><tr><th>Model</th><th>Purpose</th><th>Key Fields</th><th>Relations</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">User</span></td><td>Global user identity (exists across all orgs)</td><td>id, email (unique), phone (unique), name, password (bcrypt)</td><td>Has many OrganizationMember</td></tr>
+        <tr><td><span class="badge badge-saffron">Organization</span></td><td>A tenant (festival or club)</td><td>name, slug (unique), type, status, openingBalance, budgetTarget, prasad times, timezone</td><td>Has many: members, donations, expenses, events, bhogItems, tasks, invitations, auditLogs</td></tr>
+        <tr><td><span class="badge badge-green">OrganizationMember</span></td><td>Membership record (who belongs to which org)</td><td>userId+orgId (unique pair), email+orgId (unique pair), role, isArchived</td><td>Belongs to User & Organization</td></tr>
+        <tr><td><span class="badge badge-purple">Donation</span></td><td>Money received from a donor</td><td>donorName, amount (Decimal 12,2), category, receivedAt, isArchived</td><td>Belongs to Organization, addedBy (Member), optional Event</td></tr>
+        <tr><td><span class="badge badge-red">Expense</span></td><td>Money spent (with approval workflow)</td><td>title, amount, category (13 options), status (PENDING/APPROVED/REJECTED)</td><td>Belongs to Organization, addedBy, approvedBy, optional Event</td></tr>
+        <tr><td><span class="badge badge-saffron">Event</span></td><td>A scheduled ceremony or program</td><td>title, startTime, endTime, location, budgetTarget, status</td><td>Has many: assignments, registrations, expenses, donations, tasks</td></tr>
+        <tr><td><span class="badge badge-blue">BhogItem</span></td><td>A food/prasad offering</td><td>name, quantity, status, offeringDate, offeringWindow (MORNING/EVENING)</td><td>Belongs to Organization</td></tr>
+        <tr><td><span class="badge badge-green">VolunteerTask</span></td><td>A task assigned to a volunteer</td><td>title, status (PENDING/IN_PROGRESS/COMPLETED), priority, dueDate</td><td>Belongs to Organization, assignedTo (Member), optional Event</td></tr>
+        <tr><td><span class="badge badge-purple">EventAssignment</span></td><td>Junction table: which member is assigned to which event</td><td>eventId + organizationMemberId (unique pair)</td><td>Belongs to Event and Member</td></tr>
+        <tr><td><span class="badge badge-red">EventRegistration</span></td><td>Public sign-up for an event</td><td>name, email, phone, notes, attended (boolean)</td><td>Belongs to Event</td></tr>
+        <tr><td><span class="badge badge-yellow">OrganizationInvitation</span></td><td>Invitation to join an org</td><td>email, role, token (unique), expiresAt (48h), accepted</td><td>Belongs to Organization, invitedBy (Member)</td></tr>
+        <tr><td><span class="badge badge-saffron">AuditLog</span></td><td>Immutable record of every change</td><td>entityType, entityId, action, before (JSON), after (JSON), visibility (INTERNAL/PUBLIC)</td><td>Belongs to Organization, actor (Member)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Schema Design Patterns</h3>
+    <div class="grid-2">
+      <div class="callout callout-green"><strong>Soft Deletes (<code>isArchived</code>)</strong><br>Instead of deleting records, we set <code>isArchived = true</code>. This preserves data for audit trails, allows "unarchive" operations, and prevents accidental data loss. All queries filter by <code>isArchived: false</code>.</div>
+      <div class="callout callout-blue"><strong>Cascading Deletes</strong><br><code>onDelete: Cascade</code> means deleting an Organization automatically deletes all its members, donations, expenses, events, etc. The database handles this, not application code.</div>
+      <div class="callout callout-purple"><strong>Composite Unique Constraints</strong><br><code>@@unique([userId, organizationId])</code> ensures a user can't join the same org twice. <code>@@unique([email, organizationId])</code> prevents duplicate invite acceptance.</div>
+      <div class="callout callout-saffron"><strong>Decimal for Money</strong><br><code>Decimal(12, 2)</code> stores exact decimal numbers (e.g., 5000.00). Never use floats for money - they have rounding errors like <code>0.1 + 0.2 = 0.30000000000000004</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 8: AUTH ==================== -->
+<div class="section" id="auth">
+  <div class="section-title"><span class="num">8</span> Authentication</div>
+
+  <div class="card">
+    <h3>Login Flow (Step by Step)</h3>
+    <div class="flow">
+      <span class="flow-step">1. User submits<br>email + password</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">2. NextAuth Credentials<br>Provider receives it</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">3. DB lookup:<br>prisma.user.findUnique({ email })</span>
+    </div>
+    <div class="flow">
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">4. bcrypt.compare(password, user.password)<br><small>12 salt rounds, takes ~200ms</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">5. JWT created with { id, email, phone }</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">6. Token stored in HTTP-only cookie<br><small>Can't be read by JavaScript (XSS safe)</small></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why JWT over Database Sessions?</h3>
+    <div class="decision-box">
+      Database sessions require a DB lookup on every request to verify the session is valid. JWTs are self-contained - the token itself contains the user info, cryptographically signed. This means: (1) <strong>No DB round-trip</strong> for session verification (faster). (2) <strong>Works with serverless</strong> (Vercel functions are stateless). (3) <strong>Scales better</strong> - no session table bottleneck.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Route Protection (Middleware)</h3>
+    <div class="explain-box">
+      Middleware runs BEFORE the page loads. NextAuth's <code>withAuth</code> middleware checks if a valid JWT cookie exists. If not, it redirects to <code>/login</code>. This protects all <code>/dashboard</code> and <code>/[slug]/dashboard</code> routes.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Two Levels of Protection</h3>
+    <div class="grid-2">
+      <div class="callout callout-blue">
+        <strong>Level 1: Middleware (JWT check)</strong><br>
+        Runs on EVERY request to protected routes. Simply checks: "Is there a valid token?" If no token → redirect to login. This is fast but coarse-grained.
+      </div>
+      <div class="callout callout-purple">
+        <strong>Level 2: Service Layer (RBAC check)</strong><br>
+        Runs inside Server Actions. Checks: "Is this user a member of THIS org? Do they have the right ROLE? Do they have the right PERMISSION?" This is granular and enforced per-operation.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 9: MULTI-TENANCY ==================== -->
+<div class="section" id="multitenancy">
+  <div class="section-title"><span class="num">9</span> Multi-Tenancy</div>
+  <div class="card">
+    <h3>How Is Data Isolated Between Organizations?</h3>
+    <div class="explain-box">
+      Every table that contains org-specific data (Donation, Expense, Event, etc.) has an <code>organizationId</code> foreign key column. The multi-tenant Prisma extension (explained in Section 5) automatically adds this column to every query's WHERE clause, so you <strong>never accidentally read another org's data</strong>.
+    </div>
+    <p style="margin-top:12px;"><strong>Without the extension, every service method would need:</strong></p>
+    <div class="code-block">
+<span class="comment">// Tedious and error-prone - developer could forget organizationId</span>
+<span class="keyword">await</span> prisma.donation.<span class="func">findMany</span>({
+  <span class="func">where</span>: { organizationId: <span class="string">"org_abc"</span>, isArchived: <span class="type">false</span> }
+});
+    </div>
+    <p style="margin-top:12px;"><strong>With the extension, service code just writes:</strong></p>
+    <div class="code-block">
+<span class="comment">// Clean - organizationId is auto-injected by the extension</span>
+<span class="keyword">await</span> tenantPrisma.donation.<span class="func">findMany</span>({
+  <span class="func">where</span>: { isArchived: <span class="type">false</span> }
+});
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 10: RBAC ==================== -->
+<div class="section" id="rbac">
+  <div class="section-title"><span class="num">10</span> Role-Based Access Control</div>
+  <div class="card">
+    <h3>Permission Matrix</h3>
+    <table class="perm-matrix">
+      <thead><tr><th>Permission</th><th><span class="badge badge-red">ADMIN</span></th><th><span class="badge badge-saffron">TREASURER</span></th><th><span class="badge badge-blue">COMMITTEE</span></th><th><span class="badge badge-green">VOLUNTEER</span></th></tr></thead>
+      <tbody>
+        <tr><td><code>finance:read</code> - View financials</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:create</code> - Record donations/expenses</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:approve</code> - Approve/reject expenses</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>finance:update</code> - Edit financial records</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>members:invite</code> - Send invitations</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>members:updateRole</code> - Change member roles</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+        <tr><td><code>events:manage</code> - Create/edit events</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>tasks:manage</code> - Create/assign tasks</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x2705;</td><td>&#x274C;</td></tr>
+        <tr><td><code>tasks:updateOwn</code> - Update own task status</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td><td>&#x2705;</td></tr>
+        <tr><td><code>public:manage</code> - Manage org settings</td><td>&#x2705;</td><td>&#x274C;</td><td>&#x274C;</td><td>&#x274C;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Last Admin Protection</h3>
+    <p>Both <code>updateMemberRoleAction</code> and <code>archiveMemberAction</code> check if the target is the <strong>last ADMIN</strong>. If so, the operation is rejected. This prevents an organization from becoming inaccessible (no one would have admin rights).</p>
+  </div>
+</div>
+
+<!-- ==================== SECTION 11: FINANCE ==================== -->
+<div class="section" id="finance">
+  <div class="section-title"><span class="num">11</span> Financial Engine</div>
+
+  <div class="card">
+    <h3>Race-Condition-Safe Expense Approval</h3>
+    <div class="explain-box">
+      If two admins click "Approve" on the same expense at the exact same time, we need to prevent double-approval. We use <code>updateMany</code> with a defensive WHERE clause.
+    </div>
+    <div class="code-block">
+<span class="keyword">const</span> result = <span class="keyword">await</span> tenantPrisma.expense.<span class="func">updateMany</span>({
+  <span class="func">where</span>: {
+    id: expenseId,
+    status: <span class="string">'PENDING'</span>,     <span class="comment">// Only match if STILL pending</span>
+  },
+  <span class="func">data</span>: { status: <span class="string">'APPROVED'</span>, approvedById: memberId, approvedAt: <span class="keyword">new</span> <span class="type">Date</span>() },
+});
+
+<span class="keyword">if</span> (result.count === <span class="type">0</span>) {
+  <span class="comment">// No rows matched = expense was already processed by someone else</span>
+  <span class="keyword">throw new</span> <span class="type">ConflictAppError</span>(<span class="string">"This expense was already processed."</span>);
+}
+    </div>
+    <p style="margin-top:12px;"><strong>Why this works:</strong> <code>updateMany</code> is atomic at the database level. Only one transaction will see <code>status = 'PENDING'</code> and update it. The second will see <code>status = 'APPROVED'</code> and get <code>count = 0</code>. No locks, no crashes, no inconsistency.</p>
+  </div>
+
+  <div class="card">
+    <h3>Festival vs Club Financial Models</h3>
+    <div class="grid-2">
+      <div class="callout callout-saffron">
+        <strong>FESTIVAL</strong><br>
+        Total = Opening Balance + Donations + Sponsorships<br>
+        Remaining = Total - Approved Expenses<br>
+        Shows: <code>publicFundraisingTarget</code> publicly<br>
+        "Opening Balance" label on public page
+      </div>
+      <div class="callout callout-blue">
+        <strong>CLUB</strong><br>
+        Total = Starting Allocation + Internal Funds + Sponsorships<br>
+        Remaining = Total - Approved Expenses<br>
+        Shows: <code>internalBudgetLimit</code> privately<br>
+        <strong>Excluded from public transparency pages entirely</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 12: AI ==================== -->
+<div class="section" id="ai">
+  <div class="section-title"><span class="num">12</span> AI Admin Assistant</div>
+  <div class="card">
+    <h3>How It Works</h3>
+    <div class="flow">
+      <span class="flow-step">User asks question<br><small>"How much did we spend on food?"</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Mutation keyword check<br><small>Does it contain add/delete/update? REJECT.</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Gemini classifies intent<br><small>-> EXPENSE_BREAKDOWN</small></span>
+    </div>
+    <div class="flow">
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Service gathers facts<br><small>GROUP BY category, SUM(amount) WHERE category='FOOD'</small></span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step">Gemini generates answer<br><small>"You've spent Rs 45,000 on food..."</small></span>
+    </div>
+    <div class="callout callout-red" style="margin-top:16px;">
+      <strong>Safety:</strong> The AI is <strong>read-only</strong> (never creates/updates/deletes data), blocks mutation keywords, and only receives pre-aggregated, tenant-scoped facts (never raw DB records).
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 13: FEATURES ==================== -->
+<div class="section" id="features">
+  <div class="section-title"><span class="num">13</span> Feature Set</div>
+  <div class="grid-2">
+    <div class="card"><h3>Landing & Auth</h3><ul><li>Animated temple doors (Framer Motion)</li><li>Email + password registration (Zod validation)</li><li>JWT authentication (bcrypt 12 rounds)</li><li>Secure redirect handling</li></ul></div>
+    <div class="card"><h3>Organization Management</h3><ul><li>Create Festival or Club orgs</li><li>Unique slug-based URLs</li><li>Budget targets, opening balance</li><li>End festival (marks as ENDED)</li><li>Max 10 orgs per user (spam prevention)</li></ul></div>
+    <div class="card"><h3>Financial Tracking</h3><ul><li>6 donation categories</li><li>13 expense categories</li><li>Approval workflow (PENDING -> APPROVED/REJECTED)</li><li>Real-time dashboard stats</li><li>Utilization rate tracking</li></ul></div>
+    <div class="card"><h3>Event Management</h3><ul><li>CRUD with time, location, budget</li><li>Team member assignments</li><li>Status lifecycle (PLANNED -> ACTIVE -> COMPLETED -> ARCHIVED)</li><li>Public event registration</li><li>Per-event financial breakdown</li></ul></div>
+    <div class="card"><h3>Bhog / Prasad Management</h3><ul><li>Time-windowed offerings (morning/evening)</li><li>Configurable windows per org</li><li>Public sponsorship (no auth needed)</li><li>Next available date calculation</li></ul></div>
+    <div class="card"><h3>Volunteer Tasks</h3><ul><li>Task CRUD with priority + due dates</li><li>Assign to specific volunteers</li><li>Status tracking (PENDING -> IN_PROGRESS -> COMPLETED)</li></ul></div>
+    <div class="card"><h3>Member Management</h3><ul><li>Email invitations (Resend)</li><li>Role assignment + management</li><li>Archive/unarchive members</li><li>Last admin protection</li><li>Token-based invite (48h expiry)</li></ul></div>
+    <div class="card"><h3>Public Transparency</h3><ul><li>Unauthenticated org page: /[slug]</li><li>Full audit trail: /[slug]/transparency</li><li>Only APPROVED expenses shown</li><li>INTERNAL/PUBLIC visibility filter</li></ul></div>
+    <div class="card"><h3>AI Assistant</h3><ul><li>Natural language financial queries</li><li>8 intent categories</li><li>Read-only with mutation blocking</li><li>Prompt injection protection</li></ul></div>
+    <div class="card"><h3>UI/UX</h3><ul><li>Shadcn/ui (New York variant)</li><li>Custom saffron brand palette</li><li>Framer Motion animations</li><li>Responsive design</li><li>Recharts dashboard visualizations</li></ul></div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 14: TESTING ==================== -->
+<div class="section" id="testing">
+  <div class="section-title"><span class="num">14</span> Testing</div>
+  <div class="card">
+    <h3>Test Files (7 Total)</h3>
+    <table>
+      <thead><tr><th>File</th><th>Tests</th><th>Key Assertions</th></tr></thead>
+      <tbody>
+        <tr><td>donation.actions.test.ts</td><td>Zod validation errors</td><td>Invalid input produces correct error response</td></tr>
+        <tr><td>admin-assistant.actions.test.ts</td><td>Input validation</td><td>Empty/missing inputs rejected</td></tr>
+        <tr><td>expense.service.test.ts</td><td>Expense approval</td><td>Race condition handling, audit logging</td></tr>
+        <tr><td>admin-assistant.service.test.ts</td><td>Intent classification</td><td>6 test cases for correct intent labels</td></tr>
+        <tr><td>public-financial.service.test.ts</td><td>Data isolation</td><td>Clubs excluded from public pages</td></tr>
+        <tr><td>FinancialHero.test.tsx</td><td>Component rendering</td><td>Correct language per org type</td></tr>
+        <tr><td>prasad-windows.test.ts</td><td>Time windows</td><td>Available windows, next date calculation</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== SECTION 15: DESIGN DECISIONS ==================== -->
+<div class="section" id="decisions">
+  <div class="section-title"><span class="num">15</span> Key Design Decisions</div>
+
+  <div class="card">
+    <h3>Why Separate Services from Server Actions?</h3>
+    <div class="decision-box">
+      Server Actions are entry points (like controllers). Services contain business logic. This separation means: (1) Services can be <strong>tested independently</strong> without HTTP/Server Action overhead. (2) Multiple Server Actions can reuse the same service method. (3) RBAC checks live in services, ensuring they're <strong>never bypassed</strong>. (4) Business logic is <strong>not coupled</strong> to Next.js specifics.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Server Components by Default?</h3>
+    <div class="decision-box">
+      Most dashboard pages are data-heavy (tables, stats, lists). Server Components send <strong>zero JavaScript</strong> to the browser - just HTML. This means: (1) <strong>Faster page loads</strong> - smaller bundle size. (2) <strong>Better SEO</strong> - content is pre-rendered on the server. (3) <strong>Direct DB access</strong> - no API layer needed for reads. Client Components are only used for forms, modals, and interactive elements.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Prisma $extends for Multi-Tenancy?</h3>
+    <div class="decision-box">
+      Alternatives considered: (1) <strong>Manual WHERE clauses</strong> - error-prone, developer could forget. (2) <strong>Database Row-Level Security</strong> - PostgreSQL RLS is powerful but harder to manage, test, and debug. (3) <strong>Separate databases per tenant</strong> - overkill for this scale, complex migrations. The <code>$extends</code> approach is <strong>transparent</strong> (you can see what it does), <strong>testable</strong>, and <strong>fail-safe</strong> (missing orgId = empty results, not cross-tenant leaks).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Soft Deletes Over Hard Deletes?</h3>
+    <div class="decision-box">
+      Hard deletes are permanent and unrecoverable. Soft deletes via <code>isArchived</code>: (1) Preserve data for <strong>audit trails</strong>. (2) Allow <strong>"unarchive"</strong> operations. (3) Maintain referential integrity (foreign keys still work). (4) Enable <strong>data recovery</strong> from mistakes. (5) Historical records remain intact for reporting.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why Decimal for Money?</h3>
+    <div class="decision-box">
+      Floating-point numbers (IEEE 754) cannot exactly represent decimal fractions. Example: <code>0.1 + 0.2 = 0.30000000000000004</code>. For financial calculations, this causes real bugs. <code>Decimal(12, 2)</code> stores exact base-10 numbers with 2 decimal places, ensuring <code>0.1 + 0.2 = 0.30</code> always.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 16: INTERVIEW Q&A ==================== -->
+<div class="section" id="interview">
+  <div class="section-title"><span class="num">16</span> Interview Questions & Answers</div>
+
+  <div class="card qa-card">
+    <h3>Q1: "Walk me through the architecture"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> UTSAV is a <strong>modular monolith</strong> with 5 layers: (1) <strong>Presentation</strong> - React Server Components + Client Components; (2) <strong>Action</strong> - Server Actions with Zod validation; (3) <strong>Service</strong> - Domain-organized business logic with RBAC; (4) <strong>Data</strong> - Prisma ORM with a custom multi-tenant extension; (5) <strong>Infrastructure</strong> - Auth, errors, pagination, email, AI. The key decision was putting business logic in services, not actions - making it testable and RBAC enforceable.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q2: "How does multi-tenancy work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every tenant-scoped table has an <code>organizationId</code> column. I built a custom Prisma Client extension using <code>$extends</code> that intercepts ALL CRUD operations. On reads, it auto-appends <code>WHERE organizationId = X</code>. On creates, it injects <code>organizationId</code>. On updates, it strips <code>organizationId</code> to prevent cross-tenant migration. Cross-tenant data leaks are <strong>structurally impossible</strong> at the data layer.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q3: "How do you handle race conditions?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> For expense approval, we use <code>updateMany</code> with a WHERE clause that includes <code>status: 'PENDING'</code>. This is atomic at the DB level. If two admins approve simultaneously, only one gets <code>count === 1</code>. The second gets <code>count === 0</code> because status is no longer PENDING, and we throw a <code>ConflictAppError</code>. No distributed locks needed, works perfectly with serverless.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q4: "Why did you choose this tech stack?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Next.js 14 for Server Components (zero-JS pages) + Server Actions (no API boilerplate). PostgreSQL for ACID compliance and complex relations. Prisma for type-safe queries and the $extends API. NextAuth for JWT strategy (stateless, serverless-friendly). Tailwind + shadcn for rapid, consistent UI. Each choice optimizes for developer experience, performance, or scalability.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q5: "How does the RBAC system work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Two tiers: (1) <code>validateAccess(orgId, roles[])</code> checks auth + membership + role. (2) <code>requirePermission(orgId, permission)</code> checks against a static permission map. Four roles with different permission sets. Enforcement is at the <strong>service layer</strong>, not UI - even if someone bypasses the frontend, the backend rejects unauthorized operations.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q6: "How does the AI assistant work safely?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Three safety layers: (1) <strong>Read-only architecture</strong> - the service only uses <code>findMany</code> and aggregation, never create/update/delete. (2) <strong>Mutation keyword blocking</strong> - questions with words like "add", "delete", "create" are immediately rejected. (3) <strong>Prompt injection guardrails</strong> - system prompt instructs Gemini to never execute commands or reveal the prompt. Data fed to Gemini is pre-aggregated, tenant-scoped facts.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q7: "How does the slug/URL system work?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Each organization has a unique slug (URL-safe string). The database enforces uniqueness with <code>@unique</code> + <code>@@index</code>. In Next.js, the <code>[orgSlug]</code> dynamic route segment captures the URL parameter. A memoized <code>getOrganizationBySlug()</code> resolves slug to org (cached per-request with React's <code>cache()</code>). If slug doesn't exist, 404 is returned. The slug becomes the public identifier - e.g., <code>/ganesh-mandir-pune</code>.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q8: "How do you handle the invitation system securely?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> <code>crypto.randomBytes(32)</code> generates a 256-bit unguessable token. 48-hour expiry. Strict email matching - the logged-in user's email must match the invite email. If wrong account is logged in, a warning is shown. If a member was previously archived, the system restores instead of creating duplicates. Admins can also skip email delivery and share the link via WhatsApp.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q9: "What is the audit trail system?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Every mutation calls <code>AuditService.record()</code>, which stores: entity type, entity ID, action (CREATE/UPDATE/APPROVE/etc.), before/after JSON snapshots, actor ID, and visibility level (INTERNAL or PUBLIC). The public transparency page filters for PUBLIC visibility only, showing citizens how funds were spent without exposing internal operations.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q10: "Why not use raw SQL instead of Prisma?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> Prisma gives us: (1) <strong>Type safety</strong> - every query result is fully typed in TypeScript. (2) <strong>Schema as code</strong> - one file defines all tables, version-controlled. (3) <strong>Auto-generated client</strong> - no hand-written queries. (4) <strong>$extends</strong> - enabled the multi-tenancy pattern. (5) <strong>Migrations</strong> - <code>prisma db push</code> syncs schema changes automatically. Raw SQL would be verbose, error-prone, and lose type safety.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q11: "How would you scale this to 10,000 organizations?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>Database</strong>: Add connection pooling (PgBouncer), read replicas for public pages. (2) <strong>Caching</strong>: Redis for frequently-accessed org data and financial summaries. (3) <strong>CDN</strong>: Cache public transparency pages at edge. (4) <strong>Background jobs</strong>: Move email sending and AI classification to a queue. (5) <strong>Horizontal scaling</strong>: Vercel handles this automatically for the app tier.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q12: "What are the biggest challenges you faced?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>Multi-tenancy</strong> - ensuring data isolation without performance overhead. The $extends pattern solved this elegantly. (2) <strong>Race conditions</strong> in expense approval - solved with atomic updateMany + defensive WHERE. (3) <strong>Public vs private data</strong> - different services for public pages that never expose internal fields. (4) <strong>AI safety</strong> - making the assistant useful without it being a security risk. Solved with read-only architecture + mutation blocking + prompt guardrails.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q13: "What would you improve next?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>E2E tests</strong> with Playwright for critical flows. (2) <strong>Real-time updates</strong> via WebSockets for live expense approvals. (3) <strong>PDF/Excel exports</strong> for financial reports. (4) <strong>CI/CD pipeline</strong> with GitHub Actions (lint, test, build, preview deployments). (5) <strong>Mobile PWA</strong> for volunteer task management on-the-go. (6) <strong>Database integration tests</strong> with testcontainers.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q14: "Explain the Prisma schema design"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> The schema uses 12 models with relationships defined via <code>@relation</code>. Key patterns: <code>@id @default(cuid())</code> for auto-generated IDs, <code>@@unique([userId, organizationId])</code> for composite constraints, <code>Decimal(12, 2)</code> for money, <code>@default(false)</code> on isArchived for soft deletes, <code>onDelete: Cascade</code> for automatic cleanup, and <code>@@index</code> on frequently queried columns for performance. Enums ensure data integrity at the database level.
+    </div>
+  </div>
+
+  <div class="card qa-card">
+    <h3>Q15: "How does Next.js App Router help your architecture?"</h3>
+    <div class="callout callout-green">
+      <strong>A:</strong> (1) <strong>Server Components</strong> - dashboard pages are async functions that query the DB directly, sending zero JS to the browser. (2) <strong>Server Actions</strong> - mutations are typed functions, no API routes needed. (3) <strong>[orgSlug] dynamic routes</strong> - file-system based multi-tenant URLs. (4) <strong>Middleware</strong> - JWT verification before page loads. (5) <strong>revalidatePath()</strong> - automatic cache invalidation after mutations. (6) <strong>React cache()</strong> - request-level memoization.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="card">
+    <h3>File Locations Quick Reference</h3>
+    <table>
+      <thead><tr><th>What</th><th>File</th><th>Key Function</th></tr></thead>
+      <tbody>
+        <tr><td>Multi-tenancy extension</td><td>src/lib/access-control.ts</td><td>getTenantPrisma()</td></tr>
+        <tr><td>RBAC permissions</td><td>src/lib/access-control.ts</td><td>requirePermission()</td></tr>
+        <tr><td>Auth config</td><td>src/lib/auth.ts</td><td>authOptions</td></tr>
+        <tr><td>Error classes</td><td>src/lib/errors.ts</td><td>AppError hierarchy</td></tr>
+        <tr><td>Action responses</td><td>src/lib/action-response.ts</td><td>actionSuccess() / actionFailure()</td></tr>
+        <tr><td>Prisma singleton</td><td>src/lib/prisma.ts</td><td>prisma</td></tr>
+        <tr><td>Slug resolution</td><td>src/modules/core/organization.service.ts</td><td>getOrganizationBySlug()</td></tr>
+        <tr><td>Expense approval</td><td>src/modules/finance/expense.service.ts</td><td>updateMany with defensive WHERE</td></tr>
+        <tr><td>Audit trail</td><td>src/modules/core/audit.service.ts</td><td>record()</td></tr>
+        <tr><td>AI assistant</td><td>src/modules/assistant/admin-assistant.service.ts</td><td>classifyIntent()</td></tr>
+        <tr><td>Route protection</td><td>src/middleware.ts</td><td>withAuth()</td></tr>
+        <tr><td>Database schema</td><td>prisma/schema.prisma</td><td>12 models + 12 enums</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div style="text-align:center; padding: 40px 20px; color: var(--slate-500); font-size: 0.85rem;">
+  <div style="font-weight: 800; color: var(--saffron); font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">UTSAV Interview Prep</div>
+  <div style="margin-top: 8px;">Built by Vedant Mehta</div>
+  <div style="margin-top: 4px;">Next.js 14 &bull; Prisma &bull; PostgreSQL &bull; NextAuth &bull; Gemini AI &bull; Shadcn/ui</div>
+</div>
+
+</div>
+</body>
+</html>

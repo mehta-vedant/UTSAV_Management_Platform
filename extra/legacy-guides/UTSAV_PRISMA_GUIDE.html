@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTSAV - Complete Prisma Guide</title>
+<style>
+  :root {
+    --saffron: #FF6B2B; --saffron-light: #FFF3ED; --navy: #0F172A;
+    --slate-800: #1E293B; --slate-700: #334155; --slate-600: #475569;
+    --slate-500: #64748B; --slate-400: #94A3B8; --slate-300: #CBD5E1;
+    --slate-200: #E2E8F0; --slate-100: #F1F5F9; --slate-50: #F8FAFC;
+    --green: #10B981; --green-light: #ECFDF5; --blue: #3B82F6; --blue-light: #EFF6FF;
+    --purple: #8B5CF6; --purple-light: #F5F3FF; --red: #EF4444; --red-light: #FEF2F2;
+    --yellow: #F59E0B; --yellow-light: #FFFBEB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--slate-50); color: var(--slate-800); line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #0c4a6e 0%, #164e63 50%, #134e4a 100%); color: white; padding: 50px 40px; text-align: center; }
+  .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+  .hero h1 span { color: #22d3ee; }
+  .hero .sub { color: #94a3b8; margin-top: 10px; font-size: 1rem; }
+  .nav { background: white; border-bottom: 2px solid var(--slate-200); padding: 10px 20px; position: sticky; top: 0; z-index: 100; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .nav a { text-decoration: none; color: var(--slate-600); font-size: 0.75rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav a:hover { background: #0ea5e9; color: white; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .section { margin-bottom: 50px; }
+  .stitle { font-size: 1.4rem; font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #0ea5e9; display: flex; align-items: center; gap: 10px; }
+  .stitle .n { background: #0ea5e9; color: white; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .card { background: white; border-radius: 16px; padding: 28px; margin-bottom: 20px; border: 1px solid var(--slate-200); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .card h3 { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .card p, .card li { font-size: 0.9rem; color: var(--slate-600); line-height: 1.7; }
+  .card ul, .card ol { padding-left: 20px; }
+  .card li { margin-bottom: 3px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead th { background: var(--navy); color: white; padding: 10px 14px; text-align: left; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--slate-200); color: var(--slate-700); vertical-align: top; }
+  tbody tr:hover { background: var(--blue-light); }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+  .b-blue { background: var(--blue-light); color: var(--blue); }
+  .b-green { background: var(--green-light); color: #059669; }
+  .b-purple { background: var(--purple-light); color: var(--purple); }
+  .b-red { background: var(--red-light); color: var(--red); }
+  .b-saffron { background: var(--saffron-light); color: var(--saffron); }
+  .b-yellow { background: var(--yellow-light); color: #D97706; }
+  .code { background: var(--navy); color: #E2E8F0; padding: 18px; border-radius: 12px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.8rem; line-height: 1.6; overflow-x: auto; margin: 10px 0; white-space: pre-wrap; }
+  .code .kw { color: #C084FC; }
+  .code .str { color: #34D399; }
+  .code .cm { color: #64748B; font-style: italic; }
+  .code .fn { color: #60A5FA; }
+  .code .tp { color: #FBBF24; }
+  .code .dc { color: #F472B6; }
+  .callout { padding: 16px 20px; border-radius: 12px; margin: 14px 0; font-size: 0.88rem; border-left: 4px solid; }
+  .c-yellow { background: var(--yellow-light); border-color: var(--yellow); }
+  .c-green { background: var(--green-light); border-color: var(--green); }
+  .c-blue { background: var(--blue-light); border-color: var(--blue); }
+  .c-purple { background: var(--purple-light); border-color: var(--purple); }
+  .c-red { background: var(--red-light); border-color: var(--red); }
+  .c-saffron { background: var(--saffron-light); border-color: var(--saffron); }
+  .callout strong { color: var(--navy); }
+  .ref { font-family: 'Cascadia Code', monospace; background: var(--slate-100); padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: var(--slate-700); }
+  .divider { border: none; border-top: 2px dashed var(--slate-200); margin: 30px 0; }
+  .bigcode { background: #0f172a; color: #e2e8f0; padding: 24px; border-radius: 14px; font-family: 'Cascadia Code', monospace; font-size: 0.8rem; line-height: 1.7; overflow-x: auto; margin: 14px 0; border: 2px solid #1e293b; }
+  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero h1 { font-size: 1.8rem; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Prisma <span>Complete Guide</span></h1>
+  <div class="sub">Understanding the UTSAV Database Schema + CRUD Operations + Every Syntax Explained</div>
+</div>
+
+<div class="nav">
+  <a href="#how">How Prisma Works</a>
+  <a href="#schema-basics">Schema Basics</a>
+  <a href="#decorators">Decorators & Symbols</a>
+  <a href="#types">Field Types</a>
+  <a href="#relations">Relations</a>
+  <a href="#enums">Enums</a>
+  <a href="#constraints">Constraints</a>
+  <a href="#utsav-schema">UTSAV Schema</a>
+  <a href="#crud">CRUD Operations</a>
+  <a href="#advanced">Advanced Queries</a>
+  <a href="#transactions">Transactions</a>
+  <a href="#commands">Prisma Commands</a>
+</div>
+
+<div class="container">
+
+<!-- ==================== HOW PRISMA WORKS ==================== -->
+<div class="section" id="how">
+  <div class="stitle"><span class="n">1</span> How Prisma Actually Works</div>
+
+  <div class="card">
+    <h3>The Big Picture: What You Write vs What Happens Automatically</h3>
+    <div class="callout c-green">
+      <strong>YES - You ONLY write the <code>schema.prisma</code> file.</strong> Everything else is automatic:
+    </div>
+    <table style="margin-top:12px;">
+      <thead><tr><th>What</th><th>Who Does It</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Database tables</strong></td><td>You (one command)</td><td>Run <code>npx prisma db push</code> - Prisma reads your schema and creates/modifies actual PostgreSQL tables</td></tr>
+        <tr><td><strong>TypeScript types</strong></td><td>Automatic</td><td>Prisma generates <code>node_modules/.prisma/client</code> with full types for every model, field, and relation</td></tr>
+        <tr><td><strong>Database client</strong></td><td>Automatic</td><td><code>PrismaClient</code> is auto-generated with methods like <code>findMany()</code>, <code>create()</code>, <code>update()</code> etc.</td></tr>
+        <tr><td><strong>Migrations</strong></td><td>You (one command)</td><td>Run <code>npx prisma migrate dev</code> when you change the schema - generates SQL migration files</td></tr>
+        <tr><td><strong>Relations/JOINs</strong></td><td>Automatic</td><td>You define relations in schema with <code>@relation</code>, Prisma handles SQL JOINs behind the scenes</td></tr>
+        <tr><td><strong>Validation</strong></td><td>Automatic</td><td><code>String</code> = required, <code>String?</code> = optional, <code>@unique</code> = no duplicates - enforced at DB level</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>The Workflow (Step by Step)</h3>
+    <div class="code">
+<span class="cm">// STEP 1: You write the schema (prisma/schema.prisma)</span>
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String
+}
+
+<span class="cm">// STEP 2: Run command to sync schema to database</span>
+npx prisma db push
+
+<span class="cm">// STEP 3: Prisma automatically generates the TypeScript client</span>
+<span class="cm">// You get a fully-typed 'prisma' object you can use in your code:</span>
+
+<span class="kw">import</span> { prisma } <span class="kw">from</span> <span class="str">"@/lib/prisma"</span>;
+
+<span class="cm">// Now you can do CRUD operations with full TypeScript autocomplete:</span>
+<span class="kw">await</span> prisma.user.<span class="fn">findMany</span>();           <span class="cm">// SELECT * FROM "User"</span>
+<span class="kw">await</span> prisma.user.<span class="fn">create</span>({ data: {...} }); <span class="cm">// INSERT INTO "User"</span>
+<span class="kw">await</span> prisma.user.<span class="fn">update</span>({ ... });      <span class="cm">// UPDATE "User" SET ...</span>
+<span class="kw">await</span> prisma.user.<span class="fn">delete</span>({ ... });      <span class="cm">// DELETE FROM "User" WHERE ...</span>
+
+<span class="cm">// That's it. No SQL. No API endpoints. Just typed function calls.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The PrismaClient Singleton (What's in prisma.ts?)</h3>
+    <div class="code">
+<span class="cm">// src/lib/prisma.ts - This file is only 11 lines</span>
+<span class="kw">import</span> { PrismaClient } <span class="kw">from</span> <span class="str">"@prisma/client"</span>;
+
+<span class="cm">// 'globalThis' is a special object that persists across hot reloads in dev</span>
+<span class="kw">const</span> globalForPrisma = global <span class="kw">as unknown as</span> { prisma: <span class="tp">PrismaClient</span> };
+
+<span class="cm">// Either reuse existing client (from globalThis) or create new one</span>
+<span class="kw">export const</span> prisma = globalForPrisma.prisma || <span class="kw">new</span> <span class="tp">PrismaClient</span>({ log: [<span class="str">"query"</span>] });
+
+<span class="cm">// In dev, save to globalThis so hot reload reuses it (prevents connection leak)</span>
+<span class="kw">if</span> (process.env.NODE_ENV !== <span class="str">"production"</span>) globalForPrisma.prisma = prisma;
+    </div>
+    <div class="callout c-yellow">
+      <strong>Why the singleton?</strong> In development, Next.js hot-reloads your code on every file save. Without this pattern, every reload would create a NEW PrismaClient, opening a new database connection. After 10-15 saves, you'd hit PostgreSQL's connection limit and crash. The singleton stores ONE client on <code>globalThis</code> and reuses it.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCHEMA BASICS ==================== -->
+<div class="section" id="schema-basics">
+  <div class="stitle"><span class="n">2</span> Schema Basics</div>
+
+  <div class="card">
+    <h3>The Two Required Blocks at the Top</h3>
+    <div class="code">
+<span class="cm">// 1. GENERATOR: Tells Prisma what client to generate</span>
+generator client {
+  provider = <span class="str">"prisma-client-js"</span>   <span class="cm">// Generates a JavaScript/TypeScript client</span>
+}
+
+<span class="cm">// 2. DATASOURCE: Tells Prisma what database to connect to</span>
+datasource db {
+  provider = <span class="str">"postgresql"</span>          <span class="cm">// Database type (could also be mysql, sqlite, etc.)</span>
+  url      = <span class="dc">env</span>(<span class="str">"DATABASE_URL"</span>)  <span class="cm">// Connection string from .env file</span>
+}
+    </div>
+    <div class="callout c-yellow">
+      <strong><code>env("DATABASE_URL")</code></strong> means "read this value from the .env file." The .env file has: <code>DATABASE_URL="postgresql://user:password@host:5432/dbname"</code>. This keeps secrets out of your code.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Model = Database Table</h3>
+    <div class="code">
+<span class="cm">// Every 'model' block = one database table</span>
+model User {
+  <span class="cm">// Each line = one column in the table</span>
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}
+    </div>
+    <table style="margin-top:12px;">
+      <thead><tr><th>Part</th><th>What It Is</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>model</code></td><td>Keyword that starts a table definition</td><td><code>model User { ... }</code></td></tr>
+        <tr><td><code>User</code></td><td>Table name (PascalCase). Becomes "User" in DB.</td><td>Maps to <code>CREATE TABLE "User" (...)</code></td></tr>
+        <tr><td><code>id</code></td><td>Field name (camelCase). Becomes column in DB.</td><td>Maps to <code>"id" TEXT PRIMARY KEY</code></td></tr>
+        <tr><td><code>String</code></td><td>Field type. Maps to PostgreSQL type.</td><td>String -> TEXT, Int -> INTEGER, Boolean -> BOOLEAN</td></tr>
+        <tr><td><code>@id</code></td><td>Decorator: marks this as primary key</td><td><code>PRIMARY KEY</code></td></tr>
+        <tr><td><code>@default(cuid())</code></td><td>Decorator: auto-generate value if not provided</td><td><code>DEFAULT gen_random_uuid()</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== DECORATORS & SYMBOLS ==================== -->
+<div class="section" id="decorators">
+  <div class="stitle"><span class="n">3</span> Every Decorator & Symbol Explained</div>
+
+  <div class="card">
+    <h3>Complete Decorator Reference</h3>
+    <table>
+      <thead><tr><th>Decorator</th><th>Meaning</th><th>SQL Equivalent</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="ref">@id</span></td>
+          <td>This field is the <strong>primary key</strong> (unique identifier for each row)</td>
+          <td><code>PRIMARY KEY</code></td>
+          <td><code>id String @id</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@default(cuid())</span></td>
+          <td>Auto-generate a unique ID if not provided. CUID = collision-resistant unique ID (like a better UUID)</td>
+          <td><code>DEFAULT gen_random_uuid()</code></td>
+          <td><code>id String @id @default(cuid())</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@default(now())</span></td>
+          <td>Auto-set to current timestamp when row is created</td>
+          <td><code>DEFAULT NOW()</code></td>
+          <td><code>createdAt DateTime @default(now())</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@updatedAt</span></td>
+          <td>Auto-update to current timestamp whenever row is modified</td>
+          <td><code>DEFAULT NOW()</code> + trigger</td>
+          <td><code>updatedAt DateTime @updatedAt</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@unique</span></td>
+          <td>No two rows can have the same value for this field</td>
+          <td><code>UNIQUE</code></td>
+          <td><code>email String @unique</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@default("value")</span></td>
+          <td>Default value if none provided</td>
+          <td><code>DEFAULT 'value'</code></td>
+          <td><code>status String @default("PENDING")</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@default(false)</span></td>
+          <td>Default boolean value</td>
+          <td><code>DEFAULT false</code></td>
+          <td><code>isArchived Boolean @default(false)</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@default(0)</span></td>
+          <td>Default number value</td>
+          <td><code>DEFAULT 0</code></td>
+          <td><code>count Int @default(0)</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@db.Decimal(12, 2)</span></td>
+          <td>Exact decimal number with 12 total digits, 2 after decimal point</td>
+          <td><code>DECIMAL(12, 2)</code></td>
+          <td><code>amount Decimal @db.Decimal(12, 2)</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@relation(fields: [x], references: [id])</span></td>
+          <td>Foreign key: this field points to another table's field</td>
+          <td><code>REFERENCES "Table"("id")</code></td>
+          <td>See Relations section</td>
+        </tr>
+        <tr>
+          <td><span class="ref">onDelete: Cascade</span></td>
+          <td>When the referenced row is deleted, delete this row too</td>
+          <td><code>ON DELETE CASCADE</code></td>
+          <td><code>@relation(..., onDelete: Cascade)</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Table-Level Decorators (Starts with @@)</h3>
+    <table>
+      <thead><tr><th>Decorator</th><th>Meaning</th><th>SQL Equivalent</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="ref">@@index([field])</span></td>
+          <td>Create a database index on this column for faster queries</td>
+          <td><code>CREATE INDEX idx_name ON "Table"("field")</code></td>
+          <td><code>@@index([organizationId])</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@@unique([a, b])</span></td>
+          <td><strong>Composite unique:</strong> the COMBINATION of these fields must be unique (each individually can repeat)</td>
+          <td><code>UNIQUE("a", "b")</code></td>
+          <td><code>@@unique([userId, organizationId])</code></td>
+        </tr>
+        <tr>
+          <td><span class="ref">@@index([a, b])</span></td>
+          <td>Composite index on multiple columns (for queries filtering by both)</td>
+          <td><code>CREATE INDEX ON "Table"("a", "b")</code></td>
+          <td><code>@@index([organizationId, offeringDate])</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout c-yellow" style="margin-top:12px;">
+      <strong>@@unique vs @unique:</strong> <code>@unique</code> on a field means THAT field alone must be unique. <code>@@unique([userId, organizationId])</code> means the PAIR must be unique - the same userId can appear multiple times IF the organizationId is different. This prevents a user from joining the same org twice.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The ? Symbol (Optional Fields)</h3>
+    <div class="code">
+<span class="cm">// Required fields (NOT NULL in SQL):</span>
+email     String          <span class="cm">// MUST have a value</span>
+amount    Decimal         <span class="cm">// MUST have a value</span>
+status    ExpenseStatus   <span class="cm">// MUST have a value</span>
+
+<span class="cm">// Optional fields (? = nullable in SQL):</span>
+phone     String?         <span class="cm">// CAN be null</span>
+notes     String?         <span class="cm">// CAN be null</span>
+eventId   String?         <span class="cm">// CAN be null (donation not tied to any event)</span>
+    </div>
+    <div class="callout c-blue">
+      <strong>In TypeScript after generation:</strong> <code>String</code> becomes <code>string</code>, <code>String?</code> becomes <code>string | null</code>. The Prisma client forces you to handle nullable values.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FIELD TYPES ==================== -->
+<div class="section" id="types">
+  <div class="stitle"><span class="n">4</span> Prisma Field Types</div>
+
+  <div class="card">
+    <h3>All Available Types</h3>
+    <table>
+      <thead><tr><th>Prisma Type</th><th>TypeScript Type</th><th>PostgreSQL Type</th><th>Used For</th></tr></thead>
+      <tbody>
+        <tr><td><code>String</code></td><td><code>string</code></td><td><code>TEXT</code></td><td>Names, emails, descriptions, tokens</td></tr>
+        <tr><td><code>String @db.VarChar(255)</code></td><td><code>string</code></td><td><code>VARCHAR(255)</code></td><td>Fixed-length strings (slightly faster for indexed lookups)</td></tr>
+        <tr><td><code>Boolean</code></td><td><code>boolean</code></td><td><code>BOOLEAN</code></td><td>Flags: isArchived, accepted, attended</td></tr>
+        <tr><td><code>Int</code></td><td><code>number</code></td><td><code>INTEGER</code></td><td>Whole numbers (counts, page sizes)</td></tr>
+        <tr><td><code>Float</code></td><td><code>number</code></td><td><code>DOUBLE PRECISION</code></td><td>Approximate decimals (AVOID for money!)</td></tr>
+        <tr><td><code>Decimal</code></td><td><code>Prisma.Decimal</code></td><td><code>DECIMAL</code></td><td>Exact decimals (MONEY - use this!)</td></tr>
+        <tr><td><code>DateTime</code></td><td><code>Date</code></td><td><code>TIMESTAMP</code></td><td>Dates and times: createdAt, startTime</td></tr>
+        <tr><td><code>Json</code></td><td><code>Prisma.JsonValue</code></td><td><code>JSONB</code></td><td>Flexible JSON data: featureFlags, audit snapshots</td></tr>
+      </tbody>
+    </table>
+    <div class="callout c-red" style="margin-top:12px;">
+      <strong>NEVER use Float for money!</strong> Float uses IEEE 754 binary floating point. <code>0.1 + 0.2 = 0.30000000000000004</code>. Always use <code>Decimal @db.Decimal(12, 2)</code> for monetary values.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RELATIONS ==================== -->
+<div class="section" id="relations">
+  <div class="stitle"><span class="n">5</span> Relations (How Tables Connect)</div>
+
+  <div class="card">
+    <h3>One-to-Many Relation (Most Common)</h3>
+    <div class="code">
+<span class="cm">// One Organization has MANY members</span>
+<span class="cm">// One OrganizationMember belongs to ONE Organization</span>
+
+model Organization {
+  id      String               @id @default(cuid())
+  name    String
+  members OrganizationMember[]  <span class="cm">// This is the "many" side (array)</span>
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String       <span class="cm">// Foreign key field (stores the org's ID)</span>
+  organization   Organization <span class="cm">// The relation field (NOT a column - used by Prisma)</span>
+                     <span class="dc">@relation</span>(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+    </div>
+    <div class="callout c-yellow" style="margin-top:12px;">
+      <strong>Anatomy of <code>@relation</code>:</strong><br>
+      <code>fields: [organizationId]</code> = "This model's field that stores the foreign key"<br>
+      <code>references: [id]</code> = "The field in the other model this points to"<br>
+      <code>onDelete: Cascade</code> = "If the Organization is deleted, delete all its members too"<br>
+      In SQL: <code>"organizationId" TEXT REFERENCES "Organization"("id") ON DELETE CASCADE</code>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Named Relations (When Multiple Relations to Same Model)</h3>
+    <div class="code">
+<span class="cm">// Expense has TWO relations to OrganizationMember:</span>
+<span class="cm">// 1. Who ADDED the expense (addedById)</span>
+<span class="cm">// 2. Who APPROVED the expense (approvedById)</span>
+
+model Expense {
+  id           String             @id @default(cuid())
+  addedById    String
+  approvedById String?
+  
+  addedBy      OrganizationMember <span class="dc">@relation</span>(<span class="str">"ExpenseAddedBy"</span>, fields: [addedById], references: [id])
+  approvedBy   OrganizationMember?<span class="dc">@relation</span>(<span class="str">"ExpenseApprovedBy"</span>, fields: [approvedById], references: [id])
+}
+
+model OrganizationMember {
+  id             String    @id @default(cuid())
+  expensesAdded  Expense[] <span class="dc">@relation</span>(<span class="str">"ExpenseAddedBy"</span>)    <span class="cm">// Must match the name!</span>
+  expensesApproved Expense[] <span class="dc">@relation</span>(<span class="str">"ExpenseApprovedBy"</span>) <span class="cm">// Must match the name!</span>
+}
+    </div>
+    <div class="callout c-purple">
+      <strong>Why named relations?</strong> When two fields in the same model point to the same other model, Prisma can't automatically figure out which is which. The name acts as a label to disambiguate.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Optional Relations (?)</h3>
+    <div class="code">
+<span class="cm">// A Donation MIGHT be tied to an Event, or might not</span>
+model Donation {
+  eventId  String?   <span class="cm">// Optional foreign key (can be null)</span>
+  event    Event?    <span class="cm">// Optional relation (marked with ?)</span>
+           <span class="dc">@relation</span>(fields: [eventId], references: [id])
+}
+
+<span class="cm">// A Donation MUST belong to an Organization</span>
+model Donation {
+  organizationId String       <span class="cm">// Required foreign key (no ?)</span>
+  organization   Organization <span class="cm">// Required relation (no ?)</span>
+                 <span class="dc">@relation</span>(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Many-to-Many Relation (Junction Table)</h3>
+    <div class="code">
+<span class="cm">// An Event can have MANY Members assigned</span>
+<span class="cm">// A Member can be assigned to MANY Events</span>
+<span class="cm">// This creates a "junction table" called EventAssignment</span>
+
+model Event {
+  id          String             @id @default(cuid())
+  assignments EventAssignment[]  <span class="cm">// The junction table records</span>
+}
+
+model OrganizationMember {
+  id               String             @id @default(cuid())
+  eventAssignments EventAssignment[]  <span class="cm">// The junction table records</span>
+}
+
+<span class="cm">// The junction table (explicitly defined for extra fields)</span>
+model EventAssignment {
+  id                   String             @id @default(cuid())
+  eventId              String             <span class="cm">// FK to Event</span>
+  organizationMemberId String             <span class="cm">// FK to OrganizationMember</span>
+  createdAt            DateTime           @default(now())  <span class="cm">// Extra field!</span>
+  event                Event              <span class="dc">@relation</span>(fields: [eventId], references: [id], onDelete: Cascade)
+  member               OrganizationMember <span class="dc">@relation</span>(fields: [organizationMemberId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, organizationMemberId])  <span class="cm">// Can't assign same member twice to same event</span>
+}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Relation Summary Diagram</h3>
+    <div class="bigcode">
+Organization (1) ────── (N) OrganizationMember
+  │                          │
+  │ has many:                │ has many:
+  ├─ donations[]             ├─ donationsAdded[]
+  ├─ expenses[]              ├─ expensesAdded[]
+  ├─ events[]                ├─ expensesApproved[]
+  ├─ bhogItems[]             ├─ eventAssignments[]
+  ├─ tasks[]                 ├─ assignedTasks[]
+  ├─ invitations[]           └─ invitationsSent[]
+  ├─ auditLogs[]
+  └─ volunteers[]
+
+OrganizationMember (N) ────── (1) User
+  userId FK -> User.id
+
+Donation (N) ────── (1) Organization
+  organizationId FK -> Organization.id
+
+Donation (N) ────── (0..1) OrganizationMember (addedBy)
+  addedById FK? -> OrganizationMember.id
+
+Donation (N) ────── (0..1) Event
+  eventId FK? -> Organization.id
+
+Expense (N) ────── (1) OrganizationMember (addedBy)
+Expense (N) ────── (0..1) OrganizationMember (approvedBy)
+Expense (N) ────── (0..1) Event
+
+Event (N) ────── (N) OrganizationMember (via EventAssignment junction table)
+Event (1) ────── (N) EventRegistration
+Event (1) ────── (N) VolunteerTask
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ENUMS ==================== -->
+<div class="section" id="enums">
+  <div class="stitle"><span class="n">6</span> Enums (Restricted Value Sets)</div>
+
+  <div class="card">
+    <h3>What Are Enums?</h3>
+    <div class="callout c-yellow">
+      <strong>Enums</strong> restrict a field to a fixed set of values. Instead of <code>status String</code> (where someone could type "APPROVEDD" by accident), you use <code>status ExpenseStatus</code> where only PENDING, APPROVED, or REJECTED are valid. This catches bugs at the database level.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>All 12 Enums in UTSAV</h3>
+    <table>
+      <thead><tr><th>Enum Name</th><th>Allowed Values</th><th>Used In</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>OrganizationRole</code></td><td>ADMIN, TREASURER, COMMITTEE_MEMBER, VOLUNTEER</td><td>OrganizationMember</td><td>User's permission level in an org</td></tr>
+        <tr><td><code>OrganizationType</code></td><td>FESTIVAL, CLUB</td><td>Organization</td><td>What kind of org this is</td></tr>
+        <tr><td><code>OrganizationStatus</code></td><td>ACTIVE, ENDED</td><td>Organization</td><td>Is the org still running?</td></tr>
+        <tr><td><code>ExpenseStatus</code></td><td>PENDING, APPROVED, REJECTED</td><td>Expense</td><td>Approval workflow state</td></tr>
+        <tr><td><code>ExpenseCategory</code></td><td>IDOL, DECORATION, LIGHTING, FOOD, SOUND, SECURITY, EQUIPMENT, MARKETING, INFRASTRUCTURE, TRAVEL, RENTAL, OPERATIONS, MISCELLANEOUS</td><td>Expense</td><td>What the expense was for</td></tr>
+        <tr><td><code>DonationCategory</code></td><td>GENERAL, BHOG, DECORATION, LIGHTING, SPONSORSHIP, OTHER</td><td>Donation</td><td>Type of donation</td></tr>
+        <tr><td><code>BhogStatus</code></td><td>PENDING, PREPARED</td><td>BhogItem</td><td>Has the prasad been prepared?</td></tr>
+        <tr><td><code>BhogOfferingWindow</code></td><td>MORNING, EVENING</td><td>BhogItem</td><td>Which time slot</td></tr>
+        <tr><td><code>VolunteerStatus</code></td><td>PENDING, ACTIVE, INACTIVE</td><td>Volunteer</td><td>Volunteer engagement status</td></tr>
+        <tr><td><code>TaskStatus</code></td><td>PENDING, IN_PROGRESS, COMPLETED</td><td>VolunteerTask</td><td>Task progress</td></tr>
+        <tr><td><code>TaskPriority</code></td><td>LOW, MEDIUM, HIGH</td><td>VolunteerTask</td><td>Urgency level</td></tr>
+        <tr><td><code>EventStatus</code></td><td>PLANNED, ACTIVE, COMPLETED, ARCHIVED</td><td>Event</td><td>Lifecycle state</td></tr>
+        <tr><td><code>AuditVisibility</code></td><td>INTERNAL, PUBLIC</td><td>AuditLog</td><td>Who can see this log entry</td></tr>
+      </tbody>
+    </table>
+    <div class="code" style="margin-top:12px;">
+<span class="cm">// How enums are defined in schema:</span>
+enum ExpenseStatus {
+  PENDING     <span class="cm">// First value = default in many cases</span>
+  APPROVED
+  REJECTED
+}
+
+<span class="cm">// How enums are used in a model:</span>
+model Expense {
+  status ExpenseStatus @default(PENDING)  <span class="cm">// Uses the enum type + sets default</span>
+}
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONSTRAINTS ==================== -->
+<div class="section" id="constraints">
+  <div class="stitle"><span class="n">7</span> Constraints (Data Integrity Rules)</div>
+
+  <div class="card">
+    <h3>All Constraints in UTSAV Schema</h3>
+    <table>
+      <thead><tr><th>Constraint</th><th>Where</th><th>What It Prevents</th></tr></thead>
+      <tbody>
+        <tr><td><code>@unique</code> on User.email</td><td>User model</td><td>Two users with same email</td></tr>
+        <tr><td><code>@unique</code> on User.phone</td><td>User model</td><td>Two users with same phone</td></tr>
+        <tr><td><code>@unique</code> on Organization.slug</td><td>Organization model</td><td>Two orgs with same URL slug</td></tr>
+        <tr><td><code>@unique</code> on OrganizationInvitation.token</td><td>Invitation model</td><td>Duplicate invitation tokens</td></tr>
+        <tr><td><code>@@unique([userId, organizationId])</code></td><td>OrganizationMember</td><td>User joining same org twice</td></tr>
+        <tr><td><code>@@unique([email, organizationId])</code></td><td>OrganizationMember</td><td>Same email in same org twice</td></tr>
+        <tr><td><code>@@unique([eventId, organizationMemberId])</code></td><td>EventAssignment</td><td>Same member assigned to same event twice</td></tr>
+        <tr><td><code>onDelete: Cascade</code></td><td>All relations to Organization</td><td>Orphaned records when org is deleted</td></tr>
+        <tr><td><code>NOT NULL</code> (no ?)</td><td>All required fields</td><td>Empty required data</td></tr>
+        <tr><td><code>DECIMAL(12, 2)</code></td><td>All money fields</td><td>Floating-point rounding errors</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== UTSAV SCHEMA FULL EXPLANATION ==================== -->
+<div class="section" id="utsav-schema">
+  <div class="stitle"><span class="n">8</span> UTSAV Schema - Every Field Explained</div>
+
+  <!-- User -->
+  <div class="card">
+    <h3><span class="badge b-blue">model User</span> - Global User Identity</h3>
+    <p>A user account that exists <strong>across all organizations</strong>. One user can belong to multiple orgs.</p>
+    <div class="code">
+model User {
+  id          String               @id @default(cuid())
+  <span class="cm">// ^ Unique ID, auto-generated CUID. CUIDs look like: "clx9abc123def456"</span>
+
+  email       String               @unique
+  <span class="cm">// ^ Email address. @unique = no two users can share an email.</span>
+
+  phone       String?              @unique
+  <span class="cm">// ^ Phone number. Optional (?). Also unique if provided.</span>
+
+  name        String?
+  <span class="cm">// ^ Display name. Optional.</span>
+
+  image       String?
+  <span class="cm">// ^ Profile image URL. Optional.</span>
+
+  password    String?
+  <span class="cm">// ^ bcrypt-hashed password. Optional (for future OAuth users).</span>
+
+  createdAt   DateTime             @default(now())
+  <span class="cm">// ^ Auto-set to current time when user is created.</span>
+
+  updatedAt   DateTime             @updatedAt
+  <span class="cm">// ^ Auto-updated every time user record changes.</span>
+
+  memberships OrganizationMember[]
+  <span class="cm">// ^ Virtual field: all org memberships this user has. NOT a column.</span>
+}
+    </div>
+  </div>
+
+  <!-- Organization -->
+  <div class="card">
+    <h3><span class="badge b-saffron">model Organization</span> - A Tenant (Festival or Club)</h3>
+    <div class="code">
+model Organization {
+  id                      String                   @id @default(cuid())
+  name                    String                   <span class="cm">// Display name: "Ganesh Mandir Trust"</span>
+  slug                    String                   @unique  <span class="cm">// URL-safe: "ganesh-mandir-trust"</span>
+  description             String?                  <span class="cm">// Optional description</span>
+  startDate               DateTime                 <span class="cm">// When the festival/org starts</span>
+  endDate                 DateTime?                <span class="cm">// When it ends (optional, may not be known yet)</span>
+
+  <span class="cm">// Money fields - all Decimal(12, 2) for exact precision</span>
+  budgetTarget            Decimal?                 @db.Decimal(12, 2)  <span class="cm">// Overall budget goal</span>
+  openingBalance          Decimal?                 @db.Decimal(12, 2)  <span class="cm">// Starting cash on hand</span>
+  publicFundraisingTarget Decimal?                 @db.Decimal(12, 2)  <span class="cm">// Public fundraising goal (festivals)</span>
+  internalBudgetLimit     Decimal?                 @db.Decimal(12, 2)  <span class="cm">// Internal budget cap (clubs)</span>
+
+  status                  OrganizationStatus       @default(ACTIVE)    <span class="cm">// ACTIVE or ENDED</span>
+
+  <span class="cm">// Prasad/Bhog time windows (stored as strings like "08:00")</span>
+  prasadMorningStart      String                   @default("08:00")
+  prasadMorningEnd        String                   @default("11:00")
+  prasadEveningStart      String                   @default("17:00")
+  prasadEveningEnd        String                   @default("20:00")
+
+  timezone                String                   @default("Asia/Kolkata")
+  type                    OrganizationType         @default(FESTIVAL)   <span class="cm">// FESTIVAL or CLUB</span>
+  featureFlags            Json?                    <span class="cm">// Flexible JSON for feature toggles</span>
+
+  endedAt                 DateTime?                <span class="cm">// When festival was ended</span>
+  endedById               String?                  <span class="cm">// Who ended it</span>
+
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+
+  <span class="cm">// Virtual fields (NOT columns - these are relation lists)</span>
+  auditLogs               AuditLog[]
+  bhogItems               BhogItem[]
+  donations               Donation[]
+  events                  Event[]
+  expenses                Expense[]
+  invitations             OrganizationInvitation[]
+  members                 OrganizationMember[]
+  volunteers              Volunteer[]
+  tasks                   VolunteerTask[]
+
+  @@index([slug])  <span class="cm">// Index on slug for fast URL lookups</span>
+}
+    </div>
+  </div>
+
+  <!-- OrganizationMember -->
+  <div class="card">
+    <h3><span class="badge b-green">model OrganizationMember</span> - Who Belongs to Which Org</h3>
+    <div class="code">
+model OrganizationMember {
+  id               String                   @id @default(cuid())
+
+  userId           String?                  <span class="cm">// FK to User. Optional for pending invites.</span>
+  email            String                   <span class="cm">// Email (duplicated from User for invite flow)</span>
+  organizationId   String                   <span class="cm">// FK to Organization</span>
+  role             OrganizationRole         <span class="cm">// ADMIN | TREASURER | COMMITTEE_MEMBER | VOLUNTEER</span>
+  isArchived       Boolean                  @default(false)  <span class="cm">// Soft delete flag</span>
+
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  <span class="cm">// Relations</span>
+  donationsAdded   Donation[]               <span class="cm">// Donations this member recorded</span>
+  eventAssignments EventAssignment[]        <span class="cm">// Events this member is assigned to</span>
+  expensesAdded    Expense[]                @relation("ExpenseAddedBy")
+  expensesApproved Expense[]                @relation("ExpenseApprovedBy")
+  invitationsSent  OrganizationInvitation[]
+  organization     Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user             User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedTasks    VolunteerTask[]
+
+  @@unique([userId, organizationId])    <span class="cm">// Can't join same org twice</span>
+  @@unique([email, organizationId])     <span class="cm">// Can't have same email in same org</span>
+  @@index([userId])
+  @@index([organizationId])
+}
+    </div>
+  </div>
+
+  <!-- Donation -->
+  <div class="card">
+    <h3><span class="badge b-purple">model Donation</span> - Money Received</h3>
+    <div class="code">
+model Donation {
+  id             String              @id @default(cuid())
+  donorName      String              <span class="cm">// Who donated</span>
+  amount         Decimal             @db.Decimal(12, 2)  <span class="cm">// Exact amount (e.g., 5000.00)</span>
+  category       DonationCategory    @default(GENERAL)   <span class="cm">// GENERAL|BHOG|DECORATION|LIGHTING|SPONSORSHIP|OTHER</span>
+  date           DateTime            @default(now())
+  receivedAt     DateTime            @default(now())
+  notes          String?             <span class="cm">// Optional notes</span>
+  isArchived     Boolean             @default(false)     <span class="cm">// Soft delete</span>
+  archivedAt     DateTime?           <span class="cm">// When archived</span>
+  archivedById   String?             <span class="cm">// Who archived it</span>
+  addedById      String?             <span class="cm">// FK: which member recorded this donation</span>
+  organizationId String              <span class="cm">// FK: which org this belongs to</span>
+  eventId        String?             <span class="cm">// FK: optional tie to a specific event</span>
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  addedBy        OrganizationMember? @relation(fields: [addedById], references: [id])
+  event          Event?              @relation(fields: [eventId], references: [id])
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([addedById])
+  @@index([eventId])
+}
+    </div>
+  </div>
+
+  <!-- Expense -->
+  <div class="card">
+    <h3><span class="badge b-red">model Expense</span> - Money Spent (With Approval)</h3>
+    <div class="code">
+model Expense {
+  id             String              @id @default(cuid())
+  title          String              <span class="cm">// What was bought</span>
+  amount         Decimal             @db.Decimal(12, 2)
+  category       ExpenseCategory     @default(MISCELLANEOUS)  <span class="cm">// 13 categories</span>
+  status         ExpenseStatus       @default(PENDING)         <span class="cm">// PENDING -> APPROVED/REJECTED</span>
+  notes          String?
+  isArchived     Boolean             @default(false)
+
+  addedById      String              <span class="cm">// FK: who created this expense (REQUIRED)</span>
+  approvedById   String?             <span class="cm">// FK: who approved/rejected (null until processed)</span>
+
+  requestedAt    DateTime            @default(now())  <span class="cm">// When expense was submitted</span>
+  approvedAt     DateTime?           <span class="cm">// When approved</span>
+  rejectedAt     DateTime?           <span class="cm">// When rejected</span>
+  processedAt    DateTime?           <span class="cm">// When processed (approved or rejected)</span>
+  archivedAt     DateTime?
+  archivedById   String?
+
+  organizationId String
+  eventId        String?             <span class="cm">// Optional: tie expense to a specific event</span>
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  addedBy        OrganizationMember  @relation("ExpenseAddedBy", fields: [addedById], references: [id])
+  approvedBy     OrganizationMember? @relation("ExpenseApprovedBy", fields: [approvedById], references: [id])
+  event          Event?              @relation(fields: [eventId], references: [id])
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([eventId])
+  @@index([status])  <span class="cm">// Index on status because we frequently query PENDING expenses</span>
+}
+    </div>
+  </div>
+
+  <!-- Event -->
+  <div class="card">
+    <h3><span class="badge b-blue">model Event</span> - A Ceremony or Program</h3>
+    <div class="code">
+model Event {
+  id             String                   @id @default(cuid())
+  organizationId String
+  title          String
+  description    String?
+  startTime      DateTime
+  endTime        DateTime
+  location       String?
+  budgetTarget   Decimal?                 @db.Decimal(12, 2)
+  status         EventStatus              @default(PLANNED)  <span class="cm">// PLANNED|ACTIVE|COMPLETED|ARCHIVED</span>
+  isArchived     Boolean                  @default(false)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignments    EventAssignment[]        <span class="cm">// Many-to-many with Members</span>
+  registrations  EventRegistration[]      <span class="cm">// Public sign-ups</span>
+  expenses       Expense[]                <span class="cm">// Event-specific expenses</span>
+  donations      Donation[]               <span class="cm">// Event-specific donations</span>
+  invitations    OrganizationInvitation[]  <span class="cm">// Event-scoped invites</span>
+  tasks          VolunteerTask[]          <span class="cm">// Event-specific tasks</span>
+
+  @@index([organizationId])
+}
+    </div>
+  </div>
+
+  <!-- Remaining models briefly -->
+  <div class="card">
+    <h3>Remaining Models (BhogItem, Volunteer, VolunteerTask, EventAssignment, EventRegistration, Invitation, AuditLog)</h3>
+    <table>
+      <thead><tr><th>Model</th><th>Purpose</th><th>Key Fields</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-saffron">BhogItem</span></td><td>Prasad offering</td><td>name, quantity, status (PENDING/PREPARED), offeringDate, offeringWindow (MORNING/EVENING), estimatedCost</td></tr>
+        <tr><td><span class="badge b-green">Volunteer</span></td><td>Volunteer person record</td><td>name, phone, email, status (PENDING/ACTIVE/INACTIVE), assignedTask (text)</td></tr>
+        <tr><td><span class="badge b-purple">VolunteerTask</span></td><td>Task assigned to a member</td><td>title, description, assignedToId (FK to Member), status (PENDING/IN_PROGRESS/COMPLETED), priority (LOW/MEDIUM/HIGH), dueDate</td></tr>
+        <tr><td><span class="badge b-red">EventAssignment</span></td><td>Junction: Event <-> Member</td><td>eventId + organizationMemberId (unique pair), createdAt</td></tr>
+        <tr><td><span class="badge b-blue">EventRegistration</span></td><td>Public event sign-up</td><td>name, email, phone, notes, attended (boolean)</td></tr>
+        <tr><td><span class="badge b-yellow">OrganizationInvitation</span></td><td>Invite to join org</td><td>email, role, token (unique), expiresAt (48h), accepted, eventId (optional), invitedById</td></tr>
+        <tr><td><span class="badge b-saffron">AuditLog</span></td><td>Change history</td><td>entityType, entityId, action, before (Json), after (Json), metadata (Json), visibility (INTERNAL/PUBLIC), actorMemberId</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== CRUD OPERATIONS ==================== -->
+<div class="section" id="crud">
+  <div class="stitle"><span class="n">9</span> Complete CRUD Operations</div>
+
+  <div class="card">
+    <h3><span class="badge b-green">CREATE</span> - Adding Records</h3>
+    <div class="code">
+<span class="kw">import</span> { prisma } <span class="kw">from</span> <span class="str">"@/lib/prisma"</span>;
+
+<span class="cm">// 1. CREATE ONE record (basic)</span>
+<span class="kw">const</span> user = <span class="kw">await</span> prisma.user.<span class="fn">create</span>({
+  <span class="fn">data</span>: {
+    email: <span class="str">"vedant@example.com"</span>,
+    name: <span class="str">"Vedant"</span>,
+    password: <span class="str">"$2a$12$..."</span>,  <span class="cm">// bcrypt hashed</span>
+  },
+});
+<span class="cm">// Returns the created user with auto-generated id, createdAt, etc.</span>
+
+<span class="cm">// 2. CREATE with related record (nested create)</span>
+<span class="kw">const</span> org = <span class="kw">await</span> prisma.organization.<span class="fn">create</span>({
+  <span class="fn">data</span>: {
+    name: <span class="str">"Ganesh Mandir Trust"</span>,
+    slug: <span class="str">"ganesh-mandir-trust"</span>,
+    type: <span class="str">"FESTIVAL"</span>,
+    <span class="cm">// Simultaneously create the first member (admin)</span>
+    members: {
+      <span class="fn">create</span>: [{
+        email: <span class="str">"vedant@example.com"</span>,
+        role: <span class="str">"ADMIN"</span>,
+        userId: user.id,
+      }],
+    },
+  },
+  <span class="fn">include</span>: { members: <span class="type">true</span> },  <span class="cm">// Include the created members in response</span>
+});
+
+<span class="cm">// 3. CREATE MANY records at once</span>
+<span class="kw">const</span> result = <span class="kw">await</span> prisma.donation.<span class="fn">createMany</span>({
+  <span class="fn">data</span>: [
+    { donorName: <span class="str">"Rajesh"</span>, amount: <span class="type">5000</span>, organizationId: org.id },
+    { donorName: <span class="str">"Suresh"</span>, amount: <span class="type">10000</span>, organizationId: org.id },
+    { donorName: <span class="str">"Mahesh"</span>, amount: <span class="type">2500</span>, organizationId: org.id },
+  ],
+});
+<span class="cm">// result.count = 3 (number of records created)</span>
+
+<span class="cm">// 4. CREATE with default values (omitting fields uses @default)</span>
+<span class="kw">const</span> expense = <span class="kw">await</span> prisma.expense.<span class="fn">create</span>({
+  <span class="fn">data</span>: {
+    title: <span class="str">"Flower decoration"</span>,
+    amount: <span class="type">3000</span>,
+    addedById: memberId,
+    organizationId: orgId,
+    <span class="cm">// category defaults to MISCELLANEOUS</span>
+    <span class="cm">// status defaults to PENDING</span>
+    <span class="cm">// isArchived defaults to false</span>
+    <span class="cm">// requestedAt defaults to now()</span>
+  },
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="badge b-blue">READ</span> - Querying Records</h3>
+    <div class="code">
+<span class="cm">// 1. FIND UNIQUE (by unique field)</span>
+<span class="kw">const</span> user = <span class="kw">await</span> prisma.user.<span class="fn">findUnique</span>({
+  <span class="fn">where</span>: { email: <span class="str">"vedant@example.com"</span> },
+});
+<span class="cm">// Returns: { id: "clx...", email: "vedant@example.com", name: "Vedant", ... } or null</span>
+
+<span class="cm">// 2. FIND FIRST (first match)</span>
+<span class="kw">const</span> org = <span class="kw">await</span> prisma.organization.<span class="fn">findFirst</span>({
+  <span class="fn">where</span>: { slug: <span class="str">"ganesh-mandir-trust"</span> },
+});
+
+<span class="cm">// 3. FIND MANY (list with filters)</span>
+<span class="kw">const</span> donations = <span class="kw">await</span> prisma.donation.<span class="fn">findMany</span>({
+  <span class="fn">where</span>: {
+    organizationId: <span class="str">"org_abc123"</span>,
+    isArchived: <span class="type">false</span>,
+    <span class="cm">// Optional additional filters:</span>
+    category: <span class="str">"GENERAL"</span>,           <span class="cm">// Exact match</span>
+    amount: { <span class="fn">gte</span>: <span class="type">1000</span> },        <span class="cm">// Greater than or equal</span>
+    donorName: { <span class="fn">contains</span>: <span class="str">"Raj"</span> }, <span class="cm">// Partial match (LIKE %Raj%)</span>
+  },
+  <span class="fn">include</span>: {
+    addedBy: <span class="type">true</span>,                <span class="cm">// JOIN with OrganizationMember</span>
+    event: <span class="type">true</span>,                  <span class="cm">// JOIN with Event</span>
+  },
+  <span class="fn">select</span>: {
+    id: <span class="type">true</span>,
+    donorName: <span class="type">true</span>,
+    amount: <span class="type">true</span>,
+    <span class="cm">// If you use 'select', ONLY listed fields are returned</span>
+    <span class="cm">// If you use 'include', ALL original fields + relations are returned</span>
+  },
+  <span class="fn">orderBy</span>: { createdAt: <span class="str">"desc"</span> },  <span class="cm">// Newest first</span>
+  <span class="fn">skip</span>: <span class="type">0</span>,                         <span class="cm">// Offset (for pagination)</span>
+  <span class="fn">take</span>: <span class="type">10</span>,                        <span class="cm">// Limit (page size)</span>
+});
+
+<span class="cm">// 4. COUNT records</span>
+<span class="kw">const</span> total = <span class="kw">await</span> prisma.donation.<span class="fn">count</span>({
+  <span class="fn">where</span>: { organizationId, isArchived: <span class="type">false</span> },
+});
+<span class="cm">// Returns: 42</span>
+
+<span class="cm">// 5. AGGREGATE (sum, avg, min, max)</span>
+<span class="kw">const</span> stats = <span class="kw">await</span> prisma.donation.<span class="fn">aggregate</span>({
+  <span class="fn">where</span>: { organizationId },
+  <span class="fn">_sum</span>: { amount: <span class="type">true</span> },    <span class="cm">// SUM of all amounts</span>
+  <span class="fn">_avg</span>: { amount: <span class="type">true</span> },    <span class="cm">// Average amount</span>
+  <span class="fn">_count</span>: { amount: <span class="type">true</span> },  <span class="cm">// Count</span>
+});
+<span class="cm">// Returns: { _sum: { amount: 50000 }, _avg: { amount: 5000 }, _count: { amount: 10 } }</span>
+
+<span class="cm">// 6. GROUP BY</span>
+<span class="kw">const</span> byCategory = <span class="kw">await</span> prisma.expense.<span class="fn">groupBy</span>({
+  <span class="fn">by</span>: [<span class="str">"category"</span>],
+  <span class="fn">where</span>: { organizationId, status: <span class="str">"APPROVED"</span> },
+  <span class="fn">_sum</span>: { amount: <span class="type">true</span> },
+  <span class="fn">_count</span>: { id: <span class="type">true</span> },
+  <span class="fn">orderBy</span>: { _sum: { amount: <span class="str">"desc"</span> } },
+});
+<span class="cm">// Returns: [</span>
+<span class="cm">//   { category: "DECORATION", _sum: { amount: 25000 }, _count: { id: 5 } },</span>
+<span class="cm">//   { category: "FOOD", _sum: { amount: 15000 }, _count: { id: 8 } },</span>
+<span class="cm">//   ...</span>
+<span class="cm">// ]</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="badge b-yellow">UPDATE</span> - Modifying Records</h3>
+    <div class="code">
+<span class="cm">// 1. UPDATE ONE record by unique identifier</span>
+<span class="kw">const</span> updated = <span class="kw">await</span> prisma.expense.<span class="fn">update</span>({
+  <span class="fn">where</span>: { id: expenseId },
+  <span class="fn">data</span>: {
+    status: <span class="str">"APPROVED"</span>,
+    approvedById: memberId,
+    approvedAt: <span class="kw">new</span> <span class="tp">Date</span>(),
+  },
+});
+
+<span class="cm">// 2. UPDATE MANY records (bulk update)</span>
+<span class="kw">const</span> result = <span class="kw">await</span> prisma.expense.<span class="fn">updateMany</span>({
+  <span class="fn">where</span>: {
+    organizationId,
+    status: <span class="str">"PENDING"</span>,
+    <span class="cm">// Note: updateMany can only do simple where clauses (no nested relations)</span>
+  },
+  <span class="fn">data</span>: {
+    status: <span class="str">"APPROVED"</span>,
+    approvedById: memberId,
+  },
+});
+<span class="cm">// result.count = number of rows updated</span>
+
+<span class="cm">// 3. UPSERT (create or update)</span>
+<span class="kw">const</span> member = <span class="kw">await</span> prisma.organizationMember.<span class="fn">upsert</span>({
+  <span class="fn">where</span>: {
+    <span class="cm">// Composite unique for the lookup</span>
+    userId_organizationId: { userId: user.id, organizationId: org.id },
+  },
+  <span class="fn">update</span>: {
+    role: <span class="str">"ADMIN"</span>,  <span class="cm">// If exists, update role</span>
+  },
+  <span class="fn">create</span>: {
+    userId: user.id,
+    email: user.email,
+    organizationId: org.id,
+    role: <span class="str">"ADMIN"</span>,  <span class="cm">// If not exists, create with this data</span>
+  },
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="badge b-red">DELETE</span> - Removing Records</h3>
+    <div class="code">
+<span class="cm">// 1. DELETE ONE record</span>
+<span class="kw">await</span> prisma.eventAssignment.<span class="fn">delete</span>({
+  <span class="fn">where</span>: {
+    <span class="cm">// Use composite unique for junction tables</span>
+    eventId_organizationMemberId: {
+      eventId: eventId,
+      organizationMemberId: memberId,
+    },
+  },
+});
+
+<span class="cm">// 2. DELETE MANY records (bulk delete)</span>
+<span class="kw">const</span> result = <span class="kw">await</span> prisma.eventRegistration.<span class="fn">deleteMany</span>({
+  <span class="fn">where</span>: { eventId },
+});
+<span class="cm">// result.count = number deleted</span>
+
+<span class="cm">// NOTE: In UTSAV we almost never delete - we use soft deletes (isArchived = true)</span>
+<span class="kw">await</span> prisma.donation.<span class="fn">update</span>({
+  <span class="fn">where</span>: { id: donationId },
+  <span class="fn">data</span>: { isArchived: <span class="type">true</span>, archivedAt: <span class="kw">new</span> <span class="tp">Date</span>(), archivedById: memberId },
+});
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADVANCED QUERIES ==================== -->
+<div class="section" id="advanced">
+  <div class="stitle"><span class="n">10</span> Advanced Query Patterns</div>
+
+  <div class="card">
+    <h3>Nested Includes (Loading Related Data)</h3>
+    <div class="code">
+<span class="cm">// Get an event with ALL its related data</span>
+<span class="kw">const</span> event = <span class="kw">await</span> prisma.event.<span class="fn">findUnique</span>({
+  <span class="fn">where</span>: { id: eventId },
+  <span class="fn">include</span>: {
+    assignments: {
+      <span class="fn">include</span>: {
+        member: {
+          <span class="fn">include</span>: { user: <span class="type">true</span> },  <span class="cm">// Go 3 levels deep!</span>
+        },
+      },
+    },
+    registrations: <span class="type">true</span>,
+    expenses: {
+      <span class="fn">where</span>: { status: <span class="str">"APPROVED"</span> },  <span class="cm">// Filter the included records</span>
+      <span class="fn">orderBy</span>: { amount: <span class="str">"desc"</span> },
+    },
+    tasks: {
+      <span class="fn">where</span>: { isArchived: <span class="type">false</span> },
+      <span class="fn">include</span>: { assignedTo: <span class="type">true</span> },
+    },
+  },
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Complex Filtering</h3>
+    <div class="code">
+<span class="cm">// Various WHERE clause operators</span>
+<span class="kw">await</span> prisma.expense.<span class="fn">findMany</span>({
+  <span class="fn">where</span>: {
+    organizationId,
+
+    <span class="cm">// AND (all conditions must match - implicit when you list multiple fields)</span>
+    isArchived: <span class="type">false</span>,
+    status: <span class="str">"APPROVED"</span>,
+
+    <span class="cm">// OR (any condition can match)</span>
+    <span class="fn">OR</span>: [
+      { category: <span class="str">"FOOD"</span> },
+      { category: <span class="str">"DECORATION"</span> },
+    ],
+
+    <span class="cm">// NOT (exclude matching records)</span>
+    <span class="fn">NOT</span>: { approvedById: memberId },
+
+    <span class="cm">// Comparison operators</span>
+    amount: {
+      <span class="fn">gte</span>: <span class="type">1000</span>,     <span class="cm">// >= 1000</span>
+      <span class="fn">lte</span>: <span class="type">50000</span>,    <span class="cm">// <= 50000</span>
+    },
+
+    <span class="cm">// String contains (LIKE query)</span>
+    title: { <span class="fn">contains</span>: <span class="str">"decoration"</span>, <span class="fn">mode</span>: <span class="str">"insensitive"</span> },
+
+    <span class="cm">// Date range</span>
+    createdAt: {
+      <span class="fn">gte</span>: <span class="kw">new</span> <span class="tp">Date</span>(<span class="str">"2025-01-01"</span>),
+      <span class="fn">lte</span>: <span class="kw">new</span> <span class="tp">Date</span>(<span class="str">"2025-12-31"</span>),
+    },
+
+    <span class="cm">// In list</span>
+    category: { <span class="fn">in</span>: [<span class="str">"FOOD"</span>, <span class="str">"DECORATION"</span>, <span class="str">"LIGHTING"</span>] },
+
+    <span class="cm">// Is null</span>
+    approvedById: <span class="type">null</span>,
+  },
+});
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The $extends Multi-Tenant Pattern</h3>
+    <div class="code">
+<span class="cm">// Normal Prisma (you must add organizationId everywhere):</span>
+<span class="kw">await</span> prisma.donation.<span class="fn">findMany</span>({
+  <span class="fn">where</span>: { organizationId: <span class="str">"org_abc"</span>, isArchived: <span class="type">false</span> },
+});
+
+<span class="cm">// With getTenantPrisma (organizationId auto-injected):</span>
+<span class="kw">const</span> tenantPrisma = <span class="fn">getTenantPrisma</span>(<span class="str">"org_abc"</span>);
+<span class="kw">await</span> tenantPrisma.donation.<span class="fn">findMany</span>({
+  <span class="fn">where</span>: { isArchived: <span class="type">false</span> },  <span class="cm">// organizationId is added automatically!</span>
+});
+
+<span class="cm">// The extension intercepts ALL operations:</span>
+<span class="cm">// findMany    -> adds WHERE organizationId = X</span>
+<span class="cm">// findFirst   -> adds WHERE organizationId = X</span>
+<span class="cm">// findUnique  -> adds WHERE organizationId = X</span>
+<span class="cm">// create      -> injects organizationId into data</span>
+<span class="cm">// createMany  -> injects organizationId into each item</span>
+<span class="cm">// update      -> strips organizationId from data (prevents cross-tenant)</span>
+<span class="cm">// updateMany  -> strips organizationId from data</span>
+<span class="cm">// upsert      -> handles both create and update sides</span>
+<span class="cm">// count       -> adds WHERE organizationId = X</span>
+<span class="cm">// aggregate   -> adds WHERE organizationId = X</span>
+<span class="cm">// groupBy     -> adds WHERE organizationId = X</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TRANSACTIONS ==================== -->
+<div class="section" id="transactions">
+  <div class="stitle"><span class="n">11</span> Transactions (All-or-Nothing)</div>
+
+  <div class="card">
+    <h3>What Are Transactions?</h3>
+    <div class="callout c-yellow">
+      A <strong>transaction</strong> groups multiple database operations together. Either <strong>ALL succeed</strong> or <strong>ALL fail</strong>. If any operation throws an error, all previous operations in the transaction are rolled back. This prevents partial updates that leave your data in an inconsistent state.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Transaction Examples from UTSAV</h3>
+    <div class="code">
+<span class="cm">// Example 1: Create org + assign admin (both must succeed)</span>
+<span class="kw">await</span> prisma.<span class="fn">$transaction</span>(<span class="kw">async</span> (tx) => {
+  <span class="cm">// 'tx' is a transactional Prisma client</span>
+  <span class="kw">const</span> org = <span class="kw">await</span> tx.organization.<span class="fn">create</span>({
+    <span class="fn">data</span>: { name: <span class="str">"New Festival"</span>, slug: <span class="str">"new-festival"</span> },
+  });
+
+  <span class="cm">// If this fails, the organization create above is ROLLED BACK</span>
+  <span class="kw">await</span> tx.organizationMember.<span class="fn">create</span>({
+    <span class="fn">data</span>: {
+      userId: user.id,
+      email: user.email,
+      organizationId: org.id,
+      role: <span class="str">"ADMIN"</span>,
+    },
+  });
+
+  <span class="kw">return</span> org;
+});
+
+<span class="cm">// Example 2: Delete org (clean up all related data)</span>
+<span class="kw">await</span> prisma.<span class="fn">$transaction</span>(<span class="kw">async</span> (tx) => {
+  <span class="kw">await</span> tx.organizationMember.<span class="fn">deleteMany</span>({ <span class="fn">where</span>: { organizationId } });
+  <span class="kw">await</span> tx.organizationInvitation.<span class="fn">deleteMany</span>({ <span class="fn">where</span>: { organizationId } });
+  <span class="kw">return await</span> tx.organization.<span class="fn">delete</span>({ <span class="fn">where</span>: { id: organizationId } });
+});
+
+<span class="cm">// Example 3: Interactive transaction (read then write)</span>
+<span class="kw">await</span> prisma.<span class="fn">$transaction</span>(<span class="kw">async</span> (tx) => {
+  <span class="kw">const</span> expense = <span class="kw">await</span> tx.expense.<span class="fn">findUnique</span>({ <span class="fn">where</span>: { id: expenseId } });
+
+  <span class="kw">if</span> (expense.status !== <span class="str">"PENDING"</span>) {
+    <span class="kw">throw new</span> <span class="tp">Error</span>(<span class="str">"Already processed"</span>);
+  }
+
+  <span class="kw">return await</span> tx.expense.<span class="fn">update</span>({
+    <span class="fn">where</span>: { id: expenseId },
+    <span class="fn">data</span>: { status: <span class="str">"APPROVED"</span> },
+  });
+});
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PRISMA COMMANDS ==================== -->
+<div class="section" id="commands">
+  <div class="stitle"><span class="n">12</span> Prisma CLI Commands</div>
+
+  <div class="card">
+    <h3>Every Command You'll Need</h3>
+    <table>
+      <thead><tr><th>Command</th><th>What It Does</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td><code>npx prisma generate</code></td><td>Generates the TypeScript client from schema</td><td>After changing schema.prisma (also runs on <code>npm install</code> via postinstall)</td></tr>
+        <tr><td><code>npx prisma db push</code></td><td>Pushes schema changes directly to database (no migration files)</td><td>During development (quick sync)</td></tr>
+        <tr><td><code>npx prisma migrate dev</code></td><td>Creates a migration file + applies it to DB</td><td>In production workflows (creates versioned SQL files)</td></tr>
+        <tr><td><code>npx prisma migrate deploy</code></td><td>Applies pending migrations to production DB</td><td>Deploying to production</td></tr>
+        <tr><td><code>npx prisma studio</code></td><td>Opens a browser-based database GUI</td><td>Viewing/editing data visually</td></tr>
+        <tr><td><code>npx prisma db seed</code></td><td>Runs the seed script (prisma/seed.ts)</td><td>Populating DB with test data</td></tr>
+        <tr><td><code>npx prisma format</code></td><td>Formats the schema.prisma file</td><td>Cleaning up formatting</td></tr>
+        <tr><td><code>npx prisma validate</code></td><td>Checks schema for errors without applying</td><td>Validating schema before push/migrate</td></tr>
+        <tr><td><code>npx prisma introspect</code></td><td>Reads existing DB and generates schema from it</td><td>Adopting Prisma for existing database</td></tr>
+      </tbody>
+    </table>
+    <div class="callout c-blue" style="margin-top:12px;">
+      <strong><code>db push</code> vs <code>migrate dev</code>:</strong> <code>db push</code> is faster and simpler - it syncs your schema directly. <code>migrate dev</code> creates a versioned SQL migration file in <code>prisma/migrations/</code> which is better for team collaboration and production. UTSAV uses <code>db push</code> during development.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The postinstall Script</h3>
+    <div class="code">
+<span class="cm">// In package.json:</span>
+"postinstall": <span class="str">"prisma generate"</span>
+
+<span class="cm">// This means: after every `npm install`, automatically run `prisma generate`</span>
+<span class="cm">// This ensures the TypeScript client is always in sync with the schema</span>
+<span class="cm">// Especially important after pulling code from git (schema might have changed)</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div style="text-align:center; padding: 40px 20px; color: var(--slate-500); font-size: 0.85rem;">
+  <div style="font-weight: 800; color: #0ea5e9; font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">Prisma Complete Guide</div>
+  <div style="margin-top: 8px;">UTSAV Project - Built by Vedant Mehta</div>
+  <div style="margin-top: 4px;">Schema &bull; CRUD &bull; Relations &bull; Enums &bull; Decorators &bull; Transactions &bull; Commands</div>
+</div>
+
+</div>
+</body>
+</html>

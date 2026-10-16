@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTSAV — HLD &amp; LLD (PREP_2)</title>
+<style>
+  :root{
+    --bg:#0b1020; --bg2:#111733; --card:#151c3d; --card2:#1a2249;
+    --line:#27305c; --txt:#e8ebf7; --muted:#a3abd6; --dim:#6b73a5;
+    --saffron:#f59e0b; --saffron2:#fbbf24; --amber:#fcd34d;
+    --green:#34d399; --red:#f87171; --blue:#60a5fa; --purple:#a78bfa;
+    --mono:ui-monospace,SFMono-Regular,Consolas,"Cascadia Code",monospace;
+    --sans:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.65;font-size:15.5px}
+  .layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+  .sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--bg2);border-right:1px solid var(--line);padding:22px 16px}
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--saffron),#ea580c);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .brand b{font-size:17px;letter-spacing:.5px}
+  .brand small{display:block;color:var(--muted);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase}
+  .toc{font-size:13px}
+  .toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px;border-left:2px solid transparent}
+  .toc a:hover{color:var(--txt);background:var(--card)}
+  .toc .grp{color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:1.5px;margin:14px 8px 4px;font-weight:700}
+  .toc a.lvl2{padding-left:22px;font-size:12.3px}
+  .main{max-width:1000px;padding:34px 44px 120px}
+  h1{font-size:34px;line-height:1.2;margin:8px 0 6px;background:linear-gradient(90deg,var(--amber),var(--saffron2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h2{font-size:24px;margin:64px 0 14px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:18.5px;margin:34px 0 10px;color:var(--amber)}
+  h4{font-size:16px;margin:22px 0 8px;color:var(--saffron2)}
+  p{margin:10px 0}
+  .hero{background:linear-gradient(135deg,#1a2249,#232c5e);border:1px solid var(--line);border-radius:16px;padding:26px 30px;margin:18px 0 30px}
+  .hero .tag{display:inline-block;background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.35);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600;letter-spacing:.5px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:center}
+  .stat b{display:block;font-size:24px;color:var(--amber)}
+  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  code{font-family:var(--mono);font-size:13px;background:#0d1330;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#c7d2fe}
+  pre{background:#0a0f24;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow-x:auto;line-height:1.6}
+  pre code{background:none;border:none;padding:0;color:#dbe4ff;font-size:12.8px}
+  .kw{color:#c084fc}.st{color:#86efac}.nu{color:#fca5a5}.cm{color:#64748b}.fn{color:#7dd3fc}.pr{color:#fbbf24}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.4px}
+  th{background:var(--card2);color:var(--amber);text-align:left;padding:9px 12px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.6px}
+  td{padding:8px 12px;border:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}.main{padding:22px 20px 80px}}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:600;letter-spacing:.4px;border:1px solid}
+  .p-green{color:var(--green);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+  .p-red{color:var(--red);border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.08)}
+  .p-blue{color:var(--blue);border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.08)}
+  .p-purple{color:var(--purple);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+  .p-amber{color:var(--amber);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+  .why{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.25);border-left:4px solid var(--green);border-radius:8px;padding:12px 16px;margin:12px 0}
+  .why b{color:var(--green)}
+  .note{background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-left:4px solid var(--blue);border-radius:8px;padding:12px 16px;margin:12px 0}
+  .note b{color:var(--blue)}
+  .warn{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.25);border-left:4px solid var(--red);border-radius:8px;padding:12px 16px;margin:12px 0}
+  .warn b{color:var(--red)}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0;font-size:13px}
+  .flow .step{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+  .flow .arrow{color:var(--saffron);font-weight:700}
+  .qa{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden}
+  .qa .q{padding:12px 16px;background:var(--card2);font-weight:600;color:var(--amber)}
+  .qa .a{padding:14px 16px;background:var(--card)}
+  ul,ol{padding-left:22px}
+  li{margin:5px 0}
+  .small{font-size:12.8px;color:var(--muted)}
+  .foot{margin-top:80px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+  .backlink{display:inline-block;margin-top:30px;color:var(--saffron);text-decoration:none;font-size:13px}
+  .backlink:hover{text-decoration:underline}
+  .mermaid{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;font-family:var(--mono);font-size:12.5px;white-space:pre;overflow-x:auto;color:#c7d2fe;line-height:1.5}
+  .box{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:2px}
+  .sig{font-family:var(--mono);font-size:12.5px;color:#c7d2fe;background:#0a0f24;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;overflow-x:auto}
+  .sig b{color:var(--amber);font-weight:600}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ================= SIDEBAR ================= -->
+  <nav class="sidebar">
+    <div class="toc">
+      <div class="brand">
+        <div class="logo">🏗️</div>
+        <div><b>UTSAV</b><small>Prep&nbsp;2 · HLD &amp; LLD</small></div>
+      </div>
+      <div class="grp">High-Level Design</div>
+      <a href="#hld">A · What HLD/LLD mean here</a>
+      <a href="#context">B · System Context</a>
+      <a href="#decomp">C · Component Decomposition</a>
+      <a href="#flows">D · Core Flows</a>
+      <a href="#deploy-hld">E · Deployment HLD</a>
+      <a href="#quality">F · Quality Attributes</a>
+      <a href="#hld-imp">G · HLD Improvements</a>
+      <div class="grp">Low-Level Design</div>
+      <a href="#module-map">H · Module Map</a>
+      <a href="#classes">I · "Classes" &amp; Modules</a>
+      <a href="#service-sigs">J · Service Signatures</a>
+      <a href="#actions">K · Action Signatures</a>
+      <a href="#lib-sigs">L · Lib/Plumbing</a>
+      <a href="#components">M · UI Components</a>
+      <a href="#states">N · State Machines</a>
+      <a href="#sequences">O · Sequence Diagrams</a>
+      <a href="#lld-imp">P · LLD Improvements</a>
+      <div class="grp">Database &amp; Decisions</div>
+      <a href="#db">Q · Database Structure</a>
+      <a href="#design-decisions">R · Design Decisions</a>
+      <a href="#roadmap">S · Improvement Roadmap</a>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+    <span class="pill p-blue">PREP_2 · High-Level + Low-Level Design</span>
+    <h1>UTSAV — HLD &amp; LLD, End to End</h1>
+    <div class="hero">
+      <span class="tag">System Design Document · Implemented Reality (not theoretical)</span>
+      <p style="margin-top:12px">This is the <b>system design document</b> for UTSAV, derived directly from the code. It gives you: (A–G) the <b>High-Level Design</b> — how the whole system is built and why; (H–P) the <b>Low-Level Design</b> — every function, component, and state machine with exact signatures; (Q–S) the <b>database structure</b>, the <b>design decisions</b>, and a prioritized <b>improvement roadmap</b> for both HLD and LLD.</p>
+      <div class="stats">
+        <div class="stat"><b>6</b><span>Domain Modules</span></div>
+        <div class="stat"><b>58</b><span>Service Functions</span></div>
+        <div class="stat"><b>13</b><span>Action Files</span></div>
+        <div class="stat"><b>62</b><span>Components</span></div>
+        <div class="stat"><b>13</b><span>Models</span></div>
+        <div class="stat"><b>6</b><span>Error Classes</span></div>
+      </div>
+    </div>
+
+    <!-- ================= A ================= -->
+    <h2 id="hld">A · What HLD and LLD mean for this project</h2>
+    <div class="grid2">
+      <div class="card">
+        <b>HLD (High-Level Design) — the blueprint</b>
+        <ul>
+          <li>System context: users, browser, Vercel, PostgreSQL, Resend, Gemini.</li>
+          <li>Architecture style: <b>modular monolith</b> on Next.js 14.</li>
+          <li>Component decomposition: routes, actions, services, data layer.</li>
+          <li>Request flows: read, mutate, public, invite, assistant.</li>
+          <li>Deployment topology + quality attributes (security, integrity, scale).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <b>LLD (Low-Level Design) — the code</b>
+        <ul>
+          <li>Module map with exact file paths.</li>
+          <li>Every exported function: signature, permission gate, audit behavior.</li>
+          <li>Component inventory with props.</li>
+          <li>State machines (expense, event, task, bhog).</li>
+          <li>Sequence diagrams for the critical paths.</li>
+          <li>Database schema, enums, indexes, migrations.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note"><b>Important framing:</b> UTSAV's services are <b>plain functions, not classes</b> — this was an intentional Phase-2 refactor (see §R). The only real class hierarchy is the <code>AppError</code> family in <code>src/lib/errors.ts</code>. React components are functions too. When we say "classes implemented," the honest answer is: <i>domain logic is a set of 58 exported functions organized into 6 modules, plus one error class hierarchy.</i> This is a feature, not an omission — details in §I.</div>
+
+    <!-- ================= B ================= -->
+    <h2 id="context">B · System Context</h2>
+    <div class="mermaid">                    ┌────────────────────────────────────────────┐
+                    │              EXTERNAL ACTORS                │
+                    │  Admin / Treasurer / Committee / Volunteer  │
+                    │  Public Donor / Visitor                     │
+                    └───────────────┬────────────────────────────┘
+                                    │ HTTPS
+                    ┌───────────────▼────────────────────────────┐
+                    │            VERCEL (Next.js 14)             │
+                    │  ┌─────────┐  ┌─────────┐  ┌──────────┐    │
+                    │  │  RSC    │  │ Actions │  │ Middleware│    │
+                    │  └────┬────┘  └────┬────┘  └──────────┘    │
+                    │       │            │                        │
+                    │  ┌────▼────────────▼────┐                  │
+                    │  │  Access-Control +    │                  │
+                    │  │  getTenantPrisma     │                  │
+                    │  └──────────┬───────────┘                  │
+                    └─────────────┼──────────────────────────────┘
+              ┌───────────────────┼───────────────────────┐
+      ┌───────▼───────┐   ┌───────▼───────┐   ┌───────────▼──────┐
+      │  PostgreSQL   │   │  Resend (SMTP)│   │  Gemini (GenAI) │
+      │  Neon/Supabase│   │  invite emails│   │  read-only chat │
+      └───────────────┘   └───────────────┘   └─────────────────┘</div>
+    <table>
+      <tr><th>Actor</th><th>Capabilities</th><th>Entry point</th></tr>
+      <tr><td>ADMIN</td><td>Everything (17 perms) — members, org, finance, events</td><td><code>/[orgSlug]/dashboard/*</code></td></tr>
+      <tr><td>TREASURER</td><td>Finance CRUD + approve, member read, audit read</td><td>dashboard finance pages</td></tr>
+      <tr><td>COMMITTEE_MEMBER</td><td>Events manage, tasks manage, finance create/read</td><td>dashboard</td></tr>
+      <tr><td>VOLUNTEER</td><td>Update own tasks, read events</td><td>dashboard volunteers</td></tr>
+      <tr><td>Public visitor</td><td>See donations, approved expenses, schedule, sponsor bhog</td><td><code>/[orgSlug]</code>, <code>/transparency</code></td></tr>
+      <tr><td>Invitee</td><td>Accept a 48h token invitation</td><td><code>/accept-invite?token=…</code></td></tr>
+    </table>
+
+    <!-- ================= C ================= -->
+    <h2 id="decomp">C · Component Decomposition (HLD)</h2>
+    <h3>C.1 The 4 layers</h3>
+    <table>
+      <tr><th>Layer</th><th>Owns</th><th>Directory</th></tr>
+      <tr><td><b>1 · Presentation</b></td><td>Pages, layouts, client components, forms, toasts</td><td><code>src/app</code>, <code>src/components</code></td></tr>
+      <tr><td><b>2 · Application</b></td><td>Server Actions: zod validation, orchestration, revalidation</td><td><code>src/actions</code></td></tr>
+      <tr><td><b>3 · Domain</b></td><td>Business rules, RBAC checks, audit writes, Prisma queries</td><td><code>src/modules</code> (6 modules)</td></tr>
+      <tr><td><b>4 · Infrastructure</b></td><td>Auth, tenant client, errors, email, AI, prisma singleton, time/pagination utilities</td><td><code>src/lib</code>, <code>src/middleware.ts</code></td></tr>
+    </table>
+    <h3>C.2 Domain modules (the 6 "bounded contexts")</h3>
+    <div class="grid2">
+      <div class="card"><b>core</b> — org lifecycle, members, invitations, audit, dashboard overview.<br><span class="small">organization.service · member.service · invitation.service · audit.service · overview.service</span></div>
+      <div class="card"><b>finance</b> — the ledger: donations, expenses, overview aggregates, recent activity.<br><span class="small">donation.service · expense.service · financial.service</span></div>
+      <div class="card"><b>events</b> — event CRUD, assignments, details.<br><span class="small">event.service</span></div>
+      <div class="card"><b>tasks</b> — volunteer task CRUD, status, workload.<br><span class="small">task.service</span></div>
+      <div class="card"><b>festival</b> — bhog/prasad + all public read surfaces + event/org finance splits.<br><span class="small">bhog.service · public-*.service (6) · organization-financial · event-financial</span></div>
+      <div class="card"><b>assistant</b> — read-only Gemini admin assistant.<br><span class="small">admin-assistant.service</span></div>
+    </div>
+    <h3>C.3 Dependency rules (architecture constraints)</h3>
+    <pre><code>components / app  ──▶  actions  ──▶  modules  ──▶  lib (infra)
+        │                 │             │
+        │                 ▼             ▼
+        └────────────  lib/access-control.ts  ◀────────┘
+                      (RBAC + getTenantPrisma)
+Modules never import UI. Actions never import components.
+All DB access flows through getTenantPrisma(orgId) or the global prisma singleton.</code></pre>
+
+    <!-- ================= D ================= -->
+    <h2 id="flows">D · Core Flows (HLD)</h2>
+    <h3>D.1 Authenticated read (e.g., loading expenses page)</h3>
+    <div class="mermaid">Browser ──GET /ganeshotsav-2026/dashboard/expenses──▶ Next.js
+   middleware.ts        withAuth → JWT? (reject 401 → signin)
+   layout.tsx           getServerSession + validateAccess(orgId) (membership)
+   page.tsx (RSC)       requirePermission(orgId,"finance:read")
+                            │
+   getPaginatedExpenses  getTenantPrisma(orgId)  ──▶ SQL: WHERE organizationId=…
+                            │
+                        PostgreSQL ──▶ rows ──▶ RSC renders table</div>
+    <h3>D.2 Authenticated mutation (record a donation)</h3>
+    <div class="mermaid">Client form (RecordDonationModal)  ──await recordDonationAction──▶  src/actions/donation.actions.ts
+   zod RecordDonationSchema  (amount > 0, category enum, ISO datetime)
+   withAction(handler, { paths: ["/dashboard", "/ganeshotsav/dashboard/donations"] })
+      └─▶ donation.service.createDonation
+             requirePermission(orgId,"finance:create")
+             manual guard: donorName ≤ 100, amount > 0
+             new Prisma.Decimal(amount.toString())        ← float safety
+             getTenantPrisma(orgId).donation.create(...)  ← orgId injected
+             audit.service.record(action:"create", after snapshot)
+   ActionResult { success:true } ──▶ toast.success + router.refresh()</div>
+    <h3>D.3 Public read (transparency page — no session)</h3>
+    <div class="mermaid">GET /[orgSlug]/transparency ──▶ no middleware guard
+   getOrganizationBySlug(slug)          → orgId (React cache() memoized)
+   assertFestivalMode(org)              → 404 if CLUB
+   getFullAuditTrail / getTransparencyStats / getPublicSchedule
+      getTenantPrisma(orgId)  ← still tenant-scoped even without auth!
+   Only APPROVED expenses + donations are returned. </div>
+    <h3>D.4 Invite acceptance (the multi-party flow)</h3>
+    <div class="mermaid">Admin → inviteMemberAction → invitation service → token(randomBytes32) + 48h expiry
+   ── email (Resend) or copy/WhatsApp link ──▶ invitee
+   GET /accept-invite?token=…
+     token missing → invalid · unknown → invalid · accepted → info · expired → expired
+     no session → /login?email=…&callbackUrl=<tokenized url>
+     email mismatch (session vs invite) → "Account mismatch" banner + disabled button
+   acceptInviteAction(token)
+     re-validate invite (exists, !accepted, !expired)
+     fresh user fetch (stale-JWT guard)
+     member lookup by userId OR email → already active? redirect (no role overwrite)
+     email-match enforced server-side (real gate)
+     create member OR restore archived (invite's role)
+     if invite.eventId → eventAssignment.upsert
+     mark invite accepted → redirect to org dashboard</div>
+
+    <!-- ================= E ================= -->
+    <h2 id="deploy-hld">E · Deployment HLD</h2>
+    <table>
+      <tr><th>Aspect</th><th>Current state</th></tr>
+      <tr><td>Compute</td><td>Vercel (Next.js serverless functions, edge middleware). No custom server.</td></tr>
+      <tr><td>Database</td><td>Managed PostgreSQL — Railway / Supabase / Neon. 1 database, logical multi-tenancy.</td></tr>
+      <tr><td>Email</td><td>Resend REST API. Graceful offline: missing key → invite flow still works via links.</td></tr>
+      <tr><td>AI</td><td>Gemini (gemini-2.5-flash) via <code>@google/genai</code>. Server-only, read-only. No key → deterministic fallback.</td></tr>
+      <tr><td>Cache</td><td>Next.js RSC cache + React <code>cache()</code> per-request memoization + <code>revalidatePath</code> on writes.</td></tr>
+      <tr><td>Build</td><td><code>npx prisma generate &amp;&amp; next build</code>; <code>postinstall</code> also runs generate.</td></tr>
+      <tr><td>DB migrations</td><td>Dev: <code>prisma db push</code>; Prod: <code>prisma migrate deploy</code>; seed idempotent via upserts.</td></tr>
+      <tr><td>Secrets</td><td><code>DATABASE_URL</code>, <code>NEXTAUTH_SECRET</code>, <code>NEXTAUTH_URL</code> (+ optional Gemini/Resend). <code>.env*</code> gitignored.</td></tr>
+    </table>
+
+    <!-- ================= F ================= -->
+    <h2 id="quality">F · Quality Attributes (how HLD goals are met)</h2>
+    <table>
+      <tr><th>Attribute</th><th>How UTSAV achieves it</th><th>Gap / next step</th></tr>
+      <tr><td><b>Security</b></td><td>3-layer auth (middleware→layout→service) + ORM tenant injection + bcrypt(12) + CSRF via NextAuth + open-redirect guard + email-match invites + last-admin protection.</td><td>No rate limiting, no CSP headers, tokens stored raw.</td></tr>
+      <tr><td><b>Integrity</b></td><td>Decimal money, compare-and-set approvals, soft-delete archives, audit logs, composite uniques at DB level.</td><td>Audit log write-only; some mutations un-audited.</td></tr>
+      <tr><td><b>Availability</b></td><td>Stateless JWT → any Vercel function can serve; managed DB with backups.</td><td>Single region; no failover strategy documented.</td></tr>
+      <tr><td><b>Scalability</b></td><td>Logical multi-tenancy = one pool, one schema; per-request org scoping is constant-time; pagination on all lists.</td><td>No connection pooling layer (Prisma Accelerate suggested).</td></tr>
+      <tr><td><b>Maintainability</b></td><td>Layered modules, uniform ActionResult contract, <code>withAction</code>, strict TS, 25 unit tests.</td><td>No ESLint/CI; legacy patterns coexist.</td></tr>
+      <tr><td><b>Observability</b></td><td>Prisma query logging in dev; structured AuditLog for domain events.</td><td>No APM/log aggregation/metrics in prod.</td></tr>
+    </table>
+
+    <!-- ================= G ================= -->
+    <h2 id="hld-imp">G · HLD Improvements (blueprint-level)</h2>
+    <div class="card"><b>G1 · Connection pooling &amp; Prisma Accelerate</b><br>Serverless functions create many short-lived connections. Add Accelerate/pgBouncer in front of Postgres to avoid connection limits at scale. Low effort, immediate ceiling lift.</div>
+    <div class="card"><b>G2 · Add caching layers</b><br>Public transparency pages are read-heavy and rarely change. Options: (1) Next.js <code>ISR</code> with a short revalidate window keyed on org slug; (2) Redis (Upstash) cache for public financial aggregates keyed <code>public:fin:{orgId}</code>, invalidated on donation/expense mutations. Reduces DB load and page latency.</div>
+    <div class="card"><b>G3 · Async jobs for non-critical work</b><br>Resend emails and audit writes are fire-and-forget in code. Introduce a queue (Inngest / QStash) so invite emails + audit logs are durable and retryable without blocking the mutation response.</div>
+    <div class="card"><b>G4 · Read replicas / CQRS-lite</b><br>Route dashboard reads to a read replica; writes to primary. The public/transparency read-models already are a quasi-CQRS — formalize them as materialized read tables if scale demands.</div>
+    <div class="card"><b>G5 · Rate limiting at the edge</b><br>Upstash Ratelimit in <code>middleware.ts</code> for auth endpoints and public forms (bhog sponsorship, register) to stop brute force and spam.</div>
+    <div class="card"><b>G6 · Multi-region / DR</b><br>Postgres on Neon (built-in branching/point-in-time) + Vercel regional deployment. Document RPO/RTO. Logical multi-tenancy makes a "restore one tenant" story via Neon branch feasible.</div>
+    <div class="card"><b>G7 · Observability platform</b><br>Add Sentry for error tracking + OpenTelemetry traces; export Prisma query spans. Turn the AuditLog into the domain-event backbone.</div>
+    <div class="card"><b>G8 · Data residency / compliance</b><br>If tenants demand regional storage, the <code>getTenantPrisma</code> seam allows sharding by tenant region (each shard a DB, extension picks the client) — a clean upgrade path from logical to physical isolation.</div>
+
+    <!-- ================= H ================= -->
+    <h2 id="module-map">H · Module Map (LLD starting point)</h2>
+    <pre><code>src/
+├─ app/                    Next.js App Router (18 routes, 3 layouts, 1 API route)
+├─ actions/                13 server-action files ("use server")
+├─ components/
+│   ├─ ui/                 13 primitives (shadcn + Radix)
+│   ├─ layout/             ResponsiveDashboardLayout · Navbar · FestivalSidebar
+│   ├─ landing/            TempleDoors · LandingHero · FeaturesSection
+│   ├─ providers/          SessionProvider
+│   ├─ public/             FinancialHero · FinancialCharts · DonationList · ExpenseList
+│   │                      EventTimeline · BhogSection · BhogSponsorshipDialog · SectionWrapper
+│   ├─ public/transparency/ AuditTable · PublicSchedule
+│   └─ dashboard/
+│       ├─ overview/       DashboardHeader · StatCard · AlertBox · ActionRow · MiniWidget · EventFinancialBreakdown
+│       ├─ shared/         DashboardFilters · EmptyState · PaginationControls
+│       ├─ organization/   EditOrganizationModal
+│       ├─ bhog/           AddBhogModal · BhogModerationActions
+│       ├─ donations/      RecordDonationModal · EditDonationModal
+│       ├─ expenses/       AddExpenseModal · EditExpenseModal · ExpenseApprovalActions
+│       ├─ events/         EventModal · EventCard · EventStatusSelector
+│       │                  EventRegistrationManager · EventTeamManager
+│       ├─ volunteers/     VolunteerListView · TaskBoard · CreateTaskModal
+│       ├─ members/        InviteMemberModal · RoleBadge · MemberActions
+│       │                  CopyInviteLink · ShareOnWhatsApp · RevokeInviteButton
+│       └─ assistant/      AdminAssistantPanel
+├─ modules/                6 domain modules (18 service files, 58 exported functions)
+├─ lib/                    18 infrastructure files (+ 4 co-located tests)
+├─ server/                 EMPTY (placeholder)
+├─ types/                  next-auth.d.ts
+└─ middleware.ts           14 lines, withAuth JWT gate</code></pre>
+
+    <!-- ================= I ================= -->
+    <h2 id="classes">I · "Classes" Implemented — the honest answer</h2>
+    <div class="why"><b>Design decision (Phase 2 refactor):</b> every domain service was converted from static classes to <b>plain exported functions</b>. Why? Static classes in TS are just function namespaces with extra ceremony; plain functions are tree-shakeable, trivially mockable in Vitest (<code>vi.mock</code>), have no hidden <code>this</code> context, and reduce indirection. The modules become <b>collections of functions</b>, and the dependency injection is explicit (org id + data passed as parameters).</div>
+    <h3>I.1 The only real class hierarchy — error taxonomy</h3>
+    <pre><code>class AppError extends Error
+  ├─ code: AppErrorCode      // "AUTHENTICATION_REQUIRED" | "NOT_AUTHORIZED" | ...
+  └─ status: number          // HTTP status
+
+class AuthenticationError extends AppError   // 401 AUTHENTICATION_REQUIRED
+class AuthorizationError  extends AppError   // 403 NOT_AUTHORIZED
+class ValidationAppError  extends AppError   // 422 VALIDATION_ERROR
+class NotFoundAppError    extends AppError   // 404 NOT_FOUND
+class ConflictAppError    extends AppError   // 409 CONFLICT
+class InvariantError      extends AppError   // 500 INVARIANT_VIOLATION
+
+// normalizer maps unknown → { code, message }
+normalizeError(error, fallback)
+   ZodError → VALIDATION_ERROR(first issue) · AppError → passthrough
+   Error    → UNKNOWN_ERROR · else → fallback</code></pre>
+    <h3>I.2 Everything else is functions — the "virtual classes"</h3>
+    <p>If an interviewer asks "what classes are implemented," give both answers:</p>
+    <ol>
+      <li><b>Literal:</b> the <code>AppError</code> hierarchy; React function components; that's it.</li>
+      <li><b>Conceptual:</b> the 6 modules are the logical "classes" of the domain — <i>core, finance, events, tasks, festival, assistant</i> — each a cohesive set of functions with a clear responsibility. The per-module function groups behave like classes with static methods, minus the ceremony.</li>
+    </ol>
+
+    <!-- ================= J ================= -->
+    <h2 id="service-sigs">J · Service Signatures (LLD — the full function inventory)</h2>
+    <p class="small">Perm = access check; Audit = writes an AuditLog row.</p>
+
+    <h3>J.1 core module</h3>
+    <div class="sig"><b>organization.service.ts</b></div>
+    <div class="sig">getOrganizationBySlug = <b>cache</b>(async (slug: string) → Promise&lt;Organization|null&gt;) · Perm: none · memoized/request</div>
+    <div class="sig">getUserOrganizations(userId: string) → memberships w/ nested org · newest first · Perm: none</div>
+    <div class="sig">createOrganization(data, userId) → transactional org + creator→ADMIN; 10-org cap; slug ConflictAppError · Perm: none</div>
+    <div class="sig">updateOrganization(organizationId, data) → syncs budgetTarget=openingBalance · Perm: none</div>
+    <div class="sig">endFestival(organizationId, endedById?) → status ENDED + endedAt · Perm: none</div>
+    <div class="sig">deleteOrganization(organizationId) → transaction: delete members + invitations + org · Perm: none</div>
+    <div class="sig"><b>member.service.ts</b></div>
+    <div class="sig">getOrganizationMembers(organizationId) → non-archived members w/ user · Perm: validateAccess[ADMIN,COMMITTEE,TREASURER]</div>
+    <div class="sig"><b>audit.service.ts</b></div>
+    <div class="sig">record(input: {organizationId, actorMemberId?, entityType, entityId?, action, before?, after?, metadata?, visibility?}) → creates AuditLog · ⭐ the audit writer itself</div>
+    <div class="sig"><b>invitation.service.ts</b></div>
+    <div class="sig">inviteMember({organizationId, email, role, invitedById, eventId?, skipEmail?}) → {invitation, emailSent, emailError, inviteLink} · 48h token</div>
+    <div class="sig"><b>overview.service.ts</b></div>
+    <div class="sig">getOrganizationOverview(organizationId): Promise&lt;DashboardOverview&gt; · financials gated to management roles</div>
+
+    <h3>J.2 finance module</h3>
+    <div class="sig"><b>donation.service.ts</b></div>
+    <div class="sig">createDonation(orgId, {donorName, amount, category, receivedAt?, notes?, eventId?}) · requirePermission finance:create · Audit ✅</div>
+    <div class="sig">getDonations(orgId, filters?) · finance:read</div>
+    <div class="sig">getPaginatedDonations(orgId, query: PageQuery) · finance:read</div>
+    <div class="sig">getDonationSummary(orgId) · groupBy category · finance:read</div>
+    <div class="sig">updateDonation(orgId, donationId, data) · finance:update · Audit ✅</div>
+    <div class="sig">archiveDonation(orgId, donationId) · soft-delete · finance:update · Audit ✅</div>
+    <div class="sig"><b>expense.service.ts</b></div>
+    <div class="sig">createExpense(orgId, {title, amount, category, notes?, eventId?, requestedAt?}) → status PENDING · finance:create · Audit ✅</div>
+    <div class="sig">approveExpense(orgId, expenseId) → atomic updateMany status:PENDING→APPROVED; count===0 → ConflictAppError · finance:approve · Audit ✅</div>
+    <div class="sig">rejectExpense(orgId, expenseId) → same guard → REJECTED · finance:approve · Audit ✅</div>
+    <div class="sig">getPaginatedExpenses(orgId, query) · finance:read</div>
+    <div class="sig">updateExpense(orgId, expenseId, data) · finance:update · Audit ✅</div>
+    <div class="sig">getExpenseSummary(orgId) → {approvedTotal, pendingTotal, statusCounts, categoryBreakdown} · finance:read</div>
+    <div class="sig">archiveExpense(orgId, expenseId) · finance:update · Audit ✅</div>
+    <div class="sig"><b>financial.service.ts</b></div>
+    <div class="sig">getOrganizationFinancialOverview(orgId): Promise&lt;OrganizationFinancialOverviewResult&gt; · finance:read</div>
+    <div class="sig">getRecentActivity(orgId, limit=5) → deduped unified timeline ≤10</div>
+
+    <h3>J.3 events + tasks modules</h3>
+    <div class="sig"><b>event.service.ts</b></div>
+    <div class="sig">createEvent(orgId, input) · validateAccess[ADMIN,COMMITTEE,TREASURER]</div>
+    <div class="sig">updateEvent(orgId, eventId, input) · same role list</div>
+    <div class="sig">deleteEvent(orgId, eventId) → isArchived=true · [ADMIN] only</div>
+    <div class="sig">getEvents(orgId, includeArchived=false) · none</div>
+    <div class="sig">getEventWithDetails(orgId, eventId) → expenses/tasks/assignments(non-archived)/registrations</div>
+    <div class="sig">assignMemberToEvent(orgId, eventId, memberId) · [ADMIN,COMMITTEE,TREASURER]</div>
+    <div class="sig">removeMemberFromEvent(orgId, eventId, memberId) · delete by compound key</div>
+    <div class="sig"><b>task.service.ts</b></div>
+    <div class="sig">createTask(orgId, input) · [ADMIN,COMMITTEE]</div>
+    <div class="sig">getAllTasks(orgId) · [ADMIN,COMMITTEE,TREASURER]</div>
+    <div class="sig">getMyTasks(orgId) · any member</div>
+    <div class="sig">updateTask(orgId, taskId, input) · [ADMIN,COMMITTEE]</div>
+    <div class="sig">updateTaskStatus(orgId, taskId, status) · any member + VOLUNTEER ownership guard (assignedToId===member.id)</div>
+    <div class="sig">deleteTask(orgId, taskId) → isArchived · [ADMIN,COMMITTEE]</div>
+    <div class="sig">getVolunteerWorkload(orgId) → active task counts per volunteer · [ADMIN,COMMITTEE,TREASURER]</div>
+
+    <h3>J.4 festival module (incl. public surfaces)</h3>
+    <div class="sig"><b>bhog.service.ts</b>: createBhogItem · getBhogItems · getPaginatedBhogItems · updateBhogStatus(PREPARED sets preparedAt+approvedAt) · updateBhogItem · archiveBhog([ADMIN] only)</div>
+    <div class="sig"><b>public-bhog.service.ts</b>: getPublicBhogList(orgId) · none</div>
+    <div class="sig"><b>public-donation.service.ts</b>: getPublicDonations(orgId, limit=50) · none</div>
+    <div class="sig"><b>public-expense.service.ts</b>: getPublicApprovedExpenses(orgId, limit=50) · none</div>
+    <div class="sig"><b>public-event.service.ts</b>: getPublicEvents(orgId) · none</div>
+    <div class="sig"><b>public-financial.service.ts</b>: getPublicFinancialOverview(orgId): Promise&lt;PublicFinancialOverview&gt; · assertFestivalMode guard</div>
+    <div class="sig"><b>public-transparency.service.ts</b>: getFullAuditTrail(orgId, limit=500) · getTransparencyStats(orgId) · getPublicSchedule(orgId)</div>
+    <div class="sig"><b>organization-financial.service.ts</b>: getOrganizationSummary(orgId) → org-level vs per-event spend</div>
+    <div class="sig"><b>event-financial.service.ts</b>: getEventFinancialSummary(orgId, eventId)</div>
+
+    <h3>J.5 assistant module</h3>
+    <div class="sig">classifyAssistantIntent(question) → Gemini then keyword fallback</div>
+    <div class="sig">classifyAssistantIntentFallback(question) → synchronous deterministic classifier</div>
+    <div class="sig">answerAdminAssistantQuestion(orgId, question) → financial intents require finance:read</div>
+    <div class="sig">buildAssistantPrompt(question, intent, context, fallbackAnswer) → pure prompt builder w/ safety guardrails</div>
+
+    <div class="note"><b>Pattern worth noting:</b> finance module = fine-grained <code>requirePermission</code>; core/events/tasks/bhog = legacy <code>validateAccess</code> role lists; public services = no check (tenant isolation via extension only). Audit writes exist only in donation + expense services (9 write points). This asymmetry is the single most important "known debt" in the LLD.</div>
+
+    <!-- ================= K ================= -->
+    <h2 id="actions">K · Action Signatures (LLD — application layer)</h2>
+    <p>Every action returns <code>ActionResult&lt;T&gt;</code> (discriminated union). Most are wrapped with <code>withAction</code>/<code>withActionNoReturn</code>.</p>
+    <table>
+      <tr><th>File</th><th>Exports</th></tr>
+      <tr><td>auth.actions</td><td><code>registerUserAction(data): Promise&lt;{success,error?}&gt;</code> — bcrypt(12), P2002 handling</td></tr>
+      <tr><td>organization.actions</td><td>createOrganizationAction, updateOrganizationAction, endFestivalAction, deleteOrganizationAction, getOrganizationCountAction</td></tr>
+      <tr><td>member.actions</td><td>inviteMemberAction, updateMemberRoleAction (last-admin guard), archiveMemberAction (last-admin guard), revokeInvitationAction</td></tr>
+      <tr><td>event.actions</td><td>createEventAction, updateEventAction, deleteEventAction, assignMemberToEventAction, removeMemberFromEventAction</td></tr>
+      <tr><td>expense.actions</td><td>createExpenseAction, approveExpenseAction, rejectExpenseAction, updateExpenseAction, archiveExpenseAction</td></tr>
+      <tr><td>donation.actions</td><td>recordDonationAction, updateDonationAction, archiveDonationAction</td></tr>
+      <tr><td>bhog.actions</td><td>createBhogAction, updateBhogStatusAction, archiveBhogAction, updateBhogItemAction</td></tr>
+      <tr><td>public-bhog.actions</td><td>sponsorBhogAction — unauthenticated; validates org + window availability</td></tr>
+      <tr><td>volunteer.actions</td><td>createTaskAction, updateTaskAction, updateTaskStatusAction, deleteTaskAction</td></tr>
+      <tr><td>registration.actions</td><td>toggleAttendanceAction, addManualRegistrationAction</td></tr>
+      <tr><td>admin-assistant.actions</td><td>askAdminAssistantAction — read-only</td></tr>
+    </table>
+    <h3>Zod validation shapes (boundary contracts)</h3>
+    <div class="sig">CreateExpenseSchema: { title: string≥1, amount: number.gt(0), category: nativeEnum(ExpenseCategory), notes?, requestedAt: ISO datetime? }</div>
+    <div class="sig">RecordDonationSchema: { donorName: string≥1, amount: number.gt(0), category: nativeEnum(DonationCategory), receivedAt: datetime?, notes?, eventId? }</div>
+    <div class="sig">CreateOrganizationSchema: { name≥3, slug regex ^[a-z0-9-]+$, type: enum(FESTIVAL|CLUB), dates/balances optional }</div>
+    <div class="sig">InviteMemberSchema: { email: z.string().email(), role: nativeEnum(OrganizationRole), skipEmail?: boolean }</div>
+    <div class="sig">registerSchema: { email, password≥8, name≥2?, phone? transform ""→undefined }</div>
+
+    <!-- ================= L ================= -->
+    <h2 id="lib-sigs">L · Lib / Plumbing Signatures (LLD)</h2>
+    <div class="sig"><b>action.ts</b>: withAction&lt;T&gt;(handler: ()=>Promise&lt;T&gt;, options:{paths?: {path,type?}[]}) → ActionResult&lt;T&gt; · withActionNoReturn(handler, options) → ActionResult&lt;undefined&gt;</div>
+    <div class="sig"><b>action-response.ts</b>: actionSuccess&lt;T&gt;(data?) · actionFailure(error, fallback?) · type ActionResult&lt;T=undefined&gt;</div>
+    <div class="sig"><b>errors.ts</b>: AppError(code, message, status=400) + 6 subclasses + normalizeError + type AppErrorCode (7 codes)</div>
+    <div class="sig"><b>access-control.ts</b>: type Permission (17 strings) · hasPermission(role, perm) → boolean · requirePermission(orgId, perm, session?) → {user, member, organizationId} · validateAccess(orgId, roles[], session?) [deprecated] · getTenantPrisma(orgId)</div>
+    <div class="sig"><b>pagination.ts</b>: DEFAULT_PAGE_SIZE=10 · COMPACT_PAGE_SIZE=4 · MAX_PAGE_SIZE=100 · parsePageQuery(searchParams, opts?) → PageQuery · paginate(items, totalItems, query) → PaginatedResult · getPaginationArgs(query) → {skip, take} · buildPageHref(basePath, searchParams, page)</div>
+    <div class="sig"><b>prasad-windows.ts</b>: DEFAULT_PRASAD_WINDOWS · normalizePrasadWindowConfig · isValidTime · assertValidPrasadWindowConfig · getPrasadWindowOptions · getAvailablePrasadWindows(input) · isPrasadWindowAvailable(input) · parseDateInput · formatDateInput · getNextAvailablePrasadDate(input) · formatOfferingWindow</div>
+    <div class="sig"><b>org-context.ts</b>: resolveOrgContext(orgSlug) → {organization, member, isAdmin, isFestival} · isAdmin = ADMIN | COMMITTEE_MEMBER</div>
+    <div class="sig"><b>organization-mode.ts</b>: isFestivalOrganization(org) · assertFestivalMode(org) → NotFoundAppError for CLUB</div>
+    <div class="sig"><b>gemini.ts</b>: generateGeminiText(prompt) → Promise&lt;string|null&gt; (null if no key; temp 0.2, max 800 tokens, gemini-2.5-flash)</div>
+    <div class="sig"><b>email.ts</b>: sendInvitationEmail(to, inviteLink, organizationName) → {data}|{error} (Swiss-style, never throws)</div>
+    <div class="sig"><b>date-time.ts</b>: getOrganizationTimezone(tz?) → "Asia/Kolkata" default · formatOrgDate · formatOrgTime · formatOrgDateTime (en-IN, org tz)</div>
+    <div class="sig"><b>auth.ts</b>: authOptions (PrismaAdapter, JWT strategy, Credentials+bcrypt, redirect guard) · <b>prisma.ts</b>: prisma (global singleton) · <b>utils.ts</b>: cn(...inputs)</div>
+
+    <!-- ================= M ================= -->
+    <h2 id="components">M · UI Components (LLD)</h2>
+    <h3>M.1 Critical client components &amp; their props</h3>
+    <table>
+      <tr><th>Component</th><th>Key props</th><th>Actions called</th></tr>
+      <tr><td>ResponsiveDashboardLayout</td><td>{children, organization{id,name,slug,type}, orgSlug}</td><td>— (mounts AdminAssistantPanel)</td></tr>
+      <tr><td>ActionRow</td><td>{organizationId, role, isFestival?}</td><td>role-gates modals</td></tr>
+      <tr><td>ExpenseApprovalActions</td><td>{expenseId, organizationId, status}</td><td>approve/reject (null unless PENDING)</td></tr>
+      <tr><td>EventStatusSelector</td><td>{organizationId, orgSlug, eventId, currentStatus, isAdmin}</td><td>updateEventAction</td></tr>
+      <tr><td>EventTeamManager</td><td>{organizationId, orgSlug, eventId, currentAssignments, availableMembers, isAdmin}</td><td>assign/remove member</td></tr>
+      <tr><td>EventRegistrationManager</td><td>{organizationId, orgSlug, eventId, registrations[], isAdmin}</td><td>toggleAttendance, addManualRegistration</td></tr>
+      <tr><td>TaskBoard</td><td>{tasks[], organizationId, orgSlug, currentUserRole, currentMemberId}</td><td>updateTaskStatus, deleteTask</td></tr>
+      <tr><td>MemberActions</td><td>{memberId, currentRole, organizationId, isSelf}</td><td>updateMemberRole, archiveMember</td></tr>
+      <tr><td>InviteMemberModal</td><td>{organizationId, events?}</td><td>inviteMemberAction (custom modal, skipEmail default true)</td></tr>
+      <tr><td>AdminAssistantPanel</td><td>{organizationId, organizationName}</td><td>askAdminAssistantAction (FAB, 5 starters)</td></tr>
+      <tr><td>BhogSponsorshipDialog</td><td>public props + prasadWindowConfig</td><td>sponsorBhogAction — the only react-hook-form+zodResolver usage</td></tr>
+      <tr><td>FinancialCharts</td><td>{totalDonations, totalExpenses, expenses[{category,amount}]}</td><td>— only recharts usage</td></tr>
+      <tr><td>EditOrganizationModal</td><td>{organization{…finance fields}, canEndFestival?}</td><td>update/delete org, endFestival</td></tr>
+      <tr><td>CopyInviteLink / ShareOnWhatsApp</td><td>{token}, {token, orgName, role}</td><td>clipboard / wa.me</td></tr>
+    </table>
+    <h3>M.2 Server components (data readers)</h3>
+    <ul>
+      <li>Every <code>page.tsx</code> in the org dashboard resolves context via <code>resolveOrgContext(orgSlug)</code> or calls services directly, renders server-side, and passes plain data down to the client components above.</li>
+      <li><code>[orgSlug]/page.tsx</code> (public) fires <b>parallel</b> <code>Promise.all</code> of the 5 public services.</li>
+      <li>Shared dashboard chrome: <code>DashboardFilters</code> (GET form), <code>PaginationControls</code> (buildPageHref), <code>EmptyState</code>.</li>
+    </ul>
+    <h3>M.3 Library usage matrix</h3>
+    <table>
+      <tr><th>Library</th><th>Used by</th></tr>
+      <tr><td>recharts</td><td>FinancialCharts (only)</td></tr>
+      <tr><td>react-hook-form + zodResolver</td><td>BhogSponsorshipDialog (only)</td></tr>
+      <tr><td>sonner toast</td><td>~12 dashboard components</td></tr>
+      <tr><td>framer-motion</td><td>landing, CustomCursor, dashboard layout, FinancialHero, SectionWrapper</td></tr>
+      <tr><td>date-fns</td><td>9 files (isWithinInterval, isPast, format)</td></tr>
+      <tr><td>Radix primitives</td><td>via ui/ components; one direct import (MemberActions dropdown)</td></tr>
+    </table>
+
+    <!-- ================= N ================= -->
+    <h2 id="states">N · State Machines (LLD)</h2>
+    <div class="mermaid">Expense:  PENDING ─approve/reject─▶ APPROVED / REJECTED
+          (approval uses atomic compare-and-set; transitions locked by guard)
+Event:    PLANNED ─▶ ACTIVE ─▶ COMPLETED ─▶ (optional) ARCHIVED
+          deleteEvent() sets isArchived=true (soft-delete, ADMIN only)
+Task:     PENDING ─▶ IN_PROGRESS ─▶ COMPLETED  (VOLUNTEER only own tasks)
+Bhog:     PENDING ─▶ PREPARED  (sets approvedAt + preparedAt)
+Org:      ACTIVE ─endFestival─▶ ENDED   (endedAt + endedById)
+Member:   active ↔ archived (isArchived)  ·  last-admin removal blocked
+Invite:   pending ─accept─▶ accepted (48h expiry window)</div>
+
+    <!-- ================= O ================= -->
+    <h2 id="sequences">O · Sequence Diagrams (critical paths)</h2>
+    <h3>O.1 Tenant-isolated query</h3>
+    <div class="mermaid">Client ──▶ Server Action ──▶ Service ──▶ requirePermission(orgId, perm)
+   Service ──▶ getTenantPrisma(orgId)   // $extends client
+   getTenantPrisma ──▶ interceptor: merge { organizationId } into where
+                       inject into create/createMany/upsert
+                       DELETE organizationId from update payloads
+   interceptor ──▶ Prisma ──▶ PostgreSQL
+   Service ◀── rows (guaranteed same-org only)</div>
+    <h3>O.2 Expense approval race</h3>
+    <div class="mermaid">Actor A ──approve──▶ updateMany(where:{id, orgId, status:PENDING})
+Actor B ──approve──▶ updateMany(where:{id, orgId, status:PENDING})
+   Postgres: one UPDATE matches 1 row (A wins, count=1)
+   B: count=0 ──▶ throw ConflictAppError("already processed") ──▶ 409 toast</div>
+    <h3>O.3 Invite acceptance (server-side gate)</h3>
+    <div class="mermaid">acceptInviteAction(token)
+  1. invite = findUnique({token})        // null → invalid
+  2. accepted? expired?                  // short-circuit screens
+  3. session required                    // else redirect signup w/ email
+  4. dbUser = fetch fresh by email       // stale-JWT guard
+  5. existing member by userId OR email  // active → redirect (no overwrite)
+  6. email = invite.email (ci) ?         // MISMATCH → throw 403 "Account mismatch"
+  7. create member OR restore archived (role=invite.role)
+  8. invite.eventId → eventAssignment.upsert
+  9. invite.accepted = true ──▶ redirect org dashboard</div>
+
+    <!-- ================= P ================= -->
+    <h2 id="lld-imp">P · LLD Improvements (code-level)</h2>
+    <table>
+      <tr><th>#</th><th>Improvement</th><th>Why / impact</th></tr>
+      <tr><td>L1</td><td>Add <code>OrganizationInvitation</code> to the tenant allowlist in <code>getTenantPrisma</code></td><td>Closes the one isolation gap; invitation writes become auto-scoped like everything else.</td></tr>
+      <tr><td>L2</td><td>Finish migrating legacy actions to <code>withAction</code></td><td>auth/public-bhog/registration return bare objects — unify on ActionResult.</td></tr>
+      <tr><td>L3</td><td>Replace <code>validateAccess</code> role-lists with <code>requirePermission</code> everywhere</td><td>One authorization API; the deprecated path can be deleted.</td></tr>
+      <tr><td>L4</td><td>Extend audit logging to events, tasks, bhog, members, org changes</td><td>Today only finance writes AuditLog (9 points); a governance platform should audit role changes &amp; deletions.</td></tr>
+      <tr><td>L5</td><td>Type the <code>status</code> field into <code>UpdateEventInput</code> (remove <code>as any</code>)</td><td>Closes a type-safety hole on the event state machine.</td></tr>
+      <tr><td>L6</td><td>Create dedicated <code>setEventStatus</code> transition function</td><td>Makes PLANNED→ACTIVE→COMPLETED explicit and auditable instead of a generic update.</td></tr>
+      <tr><td>L7</td><td>Hash invitation tokens (store SHA-256)</td><td>DB leak no longer exposes usable tokens.</td></tr>
+      <tr><td>L8</td><td>Extract a shared <code>domainEvent(action, entity)</code> helper</td><td>Reduce repetitive before/after snapshot code in the 9 audit call sites.</td></tr>
+      <tr><td>L9</td><td>Move org create/delete <code>$transaction</code> logic into a repository abstraction</td><td>Keeps the transactional invariants testable without touching Prisma directly.</td></tr>
+      <tr><td>L10</td><td>Introduce service-level typed input interfaces (CreateExpenseInput, etc.)</td><td>Today services take inline object literals; explicit types make the LLD contract self-documenting.</td></tr>
+      <tr><td>L11</td><td>Add integration tests against a real Postgres (testcontainers or Neon branch)</td><td>Verify the <code>$extends</code> interceptor truly isolates tenants — the most valuable test you could add.</td></tr>
+      <tr><td>L12</td><td>Move <code>permissionMessages</code> into a single i18n-friendly table</td><td>Centralizes user-facing auth messages.</td></tr>
+      <tr><td>L13</td><td>Remove dead <code>Volunteer</code> model + prune unused deps (<code>react-day-picker</code>)</td><td>Less schema confusion, smaller bundle.</td></tr>
+      <tr><td>L14</td><td>Standardize errors: replace plain <code>new Error(...)</code> in services with typed AppErrors</td><td>status codes become reliable (409/404/422 rather than generic 400).</td></tr>
+      <tr><td>L15</td><td>Add an <code>ActionResult</code>-aware client helper <code>runAction(action, …)</code></td><td>Removes the repeated <code>const r = await action(); if (!r.success) …</code> pattern from 12 components.</td></tr>
+    </table>
+
+    <!-- ================= Q ================= -->
+    <h2 id="db">Q · Database Structure (LLD — schema)</h2>
+    <h3>Q.1 All tables &amp; key columns</h3>
+    <table>
+      <tr><th>Table</th><th>Key columns</th><th>Constraints / indexes</th></tr>
+      <tr><td><code>User</code></td><td>email, phone?, name?, image?, password? (bcrypt)</td><td>UNIQUE email, phone</td></tr>
+      <tr><td><code>Organization</code></td><td>name, slug, description?, startDate, endDate?, budgetTarget?, openingBalance?, publicFundraisingTarget?, internalBudgetLimit? (all DECIMAL(12,2)), status, type, timezone, prasad*Start/End (4), featureFlags Json?, endedAt?, endedById?</td><td>UNIQUE slug, INDEX slug</td></tr>
+      <tr><td><code>OrganizationMember</code></td><td>userId? (nullable), email, organizationId, role, isArchived</td><td>UNIQUE [userId, orgId], UNIQUE [email, orgId], INDEX userId, orgId</td></tr>
+      <tr><td><code>Donation</code></td><td>donorName, amount DEC(12,2), category, date, receivedAt, notes?, eventId?, addedById?, isArchived, archivedAt?, archivedById?</td><td>INDEX orgId, addedById, eventId</td></tr>
+      <tr><td><code>Expense</code></td><td>title, amount DEC(12,2), category, status, addedById, approvedById?, requestedAt, approvedAt?, rejectedAt?, processedAt?, eventId?, isArchived…</td><td>INDEX orgId, eventId, status</td></tr>
+      <tr><td><code>BhogItem</code></td><td>name, quantity (text), status, sponsorName?, offeringDate, offeringWindow, storage?, estimatedCost?, submittedAt, approvedAt?, preparedAt?, isArchived…</td><td>INDEX orgId, [orgId, offeringDate]</td></tr>
+      <tr><td><code>Volunteer</code></td><td>name, phone?, email?, status, assignedTask?, isArchived</td><td><span class="pill p-red">LEGACY / unused</span></td></tr>
+      <tr><td><code>Event</code></td><td>title, description?, startTime, endTime, location?, budgetTarget?, status, isArchived</td><td>INDEX orgId</td></tr>
+      <tr><td><code>VolunteerTask</code></td><td>title, description?, assignedToId→OrganizationMember, status, priority, dueDate?, eventId?, completedAt?, isArchived…</td><td>INDEX orgId, eventId, assignedToId</td></tr>
+      <tr><td><code>EventAssignment</code></td><td>eventId, organizationMemberId</td><td>UNIQUE [eventId, memberId]</td></tr>
+      <tr><td><code>EventRegistration</code></td><td>eventId, name, email, phone?, notes?, attended</td><td>INDEX eventId</td></tr>
+      <tr><td><code>OrganizationInvitation</code></td><td>email, role, token, expiresAt, accepted, eventId?, invitedById?, acceptedAt?, revokedAt?</td><td>UNIQUE token, INDEX orgId, email</td></tr>
+      <tr><td><code>AuditLog</code></td><td>actorMemberId?, entityType, entityId?, action, before Json?, after Json?, metadata Json?, visibility, occurredAt</td><td>INDEX orgId, actorMemberId, [entityType, entityId]</td></tr>
+    </table>
+    <h3>Q.2 Enums (13)</h3>
+    <div class="sig">OrganizationRole: ADMIN | TREASURER | COMMITTEE_MEMBER | VOLUNTEER
+ExpenseStatus: PENDING | APPROVED | REJECTED
+DonationCategory: GENERAL | BHOG | DECORATION | LIGHTING | SPONSORSHIP | OTHER
+ExpenseCategory: IDOL | DECORATION | LIGHTING | FOOD | SOUND | SECURITY | EQUIPMENT | MARKETING | INFRASTRUCTURE | TRAVEL | RENTAL | OPERATIONS | MISCELLANEOUS
+BhogStatus: PENDING | PREPARED
+BhogOfferingWindow: MORNING | EVENING
+VolunteerStatus: PENDING | ACTIVE | INACTIVE
+TaskStatus: PENDING | IN_PROGRESS | COMPLETED
+TaskPriority: LOW | MEDIUM | HIGH
+OrganizationType: FESTIVAL | CLUB
+OrganizationStatus: ACTIVE | ENDED
+EventStatus: PLANNED | ACTIVE | COMPLETED | ARCHIVED
+AuditVisibility: INTERNAL | PUBLIC</div>
+    <h3>Q.3 ERD (relations)</h3>
+    <div class="mermaid">User 1─N OrganizationMember N─1 Organization
+Organization 1─N Donation / Expense / BhogItem / Event / VolunteerTask /
+              OrganizationInvitation / AuditLog / Volunteer
+Event 1─N Donation(eventId) · Expense(eventId) · VolunteerTask(eventId) · Invitation(eventId)
+Event N─M OrganizationMember  via EventAssignment (composite unique)
+OrganizationMember 1─N VolunteerTask (assignedTo) · EventAssignment · Donation(addedBy)
+Expense 2 named FKs → OrganizationMember (addedBy / approvedBy)
+All tenant tables: ON DELETE CASCADE from Organization (donations/expenses via eventId: ON DELETE SET NULL)</div>
+    <h3>Q.4 Migrations</h3>
+    <table>
+      <tr><th>Migration</th><th>What it changed</th></tr>
+      <tr><td>202607170001 finance_split_and_audit</td><td>+AuditLog table +AuditVisibility enum; +openingBalance/publicFundraisingTarget/internalBudgetLimit on Organization; backfill openingBalance=budgetTarget; 3 indexes + FK.</td></tr>
+      <tr><td>202607170002 prasad_windows_and_festival_lifecycle</td><td>+OrganizationStatus, +BhogOfferingWindow; Organization.endDate nullable, +status/prasad windows/timezone/endedAt/endedById; BhogItem +offeringDate/offeringWindow/submittedAt (backfilled from createdAt); Donation +receivedAt (backfilled from date) +archivedAt/ById; Expense +requestedAt/approvedAt/rejectedAt/processedAt/archivedAt/ById (backfilled); VolunteerTask +completedAt/archivedAt; Invitation +acceptedAt/revokedAt; AuditLog +metadata/occurredAt; +BhogItem(orgId,offeringDate) index.</td></tr>
+      <tr><td>202607170003 event_linked_donations</td><td>Donation +eventId (FK → Event, ON DELETE SET NULL) + index.</td></tr>
+    </table>
+    <div class="note"><b>Migration strategy:</b> no base migration — the schema was pushed via <code>db push</code> in dev, then three incremental SQL change-sets were captured for <code>migrate deploy</code> in prod. Each ALTER backfills rows before <code>SET NOT NULL</code>.</div>
+
+    <!-- ================= R ================= -->
+    <h2 id="design-decisions">R · Design Decisions (HLD + LLD together)</h2>
+    <table>
+      <tr><th>Layer</th><th>Decision</th><th>Rationale</th></tr>
+      <tr><td>HLD</td><td>Modular monolith, not microservices</td><td>One deployable, shared types, tenant boundary enforced in-process. Microservices add latency + distributed-tx pain with zero benefit at this scale.</td></tr>
+      <tr><td>HLD</td><td>Logical multi-tenancy (shared DB, row scoping)</td><td>Cost + ops simplicity; safety bought by the Prisma <code>$extends</code> interceptor that makes cross-tenant access structurally impossible.</td></tr>
+      <tr><td>HLD</td><td>Server Actions instead of REST API</td><td>Typed end-to-end, no fetch/serialization boilerplate, <code>revalidatePath</code> cache correctness. Only public API route is NextAuth.</td></tr>
+      <tr><td>HLD</td><td>RSC-first data fetching</td><td>No client round-trip for reads; public pages can be partially static.</td></tr>
+      <tr><td>HLD</td><td>JWT stateless sessions</td><td>Horizontal scale; roles re-fetched per request so changes are instant (no stale claims).</td></tr>
+      <tr><td>HLD</td><td>PostgreSQL</td><td>DECIMAL money, JSONB audit, composite uniques, aggregates, managed serverless hosting.</td></tr>
+      <tr><td>LLD</td><td>Plain functions over service classes</td><td>Tree-shakeable, mockable, no <code>this</code> context, explicit DI via params. Phase-2 refactor.</td></tr>
+      <tr><td>LLD</td><td><code>withAction</code> + <code>ActionResult</code> union</td><td>One success/failure contract for every mutation; central error normalization; automatic revalidation.</td></tr>
+      <tr><td>LLD</td><td>Fine-grained 17-permission RBAC</td><td>Separation of duties: Treasurer approves money, Committee runs events, Volunteer updates own tasks only.</td></tr>
+      <tr><td>LLD</td><td>Compare-and-set expense approval</td><td>Atomic <code>updateMany</code> with <code>status:PENDING</code> guard beats a transaction for single-row transitions; 409 on race loss.</td></tr>
+      <tr><td>LLD</td><td>Decimal(12,2) + Prisma.Decimal math</td><td>Floats corrupt money; string-round-trip conversion avoids drift.</td></tr>
+      <tr><td>LLD</td><td>Soft-delete (<code>isArchived</code>) everywhere</td><td>Audit preservation for year-over-year transparency.</td></tr>
+      <tr><td>LLD</td><td>Token invites: 32B CSPRNG + 48h expiry + email match</td><td>Unguessable, bounded exposure, hijack-proof via strict email equality (server-side).</td></tr>
+      <tr><td>LLD</td><td>Transactions reserved for org create/delete</td><td>Only multi-row invariants need true atomicity; single-row finance uses guarded updates.</td></tr>
+      <tr><td>LLD</td><td>Zod at boundary + manual service guards</td><td>Defense in depth; rules can't be bypassed by a new entrypoint.</td></tr>
+      <tr><td>LLD</td><td>Read-model public services (quasi-CQRS)</td><td>Public pages read pre-filtered, safe projections; only APPROVED data ever leaves the org.</td></tr>
+      <tr><td>LLD</td><td>React <code>cache()</code> for slug→org lookup</td><td>One DB hit per request even when many components resolve the same org.</td></tr>
+      <tr><td>LLD</td><td>Env-gated adapters (Resend, Gemini)</td><td>Missing keys degrade gracefully; app stays fully functional for core use.</td></tr>
+      <tr><td>LLD</td><td>Idempotent seed via upserts</td><td>Re-runnable dev bootstrap without duplicate-constraint failures.</td></tr>
+    </table>
+
+    <!-- ================= S ================= -->
+    <h2 id="roadmap">S · Improvement Roadmap (prioritized)</h2>
+    <h3>Phase A — Correctness &amp; security (do first)</h3>
+    <ol>
+      <li>L1 — add <code>OrganizationInvitation</code> to tenant allowlist (isolation gap).</li>
+      <li>L7 / G5 — hash invite tokens + edge rate limiting (brute force / token leak).</li>
+      <li>L14 — typed AppErrors in all services (accurate status codes).</li>
+      <li>G7 — Sentry error tracking (catch silent prod failures).</li>
+    </ol>
+    <h3>Phase B — Consistency &amp; auditability</h3>
+    <ol start="5">
+      <li>L2 + L3 — unify action wrapper + single <code>requirePermission</code> API.</li>
+      <li>L4 — audit events/tasks/members/org (governance platform needs it).</li>
+      <li>L5 + L6 — typed event status transitions.</li>
+    </ol>
+    <h3>Phase C — Scale &amp; quality</h3>
+    <ol start="8">
+      <li>G1 — Prisma Accelerate / pgBouncer (connection ceiling).</li>
+      <li>L11 — tenant-isolation integration tests + G2 caching + G3 job queue for email/audit.</li>
+      <li>G4/G6/G8 — read replicas, DR strategy, per-region sharding if compliance demands.</li>
+      <li>E2E suite (Playwright) + CI pipeline + ESLint/Prettier gates.</li>
+    </ol>
+
+    <a class="backlink" href="#hld">↑ Back to top</a>
+    <div class="foot">
+      PREP_2 · UTSAV HLD &amp; LLD · Compiled from a complete code-level exploration<br>
+      Companion docs: PREP_1.html (end-to-end + justifications) · UTSAV_INTERVIEW_PREP_V2.html · UTSAV_REDESIGN.html
+    </div>
+  </main>
+</div>
+</body>
+</html>

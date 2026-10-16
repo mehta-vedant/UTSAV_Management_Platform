@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banking Technology Interview Prep — AML, Credit Risk, EWS, Data Engineering</title>
+<style>
+:root{
+  --bg:#0f172a; --bg2:#111c35; --panel:#1e293b; --panel2:#263449; --line:#334155;
+  --txt:#e2e8f0; --mut:#94a3b8; --acc:#38bdf8; --acc2:#22d3ee; --grn:#4ade80;
+  --yel:#fbbf24; --red:#f87171; --pur:#c084fc; --code:#0b1220;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65;font-size:15px}
+.wrap{display:flex;max-width:1400px;margin:0 auto}
+aside{width:290px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 14px}
+aside h1{font-size:15px;margin:0 0 4px;color:#fff}
+aside .sub{font-size:11px;color:var(--mut);margin-bottom:14px;line-height:1.4}
+#q{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--code);color:var(--txt);margin-bottom:12px;font-size:13px}
+aside nav a{display:block;padding:5px 8px;border-radius:6px;color:var(--mut);text-decoration:none;font-size:13px;border-left:2px solid transparent}
+aside nav a:hover{color:var(--txt);background:var(--panel)}
+aside nav a.s{color:var(--acc);border-left-color:var(--acc)}
+main{flex:1;min-width:0;padding:34px 40px 120px;max-width:1000px}
+header.hero{margin-bottom:30px}
+header.hero h1{font-size:30px;margin:0 0 6px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+header.hero p{color:var(--mut);margin:0 0 8px;max-width:800px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--panel);border:1px solid var(--line);color:var(--acc)}
+section{scroll-margin-top:20px;margin-bottom:44px}
+h2{font-size:22px;border-bottom:2px solid var(--line);padding-bottom:8px;margin:0 0 16px;color:#fff}
+h2 .n{color:var(--acc);font-family:Consolas,monospace}
+h3{font-size:17px;margin:26px 0 8px;color:var(--acc2)}
+h4{font-size:15px;margin:18px 0 6px;color:#fff}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:4px 0}
+b,strong{color:#fff}
+a{color:var(--acc)}
+code{font-family:Consolas,'Cascadia Mono',monospace;font-size:13px;background:var(--panel);padding:1px 6px;border-radius:4px;color:var(--yel)}
+pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;line-height:1.55;margin:10px 0}
+pre code{background:none;padding:0;color:#d6e2f0;font-size:12.5px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13.5px}
+th{background:var(--panel2);color:var(--acc2);text-align:left;padding:8px 10px;border:1px solid var(--line)}
+td{padding:8px 10px;border:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:rgba(255,255,255,0.02)}
+.callout{border-left:4px solid var(--acc);background:var(--panel);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0}
+.callout.warn{border-left-color:var(--yel)}
+.callout.green{border-left-color:var(--grn)}
+.callout.red{border-left-color:var(--red)}
+.callout.pur{border-left-color:var(--pur)}
+.qa{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;background:var(--panel)}
+.qa .q{font-weight:600;color:var(--acc)}
+.qa .a{color:var(--txt);margin-top:6px}
+.qa .a .hl{color:var(--grn);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card h4{margin:0 0 6px;color:var(--acc2)}
+.kpi{font-size:13px}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.toc-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--txt);display:block}
+.toc-card:hover{border-color:var(--acc)}
+.toc-card b{color:var(--acc2);font-size:14px}
+.toc-card span{font-size:12.5px;color:var(--mut);display:block;margin-top:2px}
+#toTop{position:fixed;bottom:24px;right:24px;background:var(--acc);color:#0b1220;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;display:none;box-shadow:0 4px 14px rgba(56,189,248,.4);z-index:99}
+.hidden{display:none}
+.highlight{background:rgba(251,191,36,.15);border-radius:4px;padding:0 3px}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:12px;background:var(--pur);color:#0b1220;font-weight:700;vertical-align:middle}
+@media(max-width:900px){
+  .wrap{display:block}
+  aside{position:static;width:100%;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+  main{padding:20px 16px 100px}
+  .toc-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <h1>Banking Tech Interview Prep</h1>
+  <div class="sub">AML &bull; Credit Risk &bull; Early Warning Systems &bull; ETL &bull; REST APIs &bull; SDLC & Consulting<br>ME / SEA Enterprise Banking</div>
+  <input id="q" type="text" placeholder="Search (type to filter)...">
+  <nav id="nav">
+    <a href="#map">Domain Map &amp; How to Use</a>
+    <a class="s" href="#s1">1. AML Fundamentals</a>
+    <a href="#s2">2. Transaction Monitoring</a>
+    <a href="#s3">3. Watchlist &amp; Screening Design</a>
+    <a href="#s4">4. REST API Integration</a>
+    <a href="#s5">5. Risk Scoring &amp; Data Model</a>
+    <a href="#s6">6. Credit Risk Fundamentals</a>
+    <a href="#s7">7. Credit Scoring &amp; Portfolios</a>
+    <a href="#s8">8. Early Warning Systems</a>
+    <a href="#s9">9. Risk Data &amp; Analytics</a>
+    <a href="#s10">10. ETL / ELT &amp; Modeling</a>
+    <a href="#s11">11. SAS Studio</a>
+    <a href="#s12">12. Azure Data Factory</a>
+    <a href="#s13">13. SQL for Banking</a>
+    <a href="#s14">14. Oracle vs PostgreSQL</a>
+    <a href="#s15">15. 40M / 100M+ Scale</a>
+    <a href="#s16">16. Multi-source Integration</a>
+    <a href="#s17">17. Validation &amp; Reconciliation</a>
+    <a href="#s18">18. Production Support</a>
+    <a href="#s19">19. SDLC &amp; Consulting</a>
+    <a href="#s20">20. Requirement Analysis</a>
+    <a href="#s21">21. UAT Support</a>
+    <a href="#s22">22. Deployment &amp; Release</a>
+    <a href="#s23">23. Banking IT Constraints</a>
+    <a href="#s24">24. Behavioral / STAR</a>
+    <a href="#s25">25. Trends 2024&ndash;2026</a>
+    <a href="#s26">26. Cheat Sheets &amp; Checklists</a>
+  </nav>
+</aside>
+<main>
+<header class="hero">
+  <h1>Enterprise Banking Technology &mdash; End-to-End Interview Reference</h1>
+  <p>Comprehensive prep guide built around this profile: AML, Credit Risk &amp; Early Warning Systems; ETL with SAS Studio, SQL and Azure Data Factory; 40M+ customers / 100M+ transactions; Oracle + PostgreSQL; REST API integration for screening &amp; risk assessment; data validation &amp; reconciliation; and client-facing work (requirements, UAT, deployment) across the Middle East and South-East Asia.</p>
+  <div class="tags">
+    <span class="tag">AML/CFT</span><span class="tag">KYC/CDD</span><span class="tag">Sanctions &amp; PEP</span><span class="tag">Transaction Monitoring</span>
+    <span class="tag">PD/LGD/EAD/EL</span><span class="tag">IFRS 9</span><span class="tag">Basel</span><span class="tag">EWS</span>
+    <span class="tag">ETL/ELT</span><span class="tag">SAS Studio</span><span class="tag">Azure Data Factory</span><span class="tag">Oracle</span><span class="tag">PostgreSQL</span>
+    <span class="tag">REST APIs</span><span class="tag">Reconciliation</span><span class="tag">UAT</span><span class="tag">Go-Live</span><span class="tag">BCBS 239</span>
+  </div>
+</header>
+
+<!-- ============ SECTION 0 ============ -->
+<section id="map">
+<h2><span class="n">00.</span> Domain Map &amp; How to Use This Guide</h2>
+<p>Interviewers at banking tech vendors (implementing core/risk/AML/BI platforms for ME &amp; SEA banks) will probe three layers: <b>domain knowledge</b> (AML, credit risk, EWS), <b>technical craft</b> (ETL, SQL, SAS, ADF, APIs, scale), and <b>consulting delivery</b> (requirements, UAT, deployment, client management). Every answer should connect a technical decision to a <i>control</i> or <i>business outcome</i>.</p>
+
+<div class="toc-grid">
+  <a class="toc-card" href="#s1"><b>AML &amp; Screening</b><span>3 stages, KYC/CDD/EDD, sanctions, PEP, adverse media</span></a>
+  <a class="toc-card" href="#s4"><b>REST API Integration</b><span>Screening/risk endpoints, JSON, OAuth2/mTLS, idempotency, retries, circuit breakers</span></a>
+  <a class="toc-card" href="#s6"><b>Credit Risk</b><span>PD/LGD/EAD/EL, Basel, IFRS 9, provisioning</span></a>
+  <a class="toc-card" href="#s8"><b>Early Warning Systems</b><span>EWIs, trigger workflow, cure rate, watchlist</span></a>
+  <a class="toc-card" href="#s10"><b>ETL &amp; Data Modeling</b><span>ETL vs ELT, star schema, SCD, Kimball vs Inmon</span></a>
+  <a class="toc-card" href="#s11"><b>SAS Studio</b><span>DATA step, PROC SQL, macros, dedup, reconciliation</span></a>
+  <a class="toc-card" href="#s12"><b>Azure Data Factory</b><span>Pipelines, IRs, triggers, dynamic expressions, retries</span></a>
+  <a class="toc-card" href="#s13"><b>SQL at Scale</b><span>Window functions, MERGE, tuning, dedup, date handling</span></a>
+  <a class="toc-card" href="#s15"><b>40M / 100M+ Scale</b><span>Partitioning, incremental loads, idempotency, skew, archiving</span></a>
+  <a class="toc-card" href="#s17"><b>Reconciliation &amp; DQ</b><span>Control totals, DQ dimensions, audit trails, tolerance</span></a>
+  <a class="toc-card" href="#s19"><b>SDLC &amp; Consulting</b><span>Phases, hybrid delivery, client mgmt, ME/SEA culture</span></a>
+  <a class="toc-card" href="#s24"><b>Behavioral / STAR</b><span>12+ scenario answers tailored to a banking consultant</span></a>
+</div>
+
+<div class="callout green">
+<b>Golden threads (repeat these in every interview):</b>
+<ul>
+<li><b>"Stage &rarr; Validate &rarr; Promote"</b> — never load directly to production. Banking interviewers listen for control and auditability.</li>
+<li><b>Reconcile before AND after every batch</b> (row counts + control totals). Top thing banks care about.</li>
+<li><b>Idempotent reruns</b> — safe to retry, no duplicates, via staging + upsert/MERGE + watermark.</li>
+<li>Connect every technical decision to a <b>control</b> (audit trail, lineage, least privilege) or a <b>KPI</b> (false-positive rate, alert-to-STR conversion, NPL inflow, EWS hit-rate).</li>
+<li>Quantify everything honestly: days saved, % false positives reduced, deadlines met.</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ SECTION 1 ============ -->
+<section id="s1">
+<h2><span class="n">01.</span> AML Fundamentals</h2>
+
+<h3>What AML Is</h3>
+<p><b>Anti-Money Laundering (AML)</b> = laws, regulations, controls and procedures that financial institutions use to prevent, detect and report money laundering, terrorist financing (TF) and proliferation financing (PF). Usually written <b>AML/CFT/CPF</b>.</p>
+<p>Money laundering = disguising the <b>proceeds of crime</b> as legitimate funds.</p>
+
+<h3>The 3 Stages of Money Laundering <span class="badge">MEMORIZE</span></h3>
+<table>
+<tr><th>Stage</th><th>What happens</th><th>Detection hook</th></tr>
+<tr><td><b>Placement</b></td><td>Get illicit cash into the financial system: cash deposits split below reporting thresholds ("structuring"), cash-intensive business deposits, money instruments, forex, gambling chips.</td><td>Threshold rules, structuring detection, cash-to-account ratios</td></tr>
+<tr><td><b>Layering</b></td><td>Move funds to obscure origin/ownership: rapid wires across accounts/banks/countries, shell companies, trade transactions, crypto, asset purchases.</td><td>Velocity/wire rules, pass-through detection, high-risk jurisdiction rules</td></tr>
+<tr><td><b>Integration</b></td><td>Re-introduce funds as apparently legitimate wealth: real estate, luxury goods, shares, self-loans from shell companies.</td><td>Net-worth vs income anomalies, credit repayment source checks</td></tr>
+</table>
+
+<h3>Why Banks Must Do AML</h3>
+<ul>
+<li>Legal obligation &mdash; failing to file STRs is a crime in many jurisdictions.</li>
+<li>Regulatory fines &amp; license actions; reputational damage; de-risking by correspondent banks; criminal liability for individuals.</li>
+<li>2024&ndash;2026 enforcement shifted from "no system" to <b>ineffective systems</b> — stale rules, poor tuning, false-positive floods masking real activity.</li>
+</ul>
+
+<h3>Regulatory Framework (Global)</h3>
+<ul>
+<li><b>FATF</b> (Financial Action Task Force): 40 Recommendations = global standard; risk-based approach (RBA) guidance; grey/black lists of high-risk jurisdictions; 2025 updates to <b>R16 Travel Rule</b> and R15 (virtual assets).</li>
+<li><b>Basel Committee (BCBS)</b>: "Sound management of risks related to ML/TF"; Pillar 2 expectation.</li>
+<li><b>Wolfsberg Group</b>: industry guidance — correspondent banking, trade finance, sanctions, PEPs.</li>
+<li><b>Egmont Group</b>: network of Financial Intelligence Units (FIUs).</li>
+<li><b>UN Security Council resolutions</b> (1267/1989 Al-Qaida/ISIL, 1373 TF) — legally binding.</li>
+</ul>
+
+<h3>Local Regulators — ME / SEA <span class="badge">RESUME MATCH</span></h3>
+<table>
+<tr><th>Market</th><th>Regulator</th><th>Key points</th></tr>
+<tr><td><b>UAE</b></td><td>CBUAE + Executive Office (FIU)</td><td>AML/CFT/CPF Decision &amp; Rulebook; <b>GoAML</b> reporting; removed from FATF grey list Feb 2024 &rarr; heightened expectations; virtual-asset Travel Rule; National Strategy 2024&ndash;2027.</td></tr>
+<tr><td><b>Saudi Arabia</b></td><td>SAMA</td><td>AML Law + implementing regulations; SAFCCP / "Mahadi" reporting platform.</td></tr>
+<tr><td><b>Singapore</b></td><td>MAS</td><td><b>Notice 626</b> (AML/CFT for banks); STRO reporting; Payment Services Act for VASPs.</td></tr>
+<tr><td><b>Hong Kong</b></td><td>HKMA</td><td>AMLO; <b>STREAMS</b> for STR filing (same-day / next-working-day); 2024&ndash;26 circulars push <b>AI adoption in AML</b> with model-risk governance; VASP &amp; stablecoin regimes.</td></tr>
+</table>
+
+<h3>KYC / CDD / EDD / pKYC</h3>
+<ul>
+<li><b>KYC (Know Your Customer)</b> — umbrella: identify, verify, understand purpose &amp; nature of relationship.</li>
+<li><b>CDD (Customer Due Diligence)</b> — baseline at onboarding &amp; trigger events: full name, DOB, address, ID verification (passport / Emirates ID / NRIC), beneficial ownership, source of funds/wealth. For entities: directors, signatories, <b>UBOs</b> (&ge;25% ownership/control typically), corporate registry, proof of structure.</li>
+<li><b>EDD (Enhanced Due Diligence)</b> — triggered by PEP status, high-risk jurisdiction, unusual activity, complex structures: source-of-wealth substantiation, senior management/MLRO approval, enhanced monitoring, tighter thresholds.</li>
+<li><b>pKYC (perpetual KYC)</b> — continuous, event-driven refresh instead of fixed annual cycles.</li>
+</ul>
+
+<h3>Sanctions &amp; Screening Lists</h3>
+<ul>
+<li>Key lists: <b>UN Consolidated</b>, <b>OFAC SDN</b> (incl. the <b>50% rule</b> — an entity owned &ge;50% by a listed person is blocked even if unlisted), <b>EU Consolidated</b>, <b>UK OFSI</b>, plus local lists (UAE Local Terrorist List; HK UN Sanctions Ordinance).</li>
+<li>Match types: <b>true match</b> vs <b>false positive</b> (matched but innocent — cost) vs <b>false negative</b> (missed — the dangerous one).</li>
+<li><b>PEP</b> = individuals entrusted with prominent public functions (heads of state, ministers, judges, military, central-bank officials, SOE heads) + family members &amp; close associates. PEP &rarr; EDD + senior approval + source-of-funds/wealth checks + typically a <b>12-month cooling-off period</b> after leaving office.</li>
+<li><b>Adverse media</b> = negative news (corruption, fraud, sanctions, ML, crime). Must distinguish <b>direct vs indirect</b> mentions; feeds risk scoring and EDD.</li>
+</ul>
+
+<div class="callout"><b>Answer framing:</b> "Screening must cover name, DOB, nationality, jurisdiction, ID/passport numbers. The consequence of a missed sanctions hit is severe, so sanctions lists use <i>conservative/lower</i> match thresholds, accepting more false positives; PEP lists can tolerate fewer."</div>
+</section>
+
+<!-- ============ SECTION 2 ============ -->
+<section id="s2">
+<h2><span class="n">02.</span> Transaction Monitoring (TM)</h2>
+
+<h3>Purpose &amp; Filing</h3>
+<p>Detect transactions inconsistent with a customer's profile or known typologies; generate alerts; investigate; file <b>STR</b> (Suspicious Transaction Report — FATF/APAC/ME/EU) or <b>SAR</b> (Suspicious Activity Report — US/FinCEN). Deadlines vary by jurisdiction (same-day to ~15 days).</p>
+
+<h3>Common Typologies &amp; Behaviors <span class="badge">KNOW 5+</span></h3>
+<ul>
+<li><b>Structuring / smurfing</b> — deposits just below threshold (e.g., $9,000&ndash;9,900 under $10k) or many small deposits by several people into one account.</li>
+<li><b>Threshold breach</b> — cash/reporting threshold or customer-specific thresholds (e.g., &gt;$50k/month vs historical average).</li>
+<li><b>Rapid in-and-out / pass-through ("churn")</b> — funds deposited then immediately moved; low retained balance.</li>
+<li><b>Layering via wires</b> — many cross-border wires, high-risk jurisdictions, multiple beneficiaries, round-trips.</li>
+<li><b>Unexpected activity</b> — activity inconsistent with declared profile (teacher receiving $100k wires).</li>
+<li><b>High-risk counterparties</b> — shell companies, MSBs/remittance agents, casinos, crypto exchanges, offshore havens.</li>
+<li><b>Trade-based ML</b> — over/under-invoicing, phantom shipments, valuation mismatches.</li>
+<li><b>Cash-intensive businesses</b> — cash deposits inconsistent with turnover.</li>
+<li><b>Loan repaid by unverified sources</b>; <b>multiple related accounts</b> (link analysis); <b>jewelry/real estate</b> with opaque funding.</li>
+</ul>
+
+<h3>Rules Engine &amp; Tuning</h3>
+<ul>
+<li>Scenario-based rules: e.g., <i>"Cash deposits &gt;30% of declared monthly income in 7 days"</i>, <i>"3+ wires &gt;$25k in 30 days"</i>, <i>"monthly turnover &gt;5x 90-day average"</i>.</li>
+<li>Implemented as <b>SQL/SAS aggregations</b>: daily/monthly totals, moving averages, velocity counts, joined to customer risk ratings, compared to rule parameters.</li>
+<li><b>Segment-based thresholds</b> (retail / SME / corporate / HNW / MSB) prevent uniform thresholds from flooding alerts.</li>
+<li>False positives drive tuning: adjust thresholds, add exclusions/exceptions, calibrate per segment. Track every change in a <b>tuning log</b> for regulator evidence.</li>
+</ul>
+
+<h3>Alert &rarr; Case Workflow <span class="badge">MEMORIZE</span></h3>
+<ol>
+<li><b>Alert generation</b> — rule/ML fires; alert carries customer, rule, trigger details, txn references, risk score.</li>
+<li><b>Alert triage/queuing</b> — routed by severity/segment; SLA clock starts.</li>
+<li><b>Investigation</b> — analyst reviews profile, transaction history, screening hits, adverse media, link analysis; writes narrative.</li>
+<li><b>Disposition</b> — <i>False positive</i> (close) or <i>True positive</i> (escalate).</li>
+<li><b>Case creation</b> — related alerts consolidated into a case.</li>
+<li><b>STR/SAR filing</b> — MLRO/Compliance approves; filed via GoAML / STREAMS; <b>tipping-off prohibited</b> (do not alert the subject).</li>
+<li><b>Closure &amp; audit trail</b> — documented rationale; records kept &ge;5&ndash;6 years; MIS metrics feed governance.</li>
+</ol>
+
+<h3>Key Metrics <span class="badge">BE INTERVIEW-READY</span></h3>
+<div class="grid">
+<div class="card"><h4>False Positive Rate</h4><div class="kpi">FP / total alerts. Industry historically <b>90&ndash;95%+</b>; modern systems push precision much higher.</div></div>
+<div class="card"><h4>Alert-to-SAR conversion</h4><div class="kpi">~<b>5&ndash;15%</b> benchmark (many sit at 2&ndash;5%). Low conversion = too many alerts; high = missed detection risk.</div></div>
+<div class="card"><h4>Time to disposition</h4><div class="kpi">Aging of cases, review queue depth, SLA attainment.</div></div>
+<div class="card"><h4>SAR quality</h4><div class="kpi">Regulators penalize <b>thin narratives</b> — specific dates, amounts, counterparties, deviation from profile.</div></div>
+</div>
+
+<div class="qa"><div class="q">How would you detect structuring at 100M+ transactions?</div>
+<div class="a">Aggregate cash transactions per customer/account per day/week; flag multiples just below threshold (e.g., $9k&ndash;9.9k); link accounts by shared owner/UBO/beneficiary; cluster by counterparty; implement as SQL aggregations + rules, tuned per segment.</div></div>
+<div class="qa"><div class="q">How do you compute a customer's transaction baseline?</div>
+<div class="a">Rolling 30/90-day averages, percentiles, moving median (robust to outliers); compare current velocity vs baseline; recompute nightly in batch.</div></div>
+<div class="qa"><div class="q">What makes a high-quality STR?</div>
+<div class="a">Clear narrative of why the activity is suspicious, specific dates/amounts/counterparties, deviation from profile, links to other activity, supporting documents.</div></div>
+</section>
+
+<!-- ============ SECTION 3 ============ -->
+<section id="s3">
+<h2><span class="n">03.</span> Watchlist / Screening System Design</h2>
+
+<h3>Exact vs Fuzzy Matching</h3>
+<ul>
+<li><b>Exact</b> — normalized string equality: low recall (misses Mohammed vs Mohammad), low false positives.</li>
+<li><b>Fuzzy</b> — similarity scoring: higher recall, higher false positives; tunable thresholds.</li>
+</ul>
+
+<h3>Name Normalization Pipeline <span class="badge">CODE-READY</span></h3>
+<ul>
+<li>Strip diacritics (Muhammad/Mohammed), transliterate to Latin script (Arabic, Chinese pinyin).</li>
+<li>Uppercase, trim, collapse whitespace, remove punctuation.</li>
+<li>Tokenize first/middle/last; handle name-order cultures, titles (Sheikh, Haji), honorifics.</li>
+<li>Handle <b>aliases</b>, <b>name variants</b> (Mohammad/Mohammed/Mohamed/Muhammad), initials, reversed order.</li>
+<li><b>Phonetic keys:</b> Soundex, Double Metaphone, NYSIIS (so "Smyth" ~ "Smith").</li>
+<li><b>Edit distance:</b> Levenshtein (insert/delete/substitute; distance &le;1&ndash;2 for typos), Damerau-Levenshtein (+transpositions), Jaro-Winkler (prefix weighting, common for names), bigram/trigram similarity.</li>
+<li>Token-set comparison + permutation of middle names; <b>blocking</b> (e.g., soundex + DOB) to cut the candidate set before scoring at 40M scale.</li>
+</ul>
+
+<h3>Match Scoring &amp; Disposition</h3>
+<ul>
+<li>Composite score (0&ndash;100) blending phonetic + edit distance + token + exact hits; weights per field (name &gt; DOB &gt; ID &gt; nationality &gt; address).</li>
+<li><b>Field corroboration:</b> DOB/ID match overrides a weak name match (raises confidence); name-only match &rarr; analyst review.</li>
+<li>Three-tier: <b>auto-match</b> (&ge; threshold) / <b>possible</b> (review) / <b>no match</b> (clear). Sanctions lists use lower thresholds (conservative); PEP tolerates more FPs.</li>
+<li><b>Entity resolution / dedup</b> — collapse customer records into one identity (name+DOB+ID+address+phone); essential for correct link analysis and avoiding duplicate STRs.</li>
+</ul>
+
+<h3>Batch vs Real-Time</h3>
+<table>
+<tr><th></th><th>Batch</th><th>Real-time</th></tr>
+<tr><td>Use</td><td>Portfolio back-screening, list updates, transaction sweeps, adverse-media ingestion</td><td>Onboarding, payment time, ISO 20022 messages, instant payments</td></tr>
+<tr><td>Latency</td><td>Daily / near-real-time</td><td>Sub-second (p95 &lt; 500ms&ndash;1s)</td></tr>
+<tr><td>Stack</td><td>ADF pipelines, SAS jobs, scheduled runs</td><td>In-memory watchlist caches, low-latency match service, pre-computed n-gram indexes</td></tr>
+</table>
+<ul>
+<li><b>List lifecycle:</b> high-frequency list updates (UN/OFAC SDN/EU/local), delta processing, <b>back-screening</b> existing customers on list changes ("look-back"), audit of list version per screen.</li>
+</ul>
+
+<div class="qa"><div class="q">Explain fuzzy name matching in screening.</div>
+<div class="a"><span class="hl">Normalization</span> (diacritics, transliteration, tokenization) &rarr; <span class="hl">phonetic keys</span> (Soundex/Double Metaphone) &rarr; <span class="hl">edit distance</span> (Levenshtein/Damerau) + Jaro-Winkler &rarr; <span class="hl">scoring with field corroboration</span> (DOB/ID/nationality) &rarr; threshold triage (auto/possible/clear).</div></div>
+<div class="qa"><div class="q">How do you reconcile 40M customers nightly against updated watchlists?</div>
+<div class="a">Back-screening job: new-list delta &rarr; fuzzy match against customer master (with blocking keys) &rarr; generate hits &rarr; queue to analysts. Track list version + screening coverage metrics; audit list version used per screen.</div></div>
+<div class="qa"><div class="q">How would you reduce false positives?</div>
+<div class="a">Tune thresholds per segment, add corroborating fields (DOB/ID/nationality), suppress same-list repeat hits, allowlist after review, ML re-ranking, and measure FPR continuously with a tuning log.</div></div>
+</section>
+
+<!-- ============ SECTION 4 ============ -->
+<section id="s4">
+<h2><span class="n">04.</span> REST API Integration for Screening &amp; Risk Assessment</h2>
+
+<h3>Typical Endpoints</h3>
+<ul>
+<li><code>POST /api/v1/screenings</code> — submit screening/risk-assessment request (sync or async).</li>
+<li><code>GET /api/v1/screenings/{screeningId}</code> — poll status/result.</li>
+<li><code>GET /api/v1/screenings/{screeningId}/hits</code> — detailed hits (list source, matched name, score, fields).</li>
+<li><code>POST /api/v1/screenings/{screeningId}/acknowledge</code> — write disposition back after review.</li>
+<li><code>POST /api/v1/batch/screenings</code> — bulk CSV/JSON submissions; returns <code>batchId</code> + progress endpoint.</li>
+<li><code>POST /api/v1/customers</code> or <code>/risk-assessments</code> — on-demand risk scoring.</li>
+<li><code>POST /api/v1/webhooks</code> — register callback URL for async completion.</li>
+</ul>
+
+<h3>Async Flow</h3>
+<p><code>POST</code> &rarr; <b>202 Accepted</b> + <code>screeningId</code> &rarr; poll <code>GET .../{id}</code> or receive webhook &rarr; status <code>PROCESSING &rarr; COMPLETED / FAILED</code> &rarr; retrieve results &rarr; client sends disposition.</p>
+
+<h3>Example Payload <span class="badge">SAY THIS</span></h3>
+<pre><code>// POST /api/v1/screenings
+{
+  "screeningId": "SCR-2026-00012345",          // client-supplied idempotency key
+  "screeningType": "CUSTOMER_ONBOARDING",
+  "subject": {
+    "fullName": "Mohammed Abdul Rahman Al-Sayed",
+    "aliases": ["Mohamed A. Alsayed", "Muhammad Abdulrahman"],
+    "dateOfBirth": "1980-04-12",
+    "nationality": "AE",
+    "countryOfResidence": "AE",
+    "idDocuments": [{ "type": "EMIRATES_ID", "number": "784-1980-1234567-8" }]
+  },
+  "entity": "INDIVIDUAL",
+  "listTypes": ["SANCTIONS", "PEP", "ADVERSE_MEDIA", "LAW_ENFORCEMENT"],
+  "searchProfile": { "fuzzy": true, "phonetic": true, "minScore": 70, "includeAliases": true }
+}
+
+// 202 Accepted
+{ "status": 202, "screeningId": "SCR-2026-00012345",
+  "statusUrl": "/api/v1/screenings/SCR-2026-00012345" }
+
+// GET -> COMPLETED (summary + hits)
+{
+  "screeningId": "SCR-2026-00012345", "status": "COMPLETED",
+  "listVersion": "OFAC-SDN-2026-08-07T00:00:00Z",
+  "summary": { "totalHits": 2, "autoMatched": 0, "possibleMatches": 2, "cleared": 0 },
+  "hits": [
+    { "hitId": "HIT-0091", "listSource": "OFAC_SDN",
+      "matchedName": "AL-SAYED, Mohammed", "matchType": "FUZZY",
+      "score": 94.2,
+      "matchedFields": { "fullName": 0.96, "dateOfBirth": 1.0, "nationality": 1.0 },
+      "listProgram": "SDGT", "disposition": "PENDING_REVIEW" }
+  ]
+}</code></pre>
+
+<h3>Authentication &amp; Security</h3>
+<ul>
+<li><b>API keys</b> — <code>X-API-Key</code> header; scoped, rotated, stored in Azure Key Vault.</li>
+<li><b>OAuth2 client-credentials</b> — <code>POST /token</code> with client_id/client_secret &rarr; bearer token with scopes (<code>screening:read</code>, <code>screening:write</code>); TTL + refresh. Most common for enterprise banking.</li>
+<li><b>mTLS</b> — both sides present certificates; common for inter-bank/regulator integrations; certificate lifecycle management.</li>
+<li><b>HMAC signing</b> for integrity/non-repudiation.</li>
+</ul>
+
+<h3>Robustness Engineering <span class="badge">LIKELY PANEL FOCUS</span></h3>
+<ul>
+<li><b>Rate limiting:</b> headers <code>X-RateLimit-Limit/Remaining/Reset</code>; HTTP <b>429</b> + <code>Retry-After</code>; client exponential backoff + jitter (1s, 2s, 4s...).</li>
+<li><b>Retries:</b> only for idempotent ops / safe failures (5xx, timeout, 429); never blindly retry 4xx (400/401/403/422 are permanent).</li>
+<li><b>Idempotency:</b> client-supplied key; server dedupes &amp; returns cached result on retry (no duplicate screenings).</li>
+<li><b>Timeouts:</b> connect (~2&ndash;3s), read, total; short-circuit sync path and fall back to async.</li>
+<li><b>Circuit breaker:</b> trip after N consecutive failures (e.g., 5 in 10s), open for cool-down, half-open probe — prevents cascading load on a degraded service.</li>
+<li><b>Sync vs async:</b> sync for low-latency single-entity screening (p95 &lt;1&ndash;2s); async + webhook/polling for batch &amp; heavy list matching. At 40M scale prefer async.</li>
+<li><b>Error contract:</b> <code>{ "error": { "code": "INVALID_SUBJECT", "message": "...", "field": "dateOfBirth", "requestId": "..." } }</code> mapped to HTTP statuses (400/401/403/404/422/429/5xx).</li>
+<li><b>Logging &amp; audit:</b> structured JSON logs with requestId/traceId correlation; audit logs record who, what list version, scores, dispositions (regulatory evidence). Never log raw PII/keys.</li>
+</ul>
+
+<div class="qa"><div class="q">How do you make a screening API idempotent?</div>
+<div class="a">Client supplies an <span class="hl">idempotency key</span> (the screeningId). Server stores key&rarr;result; a retry returns the cached response instead of creating a duplicate screening.</div></div>
+<div class="qa"><div class="q">How do you handle a screening vendor that times out?</div>
+<div class="a">Set timeouts; retry with backoff only on 5xx/timeouts/429; add a <span class="hl">circuit breaker</span>; fall back to async batch; alert on thresholds.</div></div>
+</section>
+
+<!-- ============ SECTION 5 ============ -->
+<section id="s5">
+<h2><span class="n">05.</span> Risk Scoring &amp; Typical Data Model</h2>
+
+<h3>Risk-Based Approach (RBA)</h3>
+<p>FATF core principle: allocate controls proportional to assessed risk; regulators expect a <b>documented</b> risk assessment, not blanket measures.</p>
+
+<h3>Risk Factors</h3>
+<ul>
+<li><b>Customer:</b> PEP, sanctions-listed, adverse media, high-risk occupation, MSB/crypto exposure, complex ownership, cash-intensive.</li>
+<li><b>Geographic:</b> FATF grey/black list, corruption index, offshore centers, sanctions exposure.</li>
+<li><b>Product:</b> private banking, correspondent, trade finance, crypto, prepaid cards, cross-border wires.</li>
+<li><b>Channel:</b> remote onboarding, digital-only, third-party introducers, cash-heavy channels.</li>
+<li><b>Behavior:</b> velocity, volume, unusual counterparties, deviations from expected profile.</li>
+</ul>
+
+<h3>Scoring Model</h3>
+<pre><code>CustomerRisk = &Sigma;( factor_i x weight_i )     // each factor 1-5, weights tuned per segment
+// Rating bands example: 0-25 Low, 26-50 Medium, 51-75 Medium-High, 76-100 High
+// Logistic regression: P(high-risk); ML (gradient boosting) with model-risk governance</code></pre>
+<ul>
+<li><b>Override &amp; governance:</b> rating changes need documented justification + approval; override metrics tracked.</li>
+<li><b>Workflow:</b> CDD &rarr; factor scoring &rarr; composite rating &rarr; controls (High = EDD + senior sign-off + enhanced monitoring + quarterly reviews) &rarr; periodic + trigger-based reassessment.</li>
+</ul>
+
+<h3>Typical Tables (40M customers / 100M+ txn scale)</h3>
+<pre><code>customer         customer_id, name, aliases, dob, nationality, type, risk_rating, segment, status
+customer_ubo     customer_id, ubo_name, dob, ownership_pct, relationship
+account          account_id, customer_id, type, currency, open_date, close_date, status, branch, kyc_status
+transaction      txn_id, account_id, type, amount, currency, txn_date, counterparty, channel, status
+screening_request request_id, screening_id, customer_id, list_version, subject_payload, status
+screening_hit    hit_id, request_id, list_source, list_entry_id, matched_name, score,
+                 match_type, matched_fields, disposition, reviewed_by, reviewed_at   -- audit table
+alert            alert_id, customer_id, rule_id, severity, risk_score, sla_due_at, status, queue
+case             case_id, customer_id, status, disposition, str_filed_flag, str_ref, narrative</code></pre>
+<p>Notes: <code>transaction</code> partitioned by month, indexed on account_id + txn_date; star schema for the TM mart (fact_transaction, dim_customer, dim_account, dim_time, dim_counterparty); <code>disposition</code> + <code>list_version</code> columns are mandatory on screening_hit (audit + reproducibility).</p>
+</section>
+
+<!-- ============ SECTION 6 ============ -->
+<section id="s6">
+<h2><span class="n">06.</span> Credit Risk Fundamentals</h2>
+
+<h3>What It Is &amp; Types</h3>
+<p>Credit risk = borrower/counterparty fails to meet obligations, causing loss. The <b>largest risk category</b> in most banks' balance sheets.</p>
+<ul>
+<li><b>Retail</b> — personal loans, cards, mortgages, auto, microfinance: high volume, low value, pooled treatment.</li>
+<li><b>Corporate/wholesale</b> — loans, trade/project finance, syndications: low volume, high value, individually assessed.</li>
+<li><b>Counterparty (CCR)</b> — derivatives/trading counterparties; measured under SA-CCR.</li>
+<li><b>Concentration</b> — undiversified exposure; large-exposure limits (e.g., &le;25% Tier 1 to one counterparty under Basel).</li>
+<li><b>Country/sovereign/transfer</b> — FX controls, war, sanctions prevent repayment.</li>
+<li><b>Settlement</b> — one party performs before receiving value (Herstatt risk).</li>
+</ul>
+
+<h3>Credit Lifecycle</h3>
+<p><b>Origination &rarr; Underwriting/Decisioning &rarr; Monitoring &rarr; Collections &amp; Recovery &rarr; Write-off</b> (charged-off ~180 DPD retail; then recoveries).</p>
+
+<h3>PD / LGD / EAD / EL <span class="badge">MEMORIZE FORMULAS</span></h3>
+<ul>
+<li><b>PD</b> — Probability of Default within 1 year (or remaining life); from scorecards/ratings.</li>
+<li><b>LGD</b> — Loss Given Default = <code>1 &minus; Recovery Rate</code>. Typical: 5&ndash;10% mortgages, 40&ndash;60% unsecured personal, 75&ndash;90% cards.</li>
+<li><b>EAD</b> — Exposure at Default = drawn + <b>CCF</b> &times; undrawn (cards ~75&ndash;100% CCF on unused limit).</li>
+<li><b>EL</b> = PD &times; LGD &times; EAD. EL is <i>covered by provisions/pricing</i>; <b>UL (unexpected loss)</b> is covered by regulatory capital.</li>
+</ul>
+
+<h3>Basel I / II / III</h3>
+<ul>
+<li><b>Basel I (1988)</b>: flat risk weights, 8% minimum capital.</li>
+<li><b>Basel II (2004)</b>: 3 Pillars — (1) minimum capital for credit/market/operational risk, (2) supervisory review (ICAAP), (3) market discipline. Introduced Standardised Approach (SA) and IRB (Foundation/Advanced, internal PD/LGD/EAD).</li>
+<li><b>Basel III / 3.1 "Endgame"</b>: CET1 4.5% + buffers (~10.5% incl. CCB); leverage ratio; LCR/NSFR; SA-CCR; <b>output floor capped at 72.5% of standardised RWA</b> (phased to 2028); revised standardised weights; minimum LGD floors. Timelines: UK 2027, EU/JP ~2025&ndash;28, US re-proposed 2026, ME/Asia aligning 2027&ndash;28.</li>
+</ul>
+<p><b>RWA</b> = Exposure &times; Risk Weight. <b>Capital ratio = Tier 1/2 &divide; RWA</b>. Consumer loan ~75% RW (SA); corporate 20&ndash;150% by rating; sovereign 0&ndash;150%.</p>
+
+<h3>IFRS 9 (ECL) <span class="badge">CRITICAL</span></h3>
+<table>
+<tr><th>Stage</th><th>Condition</th><th>Provision</th></tr>
+<tr><td><b>Stage 1</b></td><td>Performing; no significant increase in credit risk (SICR)</td><td><b>12-month ECL</b></td></tr>
+<tr><td><b>Stage 2</b></td><td><b>SICR</b> (e.g., 30+ DPD, rating downgrade, forbearance, covenant breach)</td><td><b>Lifetime ECL</b>; interest on gross carrying amount</td></tr>
+<tr><td><b>Stage 3</b></td><td><b>Credit-impaired / default</b> (90+ DPD or unlikeliness-to-pay)</td><td>Lifetime ECL; interest on net amount</td></tr>
+</table>
+<ul>
+<li><b>SICR thresholds</b> are the crux: relative PD increase (e.g., &ge;300%) and/or absolute (&ge;30 DPD).</li>
+<li><b>ECL = &Sigma; PD(t) &times; LGD(t) &times; EAD(t) &times; DF(t)</b> over 12M (S1) or lifetime (S2/S3), weighted across macro scenarios (e.g., 60/20/20 base/upside/downside).</li>
+<li><b>PiT vs TtC</b> PDs: IFRS 9 uses forward-looking PiT; Basel uses long-run TtC. US equivalent = CECL. India (RBI) moving to ECL from <b>1 Apr 2027</b>. GCC banks follow IFRS 9 under SAMA/DFSA/CBUAE.</li>
+<li><b>Post-Model Adjustments (PMAs)</b>/overlays for risks models can't capture — a big audit/regulator focus (BoE SS1/23).</li>
+</ul>
+<div class="qa"><div class="q">Explain PD, LGD, EAD for a credit-card portfolio.</div>
+<div class="a">PD from behavioural scorecard/bureau (90+ DPD within 12M), estimated per score band; LGD = 1 &minus; recovery (~75&ndash;90% unsecured); EAD = outstanding + CCF&times;undrawn limit. EL = PD&times;LGD&times;EAD; multiply per band and sum.</div></div>
+<div class="qa"><div class="q">What is the Basel III output floor?</div>
+<div class="a">Capital from internal (IRB) models cannot be below <span class="hl">72.5% of standardised RWA</span> — prevents model under-estimation; phased in to 2028; raises RWA for many banks.</div></div>
+</section>
+
+<!-- ============ SECTION 7 ============ -->
+<section id="s7">
+<h2><span class="n">07.</span> Credit Scoring &amp; Retail Portfolios</h2>
+
+<h3>Scorecards</h3>
+<ul>
+<li>Map borrower attributes &rarr; score ranking P(good/bad); "bad" typically = 90+ DPD / charge-off within 12&ndash;24 months.</li>
+<li><b>Logistic regression</b> is the workhorse: <code>logit(P(bad)) = &beta;0 + &beta;1x1 + ...</code>; coefficients scaled to score points.</li>
+<li><b>WoE (weight of evidence) + IV (information value)</b> for variable selection (IV&gt;0.3 strong, 0.1&ndash;0.3 moderate, &lt;0.02 weak). <b>Gini/KS/AR</b> measure discrimination (retail card Gini ~0.55&ndash;0.65 good).</li>
+<li><b>Application scoring</b> (at origination, static) vs <b>behavioural scoring</b> (ongoing account behavior, more predictive — powers limit management and EWS).</li>
+<li><b>Cut-off</b> drives accept/reject and pricing; <b>odds = (1&minus;P_bad)/P_bad</b>; score bands feed pricing grids, limits, and IFRS 9 PD term structures.</li>
+</ul>
+
+<h3>Typical Retail Features</h3>
+<p>Income/stability, <b>DTI</b> (&le;40&ndash;50% typical), <b>LTV</b> (80% vs 90% materially changes PD/LGD), <b>utilization</b> (&gt;60&ndash;70% is a strong risk signal), payment history, bureau enquiries, delinquency, length of credit history, product mix, plus cash-flow/alternative data.</p>
+
+<h3>Portfolio Data Reference</h3>
+<table>
+<tr><th>Product</th><th>Exposure basis</th><th>Default convention</th></tr>
+<tr><td>Credit cards</td><td>Limit + outstanding; EAD = balance + CCF&times;undrawn</td><td>90 DPD &rarr; NPA; ~180 DPD charge-off</td></tr>
+<tr><td>Personal loans</td><td>Principal outstanding, EMI</td><td>90 DPD &rarr; NPA</td></tr>
+<tr><td>Mortgages</td><td>Principal + property value (LTV)</td><td>90 DPD (some 180 by policy)</td></tr>
+<tr><td>Auto loans</td><td>Principal vs vehicle value</td><td>90 DPD &rarr; NPA</td></tr>
+<tr><td>SME</td><td>Facility + undrawn; multiple facilities per customer</td><td>90 DPD; weak financials trigger EWS</td></tr>
+</table>
+<ul>
+<li><b>Delinquency buckets (DPD):</b> 0, 1&ndash;29, 30&ndash;59, 60&ndash;89, 90&ndash;119, 120&ndash;179, 180+. Movement between buckets = <b>roll rates</b>.</li>
+<li><b>NPA/NPL:</b> India (RBI IRACP): sub-standard &ge;90 DPD, doubtful &ge;12 months, loss. GCC/IFRS: default = 90+ DPD and/or unlikeliness-to-pay (bankruptcy, restructuring, covenant breach).</li>
+<li>One customer may hold many products &rarr; need <b>aggregated customer-level exposure</b>.</li>
+</ul>
+
+<div class="qa"><div class="q">What are roll rates and why do they matter?</div>
+<div class="a">% of accounts in bucket X moving to X+30 next month. They forecast NPL flow, size collections capacity, and validate EWS timing.</div></div>
+<div class="qa"><div class="q">Application vs behavioural scoring?</div>
+<div class="a">Application = static, at origination (income, bureau); behavioural = dynamic account usage (utilisation, DPD), more predictive; powers limit management and EWS.</div></div>
+</section>
+
+<!-- ============ SECTION 8 ============ -->
+<section id="s8">
+<h2><span class="n">08.</span> Early Warning Systems (EWS)</h2>
+
+<h3>Purpose</h3>
+<p>Detect <b>credit-quality deterioration before default</b> so the bank can act early. Converts periodic/annual review into continuous, trigger-driven surveillance. Also feeds <b>IFRS 9 Stage 2 (SICR)</b> detection.</p>
+
+<h3>Internal vs External Signals</h3>
+<ul>
+<li><b>Internal:</b> missed/partial payments, DPD trends, utilisation spikes, payment-pattern change, exposure changes, <b>covenant breaches</b>, limit drawdowns, falling deposits/balances, cash advances, returned EMIs/cheques.</li>
+<li><b>External:</b> bureau score drops, new high-cost enquiries, negative news/sentiment, rating downgrades, industry stress, regulatory action, litigation, sanctions/PEP flags, macro/interest-rate environment.</li>
+</ul>
+
+<h3>Key Early Warning Indicators (EWIs) <span class="badge">SAY 5+</span></h3>
+<ul>
+<li>First 30 DPD, DPD trend (0&rarr;15&rarr;30), missed/partial payments.</li>
+<li>Utilisation spike (&gt;90% for 2+ months); frequent cash advances; returned EMIs/cheques; unauthorised overdraft.</li>
+<li>Bureau score drop (&gt;50 points in 6 months) or new delinquencies elsewhere.</li>
+<li>Corporate: covenant breaches (DSCR &lt;1.2x, leverage &gt; limit), overdraft, delays in financials, key-man events.</li>
+<li>Limit/credit-line increases right after deterioration; drawdowns on committed facilities.</li>
+<li>Reduced salary credits, balance run-off, disappearing deposits (cash-flow stress).</li>
+<li>Industry/sector stress (oil price, real-estate cycle), geographic stress, currency risk.</li>
+<li>Negative news, sanctions/litigation, guarantor/counterparty deterioration, collateral LTV breach.</li>
+</ul>
+
+<h3>EWS Workflow <span class="badge">MEMORIZE</span></h3>
+<ol>
+<li><b>Data ingestion</b> — batch (daily/monthly) + real-time REST events from core banking (Oracle Flexcube, Finacle, Temenos), bureau, news.</li>
+<li><b>Trigger evaluation</b> — rule engine scores each EWI vs thresholds (e.g., "&ge;2 triggers" or score &ge; X).</li>
+<li><b>Scoring/alert</b> — EWS risk score (0&ndash;100 or Low/Med/High); blends internal behavioural score + external factors.</li>
+<li><b>Case creation</b> — watchlist entry in the risk workbench/CRM.</li>
+<li><b>Review by risk officer</b> — validate alerts (some are false positives: e.g., seasonal utilisation); confirm rating.</li>
+<li><b>Remediation</b> — increase review frequency, reduce/block limit, watchlist, restructure, move to collections, additional collateral/guarantees, or <b>move to Stage 2</b>.</li>
+</ol>
+
+<h3>Cure Rate, Watch List, Risk Migration</h3>
+<ul>
+<li><b>Cure rate</b> = % of defaulted/Stage-2 accounts returning to performing within a window (e.g., 6 months). High cure rate &rarr; EWS alerting too early/broadly; used in LGD and staging decisions; redefault risk matters.</li>
+<li><b>Watch list</b> = accounts with elevated risk, graded (e.g., 1&ndash;4) with mandatory review frequency (quarterly &rarr; weekly). EWS feeds watchlist; watchlist feeds "flow into NPL".</li>
+<li><b>Risk migration</b> = rating/score movement over time (migration/transition matrices, Markov-style); EWS models predict probability of migration to a worse bucket.</li>
+</ul>
+
+<div class="qa"><div class="q">How would you build an EWS for 40M customers?</div>
+<div class="a">Score triggers at customer+account level; rules in a decision engine fed by daily batch + real-time API events; tiered alerts; case management; feedback loop to tune thresholds (hit-rate vs false positives). Start with a risk mart in Oracle/PG, ADF for orchestration, SAS for scoring.</div></div>
+<div class="qa"><div class="q">Your EWS is raising too many false positives. What do you do?</div>
+<div class="a">Analyse alert-to-default hit rate, tune threshold weights, add confirmation triggers (2+ signals), use cure rate to calibrate, and segment thresholds by product.</div></div>
+<div class="qa"><div class="q">Watchlist vs Stage 2 account?</div>
+<div class="a">Watchlist is internal risk-management classification; Stage 2 is IFRS 9 accounting driven by SICR. Overlapping but not identical — watchlist is usually broader/forward-looking.</div></div>
+</section>
+
+<!-- ============ SECTION 9 ============ -->
+<section id="s9">
+<h2><span class="n">09.</span> Risk Data &amp; Analytics (Dashboards, Lineage, BCBS 239)</h2>
+
+<h3>Risk Warehouse / Risk Mart</h3>
+<ul>
+<li>Star schemas: facts = exposure, delinquency, score, payment, collateral; dims = customer, account/facility, product, geography, time, rating/segment.</li>
+<li><b>Single customer view</b>: master customer ID across core banking, cards, AML, origination, collections.</li>
+<li>Layers: raw/landing &rarr; conformed/staging &rarr; integrated mart (credit risk, EWS, IFRS9) &rarr; aggregation/reporting. <b>SCD2</b> for limits/ratings history (roll-rate &amp; staging lookback).</li>
+<li>ADF orchestrates ingestion+transform; SAS computes scorecards/EWS/PD-LGD-EAD; Oracle/PG host marts &amp; dashboards.</li>
+</ul>
+
+<h3>BCBS 239 (risk data aggregation &amp; reporting)</h3>
+<p>Legal mandate for data governance: <b>accuracy, completeness, timeliness, adaptability</b>, and <b>risk-data governance</b> — trace every metric from source to dashboard via a data dictionary / business glossary ("what counts as default?").</p>
+
+<h3>The Classic Risk Dashboards</h3>
+<ul>
+<li><b>Portfolio concentration</b> — product, sector, geography, LTV band, rating bucket, top-N vs large-exposure limits.</li>
+<li><b>Vintage analysis</b> — performance by origination cohort (origination &times; months-on-book) &rarr; underwriting quality drift.</li>
+<li><b>Delinquency / roll-rate</b> — % 30&rarr;60&rarr;90; <b>flow into NPL</b> (new additions, not just stock).</li>
+<li><b>EWS funnel</b> — alerts generated &rarr; validated &rarr; cases &rarr; remediated; hit-rate vs false positives.</li>
+<li><b>ECL bridge / waterfall</b> — movement by stage (new business, repayments, migration, model updates, scenarios).</li>
+<li><b>Stress testing</b> — macro scenarios (GDP, unemployment, rates, oil, property) &rarr; PD/LGD shifts via satellite models &rarr; ECL &amp; capital impact (ICAAP/CCAR-style).</li>
+</ul>
+
+<h3>EWS &harr; AML Integration</h3>
+<ul>
+<li>Shared <b>single customer view</b> and <b>entity resolution</b> across core banking, AML, origination, collections.</li>
+<li>AML flags (sanctions hit, adverse media, structuring alerts) are <b>external EWIs</b> &rarr; can trigger a credit review; credit deterioration can be an AML red flag (mule accounts).</li>
+<li>Screening via <b>REST APIs</b> consumed by onboarding, AML, and EWS simultaneously; event-driven integration for a 40M-customer bank = streaming + dedup + high-availability APIs.</li>
+</ul>
+
+<div class="qa"><div class="q">How do you validate data for a credit-risk dashboard?</div>
+<div class="a">BCBS 239 principles: completeness (all exposures), accuracy (reconcile to GL), timeliness (T+1), lineage (traceable to source), defined business rules; automated DQ checks + reconciliation.</div></div>
+</section>
+
+<!-- ============ SECTION 10 ============ -->
+<section id="s10">
+<h2><span class="n">10.</span> ETL / ELT &amp; Data Modeling</h2>
+
+<h3>ETL vs ELT</h3>
+<ul>
+<li><b>ETL</b> — transform before load; suits mature relational DWs, strong validation before commit, transformation-heavy.</li>
+<li><b>ELT</b> — load raw into a scalable target (lake/lakehouse/Snowflake/Synapse) then transform in place; schema-on-read, massive data, batch + near-real-time.</li>
+</ul>
+<p><b>Banking nuance:</b> regulatory reporting often mandates ETL-style validation <i>before</i> the warehouse accepts data — reject/flag early rather than polluting the warehouse.</p>
+
+<h3>Full vs Incremental vs Streaming</h3>
+<ul>
+<li><b>Full load:</b> truncate + reload. Simple; only for small reference tables (branch, FX rates) or initial backfill.</li>
+<li><b>Incremental/delta:</b> watermark/high-water mark (control table tracks <code>last_load_dt</code>/max PK) — <code>WHERE last_updated &gt; :watermark</code>; fragile if timestamps drift/backdated.</li>
+<li><b>CDC (change data capture):</b> log-based (best — Oracle GoldenGate, Debezium; captures deletes + before-images, zero source impact), trigger-based (source overhead), or table-compare (expensive at 100M).</li>
+<li><b>Streaming:</b> Kafka &rarr; Debezium &rarr; landing; for real-time fraud/balances; combined with EOD batch reconciliation.</li>
+</ul>
+
+<h3>DW vs Lake vs Lakehouse</h3>
+<ul>
+<li><b>DW:</b> structured, curated, governed, fast BI (Oracle, Synapse, Teradata); expensive.</li>
+<li><b>Lake:</b> raw any-format, cheap; risk of "data swamp".</li>
+<li><b>Lakehouse:</b> ACID on object storage via <b>Delta Lake / Iceberg / Hudi</b>; <b>medallion architecture: Bronze (raw) &rarr; Silver (cleaned/deduped) &rarr; Gold (curated marts)</b>.</li>
+</ul>
+
+<h3>Schemas &amp; Dimensional Modeling <span class="badge">CORE</span></h3>
+<ul>
+<li><b>Star</b> — one fact + denormalized dims; fast, Kimball marts.</li>
+<li><b>Snowflake</b> — normalized sub-dimensions; less redundancy, more joins.</li>
+<li><b>3NF</b> — fully normalized enterprise model (Inmon / OLTP).</li>
+<li><b>Facts:</b> additive (amounts), semi-additive (balances — not summable over time), non-additive (ratios). Types: transaction, periodic snapshot (daily balance), accumulating snapshot (loan lifecycle).</li>
+<li><b>Dimensions:</b> conformed (same key everywhere — critical in banking), degenerate (e.g., txn reference), junk, role-playing (Date as Open/Close/Value date).</li>
+<li><b>Surrogate keys</b> — meaningless integer PK, independent of source business keys (insulates against source merges).</li>
+<li><b>SCD1</b> overwrite (no history); <b>SCD2</b> new row + effective_from/to/is_current (full history — used for addresses, KYC, limits); <b>SCD3</b> current + one prior value.</li>
+<li><b>Kimball</b> (bottom-up marts, conformed dims, faster) vs <b>Inmon</b> (top-down 3NF EDW first, then marts; more enterprise consistency, slower).</li>
+</ul>
+
+<h3>End-to-End Scenario: "Design ETL to load 40M customers + 100M+ txns daily" <span class="badge">WALK THROUGH</span></h3>
+<ol>
+<li><b>Sources:</b> on-prem Oracle core + PG side systems. <b>Extract:</b> log-based CDC for transactions; watermark for customer dim.</li>
+<li><b>Landing:</b> immutable raw zone with <code>src/db/table/biz_dt/</code>; checksums + row counts.</li>
+<li><b>Staging:</b> mirrored schema + validation; rejected rows held with reason codes.</li>
+<li><b>Transform:</b> ADF orchestration + SAS/SQL (or Databricks); standardize codes/dates; dedup; surrogate-key lookup.</li>
+<li><b>Dim load (SCD2):</b> compare incoming with current; insert new version on change, flip <code>is_current</code>.</li>
+<li><b>Fact load:</b> MERGE/insert into monthly <code>txn_fact</code> partitions; local indexes; ANALYZE after load.</li>
+<li><b>Marts:</b> daily balances, aggregations.</li>
+<li><b>Scheduling:</b> Control-M/Airflow top-level DAG; ADF triggers per stage; business-day calendar; parameterized rerun by <code>biz_dt</code>.</li>
+<li><b>Reconciliation:</b> row counts (extract vs landing vs staging vs target per partition), SUM/count control totals, balance check vs GL, hash compare, DQ gates that block load.</li>
+<li><b>Monitoring:</b> failure/zero-row/reconciliation-breach alerts, SLA timers, SHIR health, daily EOD report.</li>
+<li><b>Failure handling:</b> retry (transient) &rarr; quarantine &rarr; checkpoint resume &rarr; on-call escalation &rarr; post-mortem.</li>
+</ol>
+</section>
+
+<!-- ============ SECTION 11 ============ -->
+<section id="s11">
+<h2><span class="n">11.</span> SAS Studio</h2>
+<p><b>SAS Studio</b> = web-based IDE for SAS 9.4 M7+ / Viya. Gives libnames, tasks (point-and-click code generators), snippets, server file system.</p>
+
+<h3>Libraries (libname)</h3>
+<pre><code>libname bank  '/sasdata/bank';
+libname oradb oracle user='scott' password='tiger' path='dbsrv' schema='cust';
+libname out   '/sasdata/out';        // work. = temp library</code></pre>
+
+<h3>DATA step vs PROC SQL</h3>
+<ul>
+<li><b>DATA step:</b> row-wise, <code>set/merge/if/then</code>, arrays, retains — complex row transforms, dedup via BY-groups, date math.</li>
+<li><b>PROC SQL:</b> set-based joins/aggregates, DDL, DB push-down when libname points at a database.</li>
+</ul>
+
+<h3>Formats / Informats</h3>
+<pre><code>input txn_dt :date9.; input amt :comma14.2;        // informats: text -> value
+format amt dollar14.2;                             // format: display
+
+proc format;
+  value band low-<0='Negative' 0-<1000='Low' 1000-<100000='Mid' 100000-high='High';
+run;</code></pre>
+
+<h3>MERGE vs SQL joins</h3>
+<ul>
+<li><b>MERGE:</b> requires <code>PROC SORT by key</code>; supports <code>in=</code> flags + BY groups; designed 1:1 / 1:many (M:N duplicates all combinations).</li>
+<li><b>SQL:</b> no pre-sort, clearer for M:N, good for aggregates. Rule: SQL for joins/aggregates, DATA step for row-wise transforms &amp; retain logic.</li>
+</ul>
+<pre><code>proc sort data=bank.customers out=c; by cust_id; run;
+proc sort data=bank.accounts  out=a; by cust_id; run;
+data work.matched;
+  merge c(in=inc) a(in=ina);
+  by cust_id;
+  if inc;                     /* inner join semantics */
+run;</code></pre>
+
+<h3>Macros</h3>
+<pre><code>%let biz_dt = 20260806;
+%let prev_dt = %sysfunc(putn(%sysfunc(intnx(day,%sysfunc(inputn(&biz_dt,yymmdd8.)),-1)),yymmddn8.));
+
+%macro load_fact(tbl=, dt=);
+  proc append base=bank.fact data=work.fact_run; run;
+%mend load_fact;
+%load_fact(tbl=bank.transactions, dt=&biz_dt);</code></pre>
+<p>Macros are text-substituted at compile time; <code>%sysfunc()</code> runs DATA-step functions in macros; use them to parameterize ETL jobs (business date, env, schema).</p>
+
+<h3>Key PROCs for Banking ETL</h3>
+<table>
+<tr><th>PROC</th><th>Use</th></tr>
+<tr><td>SORT</td><td>Ordering, dedup (<code>nodupkey</code>), BY-groups</td></tr>
+<tr><td>FREQ</td><td>Profiling, validation counts, crosstabs (<code>table a*b / missing;</code>)</td></tr>
+<tr><td>MEANS/SUMMARY</td><td>Aggregations, sums, quantiles by class</td></tr>
+<tr><td>FORMAT</td><td>Code standardization, banding</td></tr>
+<tr><td>TRANSPOSE</td><td>Wide&harr;long pivots</td></tr>
+<tr><td>APPEND</td><td>Fast row append without re-reading source</td></tr>
+<tr><td>COMPARE</td><td>Row/column comparison — ideal for reconciliation source vs target</td></tr>
+<tr><td>CONTENTS/DATASETS</td><td>Metadata; manage/delete library members</td></tr>
+</table>
+
+<h3>Dedup &amp; Date Patterns</h3>
+<pre><code>/* Dedup: remove duplicate keys, keep first */
+proc sort data=bank.txns nodupkey out=work.dedup; by cust_id txn_ref; run;
+
+/* Keep latest per group */
+proc sort data=bank.cust_addr out=a; by cust_id descending eff_dt; run;
+data work.cur_addr; set a; by cust_id; if first.cust_id; run;
+
+/* Dates are days since 1960-01-01 */
+today(); mdy(8,6,2026); datepart(dt); intck('month',d1,d2); intnx('month',d1,0,'B');</code></pre>
+
+<h3>SAS Interview Q&amp;A</h3>
+<div class="qa"><div class="q">DATA step vs PROC SQL?</div><div class="a">DATA step = row-wise, best for transformations/retains/arrays/merges; SQL = set-based joins/aggregates, can push down to the DB engine.</div></div>
+<div class="qa"><div class="q">Informat vs Format?</div><div class="a">Informat converts text/external to values on input (<code>input</code>); Format controls display/output (<code>put</code>).</div></div>
+<div class="qa"><div class="q">How do you dedup 100M transactions in SAS?</div><div class="a"><code>PROC SORT NODUPKEY BY cust_id txn_ref</code>, or sort DESC by effective date + <code>FIRST.cust_id</code>. Prefer doing it in the source DB for very large data.</div></div>
+<div class="qa"><div class="q">What does <code>merge a(in=x) b(in=y)</code> do?</div><div class="a"><code>in=</code> flags which input contributed each row &rarr; implements left/right/inner joins and detects unmatched records for reconciliation.</div></div>
+<div class="qa"><div class="q">How do you reconcile source vs target in SAS?</div><div class="a"><code>PROC COMPARE</code> (row/col diff) + SQL counts + <code>sum()</code> control totals + <code>PROC FREQ</code> on status flags.</div></div>
+</section>
+
+<!-- ============ SECTION 12 ============ -->
+<section id="s12">
+<h2><span class="n">12.</span> Azure Data Factory (ADF)</h2>
+
+<h3>Components</h3>
+<ul>
+<li><b>Linked service</b> — connection definition (Oracle, SQL Server, Blob, REST, SFTP, SAP); credentials in Key Vault.</li>
+<li><b>Dataset</b> — pointer to data via a linked service + location/table/schema.</li>
+<li><b>Pipeline</b> — graph of <b>activities</b>.</li>
+<li><b>Activity</b> — Copy (data movement), Data Flow/Stored Proc/Databricks (transform), control flow (If, ForEach, Until, Execute Pipeline, Set Variable).</li>
+<li><b>Trigger</b> — schedule, tumbling window (aligned contiguous windows with state + dependency), event/Blob-created, manual.</li>
+<li><b>Integration Runtime</b> — Azure IR (managed/cloud), <b>Self-hosted IR</b> (on-prem agent for Oracle/SAP/file shares — essential for banking), Azure-SSIS IR (cloud SSIS).</li>
+</ul>
+
+<h3>Copy Activity &amp; Mapping Data Flows</h3>
+<ul>
+<li>Copy: bulk movement + column mapping + optional staging via Blob; incremental via watermark query or CDC connectors.</li>
+<li>Data Flow: Spark-based visual transforms — Join/Filter/Aggregate/Dedup/ReplaceNulls/SurrogateKey/Row upsert; good for ELT-scale; adds cluster cost.</li>
+</ul>
+
+<h3>Parameters vs Variables vs Global Parameters</h3>
+<ul>
+<li><b>Pipeline parameters</b> — inputs set at trigger (e.g., <code>bizDt</code>, <code>env</code>), fixed for the run.</li>
+<li><b>Variables</b> — mutable during run (<code>setVariable</code>, counters).</li>
+<li><b>Global parameters</b> — factory-wide.</li>
+</ul>
+<pre><code>@pipeline().parameters.bizDt
+@variables('counter')
+@activity('Lookup1').output.firstRow.maxTxnId
+@concat('prefix_', formatDateTime(utcnow(),'yyyyMMdd'))
+@convertFromUtc(utcnow(),'Arabian Standard Time')
+@activity('CopyData1').output.rowsCopied</code></pre>
+
+<h3>Monitoring, Retry &amp; Failure Patterns</h3>
+<ul>
+<li><b>Monitor hub:</b> pipeline/activity/trigger runs, error JSON; diagnostic logs &rarr; Log Analytics; Azure Monitor alerts on failures/SLAs.</li>
+<li><b>Retry:</b> per-activity <code>retry</code> + <code>retryIntervalInSeconds</code> on transient errors.</li>
+<li><b>Gates:</b> Validate / Get Metadata before copy; parent-pipeline Try-Catch on child status.</li>
+<li><b>Dead-letter/quarantine:</b> route error rows to a quarantine table with <code>load_job_id</code> + error code.</li>
+<li><b>Idempotent reruns:</b> watermark + upsert/MERGE sinks.</li>
+</ul>
+
+<h3>ADF vs SSIS vs Databricks</h3>
+<ul>
+<li><b>SSIS</b> — on-prem, code-heavy, legacy; future = ADF ("SSIS on Azure").</li>
+<li><b>ADF</b> — cloud-native orchestration, low-code control flow + scheduling + monitoring.</li>
+<li><b>Databricks</b> — Spark engine for heavy transformation; use ADF to orchestrate Databricks activities.</li>
+</ul>
+
+<h3>ADF Interview Q&amp;A</h3>
+<div class="qa"><div class="q">Linked service vs dataset?</div><div class="a">Linked service = connection/credentials to a system; dataset = a specific table/file at a location via that connection.</div></div>
+<div class="qa"><div class="q">Azure IR vs Self-hosted IR vs SSIS IR?</div><div class="a">Azure IR = managed cloud compute; SHIR = on-prem agent for private-network sources (Oracle, file shares); SSIS IR = cloud-hosted SSIS runtime.</div></div>
+<div class="qa"><div class="q">How would you load 40M customer rows from on-prem Oracle daily?</div><div class="a">SHIR &rarr; Copy activity from Oracle with watermark/CDC &rarr; staging to Blob/Synapse &rarr; upsert; parallel DIUs; reconciliation step.</div></div>
+<div class="qa"><div class="q">Schedule trigger vs tumbling window?</div><div class="a">Schedule = simple cron; tumbling = fixed contiguous windows with state + dependency on the previous window — better for daily EOD batch.</div></div>
+<div class="qa"><div class="q">Copy activity vs data flow?</div><div class="a">Copy = fast bulk movement with minor mapping; Data flow = in-ADF Spark transformations (joins, dedup, SCD) for ELT-scale.</div></div>
+<div class="qa"><div class="q">How do you call a REST API in ADF?</div><div class="a">Web activity with method/headers/body, or Copy activity with a REST linked service (pagination + auth).</div></div>
+</section>
+
+<!-- ============ SECTION 13 ============ -->
+<section id="s13">
+<h2><span class="n">13.</span> SQL for Enterprise Banking</h2>
+
+<h3>Window Functions</h3>
+<pre><code>SELECT cust_id, txn_dt, amt,
+       ROW_NUMBER() OVER (PARTITION BY cust_id ORDER BY txn_dt DESC) AS rn,
+       RANK()       OVER (PARTITION BY cust_id ORDER BY amt DESC)   AS rk,
+       LAG(amt,1)   OVER (PARTITION BY cust_id ORDER BY txn_dt)     AS prev_amt,
+       SUM(amt)     OVER (PARTITION BY cust_id ORDER BY txn_dt
+                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_bal
+FROM bank.txn;</code></pre>
+<ul>
+<li><b>ROW_NUMBER</b> unique; <b>RANK</b> gaps on ties; <b>DENSE_RANK</b> no gaps.</li>
+<li>Running totals / moving averages via <code>ROWS BETWEEN 6 PRECEDING AND CURRENT ROW</code>.</li>
+<li>Use: dedup (<code>rn=1</code>), latest balance per account, portfolio aggregates.</li>
+</ul>
+
+<h3>CTE &amp; Recursive CTE</h3>
+<pre><code>WITH latest AS (
+  SELECT cust_id, MAX(load_dt) AS last_load FROM staging.cust GROUP BY cust_id)
+SELECT s.* FROM staging.cust s JOIN latest l ON s.cust_id=l.cust_id AND s.load_dt=l.last_load;
+
+WITH RECURSIVE org AS (
+  SELECT emp_id, mgr_id, 1 AS lvl FROM hr.emp WHERE mgr_id IS NULL
+  UNION ALL
+  SELECT e.emp_id, e.mgr_id, o.lvl+1 FROM hr.emp e JOIN org o ON e.mgr_id=o.emp_id)
+SELECT * FROM org;</code></pre>
+
+<h3>Pivoting &amp; Anti-joins &amp; NULLs</h3>
+<pre><code>-- Portable pivot
+SELECT country,
+  SUM(CASE WHEN product='LOAN' THEN amt END) loan_amt,
+  SUM(CASE WHEN product='CARD' THEN amt END) card_amt
+FROM bank.bal GROUP BY country;
+
+-- Anti-join (customers with no txns) — prefer NOT EXISTS over NOT IN (NULL hazard)
+SELECT c.cust_id FROM bank.cust c
+WHERE NOT EXISTS (SELECT 1 FROM bank.txn t WHERE t.cust_id=c.cust_id);
+
+-- NULLs: COALESCE(a,b,0); Oracle NVL(col,0); COUNT(col) skips NULLs; use IS NULL</code></pre>
+
+<h3>Dedup &amp; UPSERT</h3>
+<pre><code>-- Oracle: keep latest per natural key
+DELETE FROM bank.cust_raw WHERE rowid IN (
+  SELECT rid FROM (
+    SELECT ROWID rid, ROW_NUMBER() OVER (PARTITION BY cust_nat_key ORDER BY load_dt DESC) rn
+    FROM bank.cust_raw) WHERE rn > 1);
+
+-- Oracle MERGE
+MERGE INTO bank.cust c USING staging.cust s ON (c.cust_nat_key=s.cust_nat_key)
+WHEN MATCHED THEN UPDATE SET c.name=s.name, c.updated_dt=SYSDATE
+WHEN NOT MATCHED THEN INSERT (cust_sk,cust_nat_key,name) VALUES (cust_seq.NEXTVAL,s.cust_nat_key,s.name);
+
+-- PostgreSQL upsert
+INSERT INTO bank.cust (cust_nat_key,name) SELECT cust_nat_key,name FROM staging.cust
+ON CONFLICT (cust_nat_key) DO UPDATE SET name=EXCLUDED.name;</code></pre>
+
+<h3>Indexing, Execution Plans, Tuning</h3>
+<ul>
+<li><b>Indexes:</b> B-tree default; composite (leading col must be used); unique (idempotency); covering/INCLUDE; partial (PG <code>WHERE status='ACTIVE'</code>); function-based (Oracle <code>ON UPPER(name)</code>).</li>
+<li><b>Plans:</b> Seq vs Index scan; <b>Nested Loop</b> (small outer &times; indexed inner), <b>Hash Join</b> (large unsorted equi-joins — best at 100M), <b>Merge Join</b> (sorted). Look for seq scans on big tables, spills, stale stats.</li>
+<li><b>Tuning:</b> index join/filter cols; <b>partition pruning</b>; <code>ANALYZE</code>/<code>GATHER_TABLE_STATS</code> after loads; avoid <code>WHERE func(col)=x</code>; <b>set-based over row-by-row</b>; pre-aggregate; avoid <code>SELECT *</code>.</li>
+<li><b>Batch:</b> Oracle <code>FORALL</code>/bulk collect; PG batched <code>INSERT</code>; chunked commits (e.g., 10k rows); parallel streams per partition.</li>
+<li><b>Views</b> = virtual convenience/access control; <b>materialized views</b> = precomputed physical aggregates for performance on huge data.</li>
+</ul>
+
+<h3>SQL Interview Q&amp;A</h3>
+<div class="qa"><div class="q">ROW_NUMBER vs RANK vs DENSE_RANK?</div><div class="a">RN = unique row numbers; RANK has gaps on ties; DENSE_RANK no gaps. Use RANK when ties should share rank.</div></div>
+<div class="qa"><div class="q">How to find duplicate customers?</div><div class="a"><code>GROUP BY nat_key HAVING COUNT(*)&gt;1</code>, or <code>ROW_NUMBER() PARTITION BY nat_key</code>.</div></div>
+<div class="qa"><div class="q">NOT IN vs NOT EXISTS?</div><div class="a">NOT IN fails if the subquery contains NULLs (three-valued logic); NOT EXISTS is semantically safe and usually faster.</div></div>
+<div class="qa"><div class="q">How do you tune a 100M-row join?</div><div class="a">Analyze stats; hash join; partition both sides on the same key (partition-wise join); covering indexes; filter before join; pre-aggregate; parallel query.</div></div>
+<div class="qa"><div class="q">What is partition pruning?</div><div class="a">The optimizer skips irrelevant partitions via <code>WHERE txn_dt BETWEEN ...</code> on a range-partitioned table — a huge scan becomes tiny.</div></div>
+</section>
+
+<!-- ============ SECTION 14 ============ -->
+<section id="s14">
+<h2><span class="n">14.</span> Oracle vs PostgreSQL</h2>
+<table>
+<tr><th>Area</th><th>Oracle</th><th>PostgreSQL</th></tr>
+<tr><td>Numeric</td><td>NUMBER(p,s)</td><td>NUMERIC/DECIMAL(p,s)</td></tr>
+<tr><td>Date/time</td><td>DATE includes time; TIMESTAMP</td><td>DATE (no time); TIMESTAMP/TIMESTAMPTZ</td></tr>
+<tr><td>Dummy table</td><td><code>FROM dual</code></td><td>none (<code>SELECT now();</code>)</td></tr>
+<tr><td>Row limit</td><td><code>ROWNUM</code>/<code>FETCH FIRST n ROWS ONLY</code></td><td><code>LIMIT n OFFSET m</code></td></tr>
+<tr><td>Null coalesce</td><td><code>NVL(a,b)</code></td><td><code>COALESCE(a,b)</code></td></tr>
+<tr><td>Current time</td><td><code>SYSDATE</code></td><td><code>NOW()</code>/<code>CURRENT_TIMESTAMP</code></td></tr>
+<tr><td>Auto keys</td><td>SEQUENCE / identity (12c+)</td><td>SERIAL / <code>GENERATED ALWAYS AS IDENTITY</code></td></tr>
+<tr><td>Row matching</td><td>CONNECT BY</td><td><code>WITH RECURSIVE</code></td></tr>
+<tr><td>Materialized views</td><td>Native; complete/fast refresh</td><td><code>CREATE MATERIALIZED VIEW</code> + REFRESH (full)</td></tr>
+<tr><td>Partitioning</td><td>Range/list/hash/composite; interval; global/local indexes</td><td>Declarative RANGE/LIST/HASH; partition-wise joins</td></tr>
+<tr><td>Hints</td><td><code>/*+ PARALLEL(t,8) */</code>, <code>/*+ INDEX */</code></td><td>None native; pg_hint_plan / settings</td></tr>
+<tr><td>HA</td><td>RAC, Data Guard</td><td>Streaming replication, failover</td></tr>
+<tr><td>Cost</td><td>Licensed ($$$)</td><td>Open source</td></tr>
+<tr><td>Extras</td><td>PL/SQL, Flashback, interval part.</td><td>PostGIS, JSONB, Citus, plpgsql</td></tr>
+</table>
+
+<pre><code>-- Oracle
+SELECT NVL(bal_amt,0), TRUNC(SYSDATE,'MM'), ADD_MONTHS(SYSDATE,-1)
+FROM bank.bal WHERE ROWNUM <= 10;
+
+-- PostgreSQL
+SELECT COALESCE(bal_amt,0), date_trunc('month', now()), now() - INTERVAL '1 month'
+FROM bank.bal LIMIT 10;</code></pre>
+
+<div class="callout"><b>Which and why:</b> Oracle for the enterprise OLTP/regulatory core (mature partitioning, RAC HA, MVs, hints, vendor support). PostgreSQL for the analytics/DW layer on a budget (free, JSONB, strong window functions, declarative partitioning, Citus scale-out). Best answer: <b>hybrid</b> — Oracle sources, PostgreSQL/cloud DW for the warehouse layer.</div>
+</section>
+
+<!-- ============ SECTION 15 ============ -->
+<section id="s15">
+<h2><span class="n">15.</span> Scale: 40M Customers / 100M+ Transactions</h2>
+
+<h3>Partitioning</h3>
+<ul>
+<li>Facts by <b>range on date</b> (monthly partitions; Oracle interval auto-creates) &rarr; partition pruning; roll-offs = drop partition (fast).</li>
+<li><b>Hash</b> by key (cust_id) for even distribution + parallel scans.</li>
+<li><b>Composite</b> — range + hash subpartitions for hot months; <b>local indexes</b> per partition for cheap maintenance.</li>
+</ul>
+
+<h3>Indexing, Parallelism, Incremental, Idempotency</h3>
+<ul>
+<li>Composite covering indexes; partial indexes; function-based for MDM; <code>ANALYZE</code> regularly.</li>
+<li>Oracle <code>/*+ PARALLEL(t,8) */</code>; PG <code>max_parallel_workers_per_gather</code>; ADF parallel DIUs; chunk reads by PK/date ranges.</li>
+<li>Watermark/high-water-mark per table + log-based CDC; never full-refresh 100M rows daily.</li>
+<li>Staging &rarr; atomic <code>MERGE</code>/upsert by unique natural key; <code>load_job_id</code>; deterministic ORDER BY; TRUNCATE+INSERT per partition; transactional boundaries.</li>
+<li><b>Checkpointing:</b> track last completed chunk in a control table; resume from checkpoint, don't restart the whole load.</li>
+<li><b>Skew:</b> salting hot keys (append 0&ndash;N), broadcast small dims, repartition data flows; avoid one hot partition on inserts.</li>
+<li><b>Archival:</b> drop old partitions to archive schemas (legal retention ~7 years — archive, don't destroy), partition exchange to swap cold data out instantly.</li>
+<li><b>Joins:</b> hash joins, partition-aligned joins, pre-filter/pre-aggregate, surrogate keys (int joins cheap), pre-aggregated marts so reports never scan 100M rows.</li>
+</ul>
+</section>
+
+<!-- ============ SECTION 16 ============ -->
+<section id="s16">
+<h2><span class="n">16.</span> Multi-Source Integration &amp; MDM</h2>
+<ul>
+<li><b>Heterogeneity:</b> core banking (Oracle/DB2/mainframe), payments switches (ISO8583), cards, CRM, channels, files (CSV/fixed-width/EBCDIC), REST APIs, queues (Kafka/MQ). Problems: different keys, formats, encodings, code lists, currencies, time zones, semantics.</li>
+<li><b>Landing:</b> raw files/unloads preserved (immutable) with <code>source, load_dt, batch_id</code>; log file name, checksum, row count, received_at, status.</li>
+<li><b>Staging:</b> mirrored schemas, lightly standardized; holds rejected rows; enables reprocessing without re-hitting sources.</li>
+<li><b>Standardization:</b> normalize codes (AE&rarr;UAE&rarr;784), ISO 4217 currency, common date/timezone (UTC + business calendar), names/addresses.</li>
+<li><b>MDM / customer master:</b> exact match on national ID/email; fuzzy/score-based on name+DOB+address; <b>survivorship/golden record</b> (most complete/trusted per field); <code>customer_master</code> + <code>customer_map (src_sys, src_cust_id, cust_master_id)</code>; daily match/merge jobs; audit merges (merging the wrong customers is a serious banking risk).</li>
+<li><b>Lineage:</b> track source &rarr; landing &rarr; staging &rarr; master &rarr; marts (source_system, table, extraction_time, job_id, transform rules).</li>
+<li><b>Error handling:</b> quarantine/rejection tables with reason + raw payload; retry with backoff; <b>zero-downtime pattern</b> (load to staging, validate, promote via rename/partition-swap); alert on error thresholds; fail the job on material discrepancy.</li>
+</ul>
+</section>
+
+<!-- ============ SECTION 17 ============ -->
+<section id="s17">
+<h2><span class="n">17.</span> Data Validation &amp; Reconciliation</h2>
+
+<h3>Techniques</h3>
+<ul>
+<li><b>Row counts</b> — source vs staged vs target, per file/partition.</li>
+<li><b>Control totals</b> — SUM(amount), COUNT, MIN/MAX of key columns.</li>
+<li><b>Hash/sum checks</b> — MD5/SHA-256 over row payloads (prove equality without full compare); per-file checksums.</li>
+<li><b>Balancing</b> — front-office vs risk/back-office (positions, EOD balances); sum of daily txns reconciles to GL movement.</li>
+<li><b>Tolerance thresholds</b> — financial data exact match or &le;0.1% variance; document + escalate.</li>
+<li><b>Key-based reconciliation</b> — full outer join &rarr; matched / only-source / only-target.</li>
+</ul>
+
+<h3>DQ Dimensions <span class="badge">MEMORIZE</span></h3>
+<table>
+<tr><th>Dimension</th><th>Question</th></tr>
+<tr><td><b>Accuracy</b></td><td>Correct vs real-world / source of truth</td></tr>
+<tr><td><b>Completeness</b></td><td>No missing mandatory fields (<code>COUNT(*) vs COUNT(col)</code>)</td></tr>
+<tr><td><b>Timeliness</b></td><td>Available within SLA (T-1 EOD by 06:00)</td></tr>
+<tr><td><b>Consistency</b></td><td>Same values across systems; codes align</td></tr>
+<tr><td><b>Uniqueness</b></td><td>No duplicate customer/account keys</td></tr>
+<tr><td><b>Validity</b></td><td>Conforms to rules (positive amounts, valid codes, in-range dates)</td></tr>
+</table>
+<pre><code>SELECT COUNT(*) FROM stg.txn WHERE amt < 0;                       -- validity
+SELECT COUNT(*) FROM stg.txn WHERE cust_id IS NULL;               -- completeness
+SELECT cust_id, COUNT(*) FROM stg.txn GROUP BY cust_id HAVING COUNT(*)>1;  -- uniqueness</code></pre>
+
+<h3>Frameworks, Audit &amp; Discrepancy Reporting</h3>
+<ul>
+<li>DAMA-DMBOK dimensions; DQ scorecards per feed; rules engine (SQL or Collibra/Ataccama/Informatica DQ).</li>
+<li><b>Gate:</b> DQ score above threshold before load promotion; trending dashboard per feed.</li>
+<li><b>Audit trail:</b> <code>audit_feed (feed, src_table, load_dt, src_rows, tgt_rows, sum_diff, status, reconciled_at)</code>; every transform logged (job, version, params, rows).</li>
+<li><b>Discrepancy report:</b> non-reconciling rows + reason codes + owner; escalate per SLA; track to closure.</li>
+</ul>
+</section>
+
+<!-- ============ SECTION 18 ============ -->
+<section id="s18">
+<h2><span class="n">18.</span> Production Issue Resolution</h2>
+
+<h3>Triage</h3>
+<ol>
+<li>Scope: single job/feed or systemic? Source vs target vs transform?</li>
+<li>Check monitor/alerts &rarr; logs &rarr; data. Stabilize (hold dependent jobs) before deep-diving.</li>
+<li>Communicate status to stakeholders early.</li>
+</ol>
+
+<h3>RCA &amp; Classification</h3>
+<ul>
+<li>5 Whys / fishbone; classify: <b>data issue</b> (backdated txn, schema change &rarr; fix source/re-extract), <b>code issue</b> (fix + rerun), <b>infra issue</b> (network/disk/DB locks/SHIR down &rarr; rerun after recovery), dependency, parameter/calendar.</li>
+<li>Evidence: job logs, run history, source timestamps, row-level diffs.</li>
+</ul>
+
+<h3>Monitoring &amp; Scheduling Tools</h3>
+<ul>
+<li>Alert on: failure, late start (SLA), zero rows loaded, reconciliation breach, SHIR heartbeat down.</li>
+<li><b>Control-M</b> (enterprise batch: dependencies, business-day calendars, SLA alerts — common in banks), <b>Apache Airflow</b> (DAGs, retries, backfills, sensors), ADF triggers.</li>
+<li>Design: dependency graph, task-level reruns, holiday calendars, resource contention handling.</li>
+</ul>
+
+<h3>Rerun / Recovery / Incident / Post-mortem</h3>
+<ul>
+<li><b>Idempotent reruns</b> (staging + upsert + watermark); <b>checkpoint resume</b> from failed partition; <b>partial rerun</b>; <b>backfill</b> via parameterized run (<code>biz_dt</code>); rollback from staging/pre-load backup; document data-versioning so consumers know what changed.</li>
+<li><b>Severities:</b> Sev1 = EOD batch down/financial misstatement; Sev2 = single feed delayed; Sev3 = cosmetic. SLA response targets, owner/on-call, escalation path (ITSM/ServiceNow).</li>
+<li><b>Post-mortem:</b> timeline, impact, root cause, containment, prevention (tests, validation rules, monitoring, runbooks), follow-up actions with owners/dates — blameless culture.</li>
+</ul>
+
+<div class="qa"><div class="q">A production job failed at 3am, what do you do?</div>
+<div class="a">(1) Assess impact — deadline today? who must know? (2) Open incident, pull the rota. (3) Diagnose from logs: data, code, or infra. (4) If data &rarr; correct and rerun after smoke test; if code &rarr; approved fix path, never improvise in prod. (5) Verify outputs + reconcile totals vs prior run. (6) Communicate upward. (7) Drive RCA: root cause, why not caught earlier, the control to prevent recurrence. <b>"Slow is smooth, smooth is fast"</b> — controlled steps beat panic reruns.</div></div>
+</section>
+
+<!-- ============ SECTION 19 ============ -->
+<section id="s19">
+<h2><span class="n">19.</span> SDLC &amp; Consulting in Banking</h2>
+
+<h3>Waterfall vs Agile vs Hybrid</h3>
+<ul>
+<li><b>Waterfall:</b> sequential, phase-gated, signed off — favored for regulatory/risk/core-banking implementations (auditability).</li>
+<li><b>Agile:</b> sprints, backlog, working software each sprint — front-office channels, BI, risk analytics tools.</li>
+<li><b>Hybrid (common in ME/SEA):</b> "Agile delivery, waterfall governance" — sprints internally + stage gates (Initiation &rarr; Discovery &rarr; Build &rarr; SIT &rarr; UAT &rarr; Go-Live) with formal sign-offs and CAB-approved releases.</li>
+</ul>
+
+<h3>The Phases &amp; Consultant's Role</h3>
+<table>
+<tr><th>Phase</th><th>Deliverables</th><th>Consultant role</th></tr>
+<tr><td>Discovery</td><td>Business case, feasibility, as-is, scope</td><td>Quantify pain (manual reconciliation hours), assess data availability, flag DQ blockers early</td></tr>
+<tr><td>Requirements</td><td>BRD/FRD, process maps, data mapping, traceability</td><td>Workshops; ask "what decision does this report drive?"; produce report mockups</td></tr>
+<tr><td>Design</td><td>TDD, interface specs, data model, mapping</td><td>Validate mapping against real source data; define rules for nulls/dupes/currency/calendar</td></tr>
+<tr><td>Build</td><td>Code/ETL/dashboards, unit tests, technical docs</td><td>Clarify ambiguities, demo incrementally, chase source access</td></tr>
+<tr><td>SIT</td><td>Integration test results</td><td>Integration test data; verify end-to-end data flows; resolve mapping errors</td></tr>
+<tr><td>UAT</td><td>UAT sign-off</td><td><b>Central:</b> test data, triage defects, bridge business/dev, track readiness</td></tr>
+<tr><td>Go-Live</td><td>Deployment, cutover, smoke tests</td><td>Reconcile data migration; validate totals</td></tr>
+<tr><td>Hypercare</td><td>War-room, daily status, rapid fixes (2&ndash;6 wks)</td><td>Monitor accuracy vs old system, parallel reconciliations, log lessons learned</td></tr>
+<tr><td>BAU Support</td><td>Tickets, RCA, releases</td><td>Discrepancy investigations; turn recurring fixes into permanent controls</td></tr>
+</table>
+
+<h3>Consulting &amp; Client Management</h3>
+<ul>
+<li><b>Status reports</b> weekly (accomplishments, next week, decisions needed, risks/issues) — decision-focused.</li>
+<li><b>Steering committee</b> monthly — milestones, RAID, budget, go-live readiness; one page per topic; "decision required" stated clearly.</li>
+<li><b>RAID log:</b> Risks (may happen), Assumptions (accepted — chase them), Issues (happening — act), Dependencies (external). Review weekly.</li>
+<li><b>Expectation management:</b> explicit in/out of scope; baseline; say it early with mitigation, not late with an excuse.</li>
+<li><b>Ambiguity handling:</b> never guess silently — restate, write the interpretation, get written sign-off, present the cost of each option.</li>
+<li><b>Bridge:</b> business speaks outcomes/days, tech speaks mechanisms/effort. "The ETL job times out" &rarr; "the monthly report will be a day late; here's the fix."</li>
+<li><b>ME context:</b> relationships before transactions; hierarchy; Ramadan hours; formal titles; Friday key day.</li>
+<li><b>SEA context:</b> hierarchy &amp; face-saving; harmony over confrontation ("maybe" can mean "no"); consensus before formal decisions.</li>
+<li><b>Time zones (ME&rarr;SEA ~3&ndash;6h):</b> overlap windows, record sessions, circulate MOM with owners + due dates.</li>
+<li><b>Demos:</b> rehearse, representative data, plan for demo failure, state what's NOT included.</li>
+</ul>
+
+<div class="qa"><div class="q">Walk me through a project end to end.</div>
+<div class="a">Initiation (business case, regulatory driver) &rarr; Discovery (as-is, data assessment — found duplicate customer records) &rarr; Requirements (workshops, signed FRD, glossary) &rarr; Design (data mapping doc, interface specs) &rarr; Build (weekly demos) &rarr; SIT (interface timing issues) &rarr; UAT (supported 20 users, 150 scenarios, daily stand-up, defect review board) &rarr; Go-live (data migration reconciled to the penny, dress rehearsal, CAB) &rarr; Hypercare (fixed 12 data issues week 1) &rarr; PIR (added DQ gates). End with numbers.</div></div>
+</section>
+
+<!-- ============ SECTION 20 ============ -->
+<section id="s20">
+<h2><span class="n">20.</span> Requirement Analysis</h2>
+
+<h3>Gathering Techniques</h3>
+<p>Interviews (exceptions are where requirements hide), workshops, <b>JAD sessions</b>, document analysis (existing reports, regulator circulars, data dictionary), shadowing, prototyping/mockups, questionnaires.</p>
+
+<h3>BRD vs FRD vs SRS</h3>
+<ul>
+<li><b>BRD</b> — what the business wants and why (objectives, scope, stakeholders, success criteria) — for sponsors.</li>
+<li><b>FRD</b> — how the system must behave (functions, rules, validations, screen/report logic) — for developers/QA.</li>
+<li><b>SRS</b> — consolidated formal spec (functional + non-functional + interface + constraints), contract-level in vendor projects. In many banks FRD &asymp; SRS.</li>
+</ul>
+
+<h3>Functional vs Non-Functional (NFRs)</h3>
+<ul>
+<li><b>Functional:</b> "the report must show ECL by portfolio and product", "the API must validate customer ID".</li>
+<li><b>Non-functional:</b> performance (batch before 06:00, report &lt;5s), security (encryption, RBAC, PII masking), availability/DR (RTO/RPO), scalability, compliance/auditability (lineage, immutable audit trail), usability.</li>
+</ul>
+<div class="callout warn">Interview tip: regulators/architects probe NFRs harder than FRs. Always ask "what happens at month-end with 10x data?"</div>
+
+<h3>MoSCoW, User Stories, As-Is/To-Be, Traceability</h3>
+<ul>
+<li><b>MoSCoW:</b> Must / Should / Could / Won't — "Won't have" is as valuable as Must; use it when a deadline slips instead of silently cutting.</li>
+<li><b>User stories + acceptance criteria:</b> <i>Given</i> a corporate customer with a past-due installment, <i>when</i> the EWS batch runs, <i>then</i> a watchlist alert is generated with reason code PAST_DUE_30.</li>
+<li><b>As-is vs to-be:</b> document current (often Excel-driven) flow; gap analysis; to-be removes the manual layer.</li>
+<li><b>Traceability matrix:</b> every requirement &rarr; design &rarr; test case &rarr; evidence (<code>FR-014 &rarr; DM-09 &rarr; UAT TC-57 &rarr; Passed 12-Mar</code>) — proves to audit everything was built &amp; tested.</li>
+<li><b>Sign-off:</b> right people (authorized business owners) sign after walkthrough; route regulatory requirements through compliance/IT risk.</li>
+</ul>
+
+<h3>Scope Creep &amp; Change Requests</h3>
+<p>Counter with a baselined, signed scope + change control: any new request &rarr; CR with impact analysis &rarr; CCB approval &rarr; update BRD/mapping/tests. Realistic scenario: two weeks before UAT the client adds a regulator field &rarr; "Impact: +6 dev days, +3 UAT days, go-live moves to 14-Sep, or we ship without it." Let the business decide.</p>
+
+<h3>Data Mapping Document Example</h3>
+<table>
+<tr><th>#</th><th>Source</th><th>Source Field</th><th>Target Field</th><th>Transformation / Rule</th><th>Validation</th><th>Null handling</th><th>Req</th></tr>
+<tr><td>1</td><td>CORE</td><td>CUST_ID</td><td>DIM_CUSTOMER.CUST_KEY</td><td>Surrogate key from CUST_ID + source code</td><td>Regex [0-9]{6,12}; reject invalid</td><td>Auto-generate + audit flag</td><td>FR-003</td></tr>
+<tr><td>2</td><td>LOAN</td><td>STATUS_CODE</td><td>FACT_EXPOSURE.LOAN_STATUS</td><td>A&rarr;ACTIVE, D&rarr;DPD_30_59, F&rarr;DPD_60_89, G&rarr;NPL</td><td>Unmapped &rarr; UNKNOWN + exception</td><td>N/A</td><td>FR-015</td></tr>
+<tr><td>3</td><td>LOAN</td><td>ACCR_INT_AMT</td><td>FACT_EXPOSURE.ACCRUED_INT</td><td>Round 2dp; FX via REF_RATES at report date</td><td>Total within tolerance 0.01</td><td>0 with warning</td><td>FR-012</td></tr>
+</table>
+</section>
+
+<!-- ============ SECTION 21 ============ -->
+<section id="s21">
+<h2><span class="n">21.</span> UAT Support</h2>
+
+<h3>What UAT Is</h3>
+<p><b>Business users</b> (not developers) test that the system meets business requirements in a production-like environment — "fit for purpose", not "does the code work".</p>
+
+<h3>UAT Plan &amp; Test Data</h3>
+<ul>
+<li>Plan: scope, entry/exit criteria, environment, testers, data strategy, schedule, defect process, sign-off criteria.</li>
+<li>Scenarios: end-to-end business journeys + <b>negative tests</b> + <b>regulatory scenarios</b> (loan goes 90-dpd &rarr; check EWS alert + provisioning output). Map each to a requirement.</li>
+<li>Use <b>masked/synthetic production data</b>; cover normal, boundary (exactly 90 DPD, at limit), and exception cases (duplicates, nulls, currency mismatches). Validate data BEFORE UAT — "the UAT data itself is wrong" is the #1 day-one failure.</li>
+</ul>
+
+<h3>Defect Lifecycle &amp; Severity/Priority</h3>
+<ol>
+<li><b>Log</b> (repro steps, expected vs actual, screenshot) &rarr; <b>Triage</b> (defect review board) &rarr; <b>Assign</b> &rarr; <b>Fix</b> &rarr; <b>Retest</b> &rarr; <b>Close</b>.</li>
+</ol>
+<ul>
+<li><b>Severity = impact; Priority = urgency.</b> S1 Critical (system down / wrong regulatory report — blocks go-live), S2 Major (core function fails, no workaround), S3 Minor, S4 Cosmetic.</li>
+<li><b>JIRA</b> standard; track open-vs-closed trend, <b>defect leakage</b> (prod defects that should've been caught in UAT).</li>
+<li>Weekly defect report: total logged, open by severity, fixed, verified, waivered, blockers to sign-off; ageing &gt;5 days.</li>
+</ul>
+
+<h3>Sign-off Criteria &amp; Coordination</h3>
+<ul>
+<li>No open S1/S2 (or formal waivers); all Must-haves tested &amp; passed; 100% scenario execution; known-issues list with workarounds.</li>
+<li>Daily UAT stand-up (10 min); defect review board (twice weekly); single UAT tracker; translate dev jargon &harr; business language.</li>
+</ul>
+
+<h3>Common UAT Challenges</h3>
+<table>
+<tr><th>Challenge</th><th>Handling</th></tr>
+<tr><td>Wrong/old test data</td><td>Pre-validate, freeze dataset, data dictionary, log data defects separately</td></tr>
+<tr><td>Environment not refreshed</td><td>Schedule refreshes; smoke test before sessions; escalate with business impact</td></tr>
+<tr><td>Unclear requirements</td><td>"Ambiguity is a design-time problem that surfaces at test-time" — triage, write interpretation, sign-off</td></tr>
+<tr><td>Testers unavailable</td><td>Roster + backups at kickoff; escalate via steering</td></tr>
+<tr><td>Scope creep disguised as bugs</td><td>A "bug" that changes expected behavior = change request — triage carefully</td></tr>
+</table>
+
+<div class="qa"><div class="q">How do you handle UAT when the client keeps finding bugs?</div>
+<div class="a">Don't react defensively. (1) Triage — defect or new requirement? (2) Confirm data/environment before blaming code (many "bugs" are test-data issues). (3) Get an agreed expected result per failing scenario — if the tester can't state it, the requirement is ambiguous. (4) Prioritize severity&times;priority; protect go-live by trading Should-haves. (5) Daily defect review + show a declining bug-trend so they see convergence.</div></div>
+</section>
+
+<!-- ============ SECTION 22 ============ -->
+<section id="s22">
+<h2><span class="n">22.</span> Deployment &amp; Release Management</h2>
+
+<h3>Environments</h3>
+<p><code>DEV &rarr; SIT &rarr; UAT &rarr; PROD</code> (+ PREPROD, DR). Config alignment matters — "it works in UAT but not prod" is usually an environment/config difference.</p>
+
+<h3>Strategies</h3>
+<ul>
+<li><b>Big bang</b> — replace everything at once; high risk; for tightly coupled cores.</li>
+<li><b>Phased/rolling</b> — by branch/country/product (roll EWS to UAE first, then Saudi); lower risk, dual-running.</li>
+<li><b>Blue-green</b> — two identical prod environments; instant rollback.</li>
+<li><b>Canary</b> — small slice of users, then ramp; rare in core banking.</li>
+</ul>
+
+<h3>Go-Live / Cutover / Rollback / Hypercare</h3>
+<ul>
+<li><b>Cutover plan:</b> minute-by-minute steps with named owners: freeze &rarr; backups &rarr; stop interfaces &rarr; data migration &rarr; deploy &rarr; configure &rarr; smoke test &rarr; open to users.</li>
+<li><b>Data migration:</b> reconcile counts/totals/hash totals (records in vs out), handle duplicates/dirty data before go-live, validate lookups, keep old system until proven.</li>
+<li><b>Rollback vs roll-forward:</b> restore vs fix-forward. For data migrations, restore may be impossible after new transactions — plan "fall back to old system + re-enter the window's transactions", or phase the release.</li>
+<li><b>CAB:</b> every prod change needs a Change Request reviewed by the Change Advisory Board (risk level, impact, outage window, rollback plan).</li>
+<li><b>Hypercare:</b> 2&ndash;6 weeks war-room, dedicated queue, faster SLA, known-issues register; exit when incident rate drops to BAU.</li>
+<li><b>Go/No-Go:</b> objective criteria — UAT sign-off, S1/S2 resolved, data reconciled, rollback rehearsed, training done. No-go is legitimate.</li>
+<li><b>PIR</b> (4&ndash;8 weeks after): business case met? defect leakage, performance vs NFR, lessons learned.</li>
+</ul>
+
+<div class="callout green"><b>Data consultant's moment:</b> post-deploy smoke tests + <b>reconciliation checks</b> (totals before vs after cutover) are your job. Baseline reconciliations (counts, totals, hash totals, lookups) defined pre- and post-cutover.</div>
+</section>
+
+<!-- ============ SECTION 23 ============ -->
+<section id="s23">
+<h2><span class="n">23.</span> Banking-Specific IT Constraints</h2>
+<ul>
+<li><b>Privacy &amp; residency:</b> GDPR, Saudi PDPL, UAE Federal PDPL 2021, Singapore PDPA, India DPDP Act; data residency in-country or approved zones; cloud needs regulator approval (CBUAE guidance).</li>
+<li><b>PCI-DSS:</b> card data encryption, segmentation, quarterly scans, restricted storage.</li>
+<li><b>Encryption:</b> AES-256 at rest, TLS 1.2+ in transit, masking in non-prod, tokenization for card numbers, HSM key management.</li>
+<li><b>Regulatory deadlines:</b> CBUAE daily liquidity, monthly/quarterly prudential returns; MAS timelines; <b>BCBS 239</b> = legal mandate for data lineage/accuracy/completeness/timeliness. ETL must hit hard deadlines with zero tolerance.</li>
+<li><b>Audit readiness:</b> every change documented, signed, traceable; evidence retained per policy.</li>
+<li><b>IT general controls / SOX-like:</b> access reviews, change-management evidence, segregation of duties, approval workflows, audit logs.</li>
+<li><b>Access:</b> RBAC, least privilege, quarterly recertification, segregation of duties (approver &ne; booker), 2FA, PII access logging.</li>
+</ul>
+<div class="callout"><b>Answer framing:</b> "I designed the dashboard so credit analysts see only their business unit's data — that's least-privilege and segregation-of-duties, which also satisfies access recertification."</div>
+</section>
+
+<!-- ============ SECTION 24 ============ -->
+<section id="s24">
+<h2><span class="n">24.</span> Behavioral / STAR Questions</h2>
+<p>Format: <b>S</b>ituation, <b>T</b>ask, <b>A</b>ction (your actions), <b>R</b>esult (quantify).</p>
+
+<div class="qa"><div class="q">Tell me about teamwork in a challenging project.</div>
+<div class="a"><b>S:</b> Cross-functional team (business, IT, vendor) building a credit-risk dashboard for a Gulf bank. <b>T:</b> Deliver ECL reporting by a fixed regulatory deadline. <b>A:</b> Weekly cross-team sync, shared RAID log, wrote a definitions glossary both sides signed, pair-sessions between credit and ETL teams. <b>R:</b> Definitional disputes dropped to zero before UAT; report delivered on time; both teams credited the glossary.</div></div>
+
+<div class="qa"><div class="q">Conflict between a business user and a developer.</div>
+<div class="a"><b>S:</b> User said a report was wrong; dev said code matched spec. <b>A:</b> Ran the user's test case, traced it to a data-mapping rule (not code), convened a short triage, proposed the updated mapping as a documented CR with sign-off. <b>R:</b> Root cause confirmed in the data layer; fixed; trust maintained because I showed evidence, not opinions.</div></div>
+
+<div class="qa"><div class="q">Tight deadline.</div>
+<div class="a"><b>A:</b> Re-baselined scope with MoSCoW (deferred Should-haves with sign-off), parallelised testing with pre-built scripts, evening support for testers. <b>R:</b> Must-haves delivered on the new date; deferred items in the next release; regulator deadline met.</div></div>
+
+<div class="qa"><div class="q">Production incident (month-end EWS batch failed at 02:00).</div>
+<div class="a"><b>A:</b> Opened incident, coordinated support/IT ops; diagnosed an upstream data issue; reran after smoke test; reconciled totals vs prior month; posted RCA in 48h. <b>R:</b> Report delivered by deadline; a permanent DQ validation was added so it never recurred.</div></div>
+
+<div class="qa"><div class="q">Ambiguous requirement ("an early warning dashboard for problem accounts").</div>
+<div class="a"><b>A:</b> Workshop asking "what does a problem account mean, and what decision does this dashboard support?"; drafted glossary + mock-ups; confirmed definitions (30+ DPD, covenant breach) with the credit head; signed FRD. <b>R:</b> UAT passed with fewer than five rework defects; went live on schedule.</div></div>
+
+<div class="qa"><div class="q">Cross-cultural team (Gulf client + SEA offshore devs).</div>
+<div class="a"><b>A:</b> 30-min overlap handover window, written clarification log (async), raised concerns one-to-one (face-saving), recorded every session. <b>R:</b> Clarification turnaround dropped from 2 days to hours; zero requirements lost.</div></div>
+
+<div class="qa"><div class="q">Taking ownership.</div>
+<div class="a"><b>S:</b> Previous consultant left mid-project; UAT stalled, docs missing. <b>A:</b> Owned the UAT tracker end-to-end, rebuilt the traceability matrix, organised a defect review board, chased sign-offs. <b>R:</b> UAT signed off in four weeks; became named owner for the next release.</div></div>
+
+<div class="qa"><div class="q">Failure and learning.</div>
+<div class="a"><b>S:</b> Recommended "go" on a go-live aborted on the day due to unvalidated data migration. <b>A:</b> Admitted the gap, worked 48h to restore the old system, led the PIR. <b>R:</b> A data-reconciliation + dry-run gate was added to the deployment checklist; next go-live succeeded first time. I now always verify "did the migration total match source total" before recommending go.</div></div>
+
+<div class="qa"><div class="q">Persuading a resistant stakeholder.</div>
+<div class="a"><b>A:</b> Sat with the senior risk manager and watched his Excel workflow; rebuilt the dashboard around his decision flows; side-by-side comparison on his own portfolio. <b>R:</b> He became the system's champion in the risk committee; adoption followed.</div></div>
+
+<div class="qa"><div class="q">Handling scope creep.</div>
+<div class="a"><b>A:</b> Logged every request with effort estimates; presented impact at steering; got a decision to move additions to Phase 2. <b>R:</b> Go-live held; business appreciated the explicit trade-off; Phase 2 approved.</div></div>
+
+<div class="qa"><div class="q">Explaining technical issues to non-technical people.</div>
+<div class="a"><b>S:</b> A reconciliation difference was being escalated to the COO. <b>A:</b> Framed as "the new system counts one class of loans differently, affecting the monthly total by X%" with a one-page visual and timeline; gave the COO talking points. <b>R:</b> COO briefed the board accurately; fix went through CAB on schedule.</div></div>
+
+<div class="qa"><div class="q">Prioritising under pressure.</div>
+<div class="a"><b>S:</b> Same week as go-live: a critical bug and a regulatory report. <b>A:</b> Assessed impact — bug affected one report; regulatory deadline non-negotiable. Fixed the report path first; workaround for the bug; logged proper fix for next release. <b>R:</b> Regulator met on time; bug shipped in the scheduled release with no data impact.</div></div>
+</section>
+
+<!-- ============ SECTION 25 ============ -->
+<section id="s25">
+<h2><span class="n">25.</span> Trends 2024&ndash;2026</h2>
+
+<h3>AML</h3>
+<ul>
+<li><b>AI/ML mainstream</b> — anomaly detection + risk scoring; regulators (HKMA 2024&ndash;26, EBA, FATF) encourage adoption but require <b>model risk management and explainability (XAI)</b> — audit trails showing WHY a decision was made. Hybrid stacks: rules + ML + graph analytics.</li>
+<li><b>Real-time monitoring</b> — instant payments (UAE IPP, SG FAST, HK FPS) demand near-real-time screening; "instant payments demand instant AML".</li>
+<li><b>Perpetual KYC (pKYC)</b> — continuous event-driven refresh; reduces stale-risk and review backlogs.</li>
+<li><b>Regtech/suptech</b> — HKMA digitalised AML/CFT supervision; automated SAR narratives.</li>
+<li><b>Crypto/VASP AML</b> — <b>Travel Rule</b> (FATF R16; ISO 20022 alignment June 2025), VASP licensing (HK 2023, EU MiCA), stablecoin regulation (HK 2024), on-chain analytics; ~84% of illicit VA volume in stablecoins.</li>
+<li><b>Enforcement shift</b> — regulators penalise <i>ineffective systems</i> (stale rules, poor tuning, FP floods), not just absent programs — "TM adequacy enforcement"; KPI-focused exams.</li>
+</ul>
+
+<h3>Credit Risk &amp; EWS</h3>
+<ul>
+<li><b>Real-time decisioning</b> — rule engines + AI scoring + API decisioning; &gt;90% STP in retail/SMB; "always-on" monitoring replaces monthly batch.</li>
+<li><b>Alternative data</b> — bank-transaction/cash-flow analysis, open banking (GCC/India account aggregators), rent/telco for thin-file borrowers.</li>
+<li><b>ML credit models</b> — gradient boosting/ensembles; ESG/climate into credit; explainable AI (SHAP, reason codes) + drift monitoring; EU AI Act + model-risk expectations.</li>
+<li><b>IFRS 9 automation</b> — end-to-end ECL engines (staging + PD/LGD/EAD + macro scenarios + attribution); SICR trigger libraries; month-end close cut 40&ndash;60%; <b>RBI ECL from 1 Apr 2027</b>; climate-aware ECL; PMAs/overlays under scrutiny (BoE SS1/23).</li>
+<li><b>Gen-AI</b> — early-warning summaries, credit-memo drafting, document extraction, unstructured news &rarr; watchlist scoring; adoption &gt; pilots but constrained by data quality, explainability, and hallucination risk. "Workflow design matters as much as model quality."</li>
+<li><b>EWS evolution (EY 2025)</b> — from backward-looking to <b>real-time predictive EWS</b>; three pillars: data, analytics/technology, process/governance.</li>
+</ul>
+</section>
+
+<!-- ============ SECTION 26 ============ -->
+<section id="s26">
+<h2><span class="n">26.</span> Cheat Sheets &amp; Checklists</h2>
+
+<h3>One-Line Definitions (Rapid-fire)</h3>
+<table>
+<tr><th>Term</th><th>One-liner</th></tr>
+<tr><td>EL</td><td>PD &times; LGD &times; EAD — the average expected loss</td></tr>
+<tr><td>RWA</td><td>Exposure &times; risk weight; denominator of capital ratios</td></tr>
+<tr><td>CCF</td><td>Credit conversion factor — % of undrawn commitment counted in EAD</td></tr>
+<tr><td>SICR</td><td>Significant increase in credit risk &rarr; moves Stage 1&rarr;2 (lifetime ECL)</td></tr>
+<tr><td>Roll rate</td><td>% of accounts migrating from bucket X to X+30 next month</td></tr>
+<tr><td>Cure rate</td><td>% of defaulted/Stage-2 accounts returning to performing</td></tr>
+<tr><td>FPR</td><td>False positives &divide; total alerts</td></tr>
+<tr><td>STR vs SAR</td><td>Suspicious Transaction Report (FATF/APAC/ME/EU) vs Suspicious Activity Report (US)</td></tr>
+<tr><td>RBA</td><td>Risk-based approach — controls proportional to assessed risk</td></tr>
+<tr><td>SCD2</td><td>Slowly changing dimension keeping full history via effective dates</td></tr>
+<tr><td>CDC</td><td>Change data capture (log-based) for incremental loads</td></tr>
+<tr><td>SHIR</td><td>Self-hosted integration runtime — on-prem agent for ADF</td></tr>
+<tr><td>HWM</td><td>High-water mark / watermark for incremental extraction</td></tr>
+<tr><td>MoSCoW</td><td>Must / Should / Could / Won't prioritization</td></tr>
+<tr><td>RAID</td><td>Risks, Assumptions, Issues, Dependencies log</td></tr>
+<tr><td>PIR</td><td>Post-implementation review 4&ndash;8 weeks after go-live</td></tr>
+</table>
+
+<h3>Day-1 Onboarding Questions (for a banking client)</h3>
+<ul>
+<li>What business problem/decision does this serve; who is the sponsor; what does "done" look like?</li>
+<li>Which regulations drive this (CBUAE, MAS, BCBS 239...)?</li>
+<li>Which source systems exist (core, GL, loans, payments, bureau) and who owns each?</li>
+<li>Where is the data dictionary / lineage for key fields?</li>
+<li>What DQ issues are already known (duplicates, missing statuses, reclassifications)?</li>
+<li>What are the masking, retention, and residency rules for data I'll touch?</li>
+<li>Who are the business owners / key users / IT stakeholders, and who signs off?</li>
+<li>What is the CAB process and typical release window?</li>
+<li>What environment access and approvals do I need?</li>
+<li>What is "as-is" today — who does what manually, where are the pain points?</li>
+</ul>
+
+<h3>UAT Readiness Checklist</h3>
+<ul>
+<li>Requirements baselined &amp; signed; traceability current.</li>
+<li>UAT plan approved (scope, entry/exit criteria, testers, sign-off criteria).</li>
+<li>UAT environment stable, refreshed to agreed data cut; test data masked, validated vs source totals, frozen.</li>
+<li>Scenarios mapped to requirements; negative + regulatory scenarios included.</li>
+<li>Tester roster confirmed (name + backup), trained on system and defect tool.</li>
+<li>JIRA configured (fields, priorities, workflow, dashboards); defect review board + daily stand-up scheduled.</li>
+<li>Sign-off authority confirmed; known-issues list + expected-result baseline established.</li>
+</ul>
+
+<h3>Go-Live Checklist</h3>
+<ul>
+<li>UAT sign-off (no open S1/S2, waivers documented); go/no-go decision approved; CAB change approved.</li>
+<li>Artifacts versioned/tagged; deployment package verified in PREPROD; dress rehearsal completed.</li>
+<li>Data migration plan finalised (extract/transform/load/reconcile/exception handling).</li>
+<li>Baseline reconciliations defined (counts, totals, hash totals, lookups) pre- and post-cutover.</li>
+<li>Backups verified and restore-tested; cutover plan with named owners; rollback plan rehearsed.</li>
+<li>Interfaces/downstream notified; re-enable order defined; hypercare rota + escalation path agreed.</li>
+<li>Release notes, known issues, runbook handed to production support; PIR scheduled.</li>
+</ul>
+
+<h3>Suggested Prep Points (tie to your resume)</h3>
+<ul>
+<li>ETL at scale: partitioning, incremental loads, aggregations that power TM rules and EWS triggers on 40M customers / 100M+ txns.</li>
+<li>SAS Studio: rule development/validation, scorecard &amp; EWS scoring, PROC COMPARE for reconciliation.</li>
+<li>REST API integration patterns you built: idempotency, retries/backoff, async + webhooks, circuit breakers.</li>
+<li>A concrete, quantified win: reduced false positives X%, improved alert-to-STR conversion, detected NPL deterioration 30&ndash;45 days earlier, cut month-end close time.</li>
+<li>Regulatory language: BCBS 239, IFRS 9 staging, FATF 40 recommendations, Basel 3.1 output floor — use the terms naturally.</li>
+<li>Delivery evidence trail: traceability matrix, data mapping docs, UAT defect reports, go-live reconciliation — treat documents as deliverables.</li>
+</ul>
+
+<div class="callout red"><b>Final tip:</b> You have three stories to prepare cold — (1) one AML/EWS build end-to-end, (2) one reconciliation/data-quality rescue, (3) one UAT/go-live you drove to sign-off. Memorise numbers for each. Everything else in this guide is supporting ammunition.</div>
+</section>
+
+</main>
+</div>
+
+<button id="toTop" title="Back to top">&uarr;</button>
+
+<script>
+// Search filter
+const q=document.getElementById('q');
+const nav=document.getElementById('nav');
+q.addEventListener('input',()=>{
+  const t=q.value.toLowerCase().trim();
+  nav.querySelectorAll('a').forEach(a=>{
+    const text=a.textContent.toLowerCase();
+    if(!t) a.classList.remove('hidden');
+    else a.classList.toggle('hidden', !text.includes(t));
+  });
+});
+// Back to top
+const btn=document.getElementById('toTop');
+window.addEventListener('scroll',()=>{ btn.style.display = window.scrollY>400?'block':'none'; });
+btn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+// Active nav highlighting
+const links=[...document.querySelectorAll('#nav a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+window.addEventListener('scroll',()=>{
+  let idx=0;
+  secs.forEach((s,i)=>{ if(s && s.getBoundingClientRect().top<120) idx=i; });
+  links.forEach((a,i)=>a.classList.toggle('s',i===idx));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTSAV — Architectural Redesign from Scratch</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --surface2: #222222;
+            --border: #333;
+            --text: #e8e8e8;
+            --text-dim: #999;
+            --accent: #ff6b35;
+            --accent2: #ffc107;
+            --green: #4caf50;
+            --red: #ef5350;
+            --blue: #42a5f5;
+            --purple: #ab47bc;
+            --cyan: #26c6da;
+            --code-bg: #1e1e1e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a0a00 0%, #2d1500 50%, #1a0a00 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 2.8em; color: var(--accent); margin-bottom: 10px; }
+        .hero .subtitle { font-size: 1.2em; color: var(--text-dim); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .toc h2 { color: var(--accent); margin-bottom: 15px; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+        .toc a {
+            color: var(--blue);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: block;
+            transition: background 0.2s;
+        }
+        .toc a:hover { background: var(--surface2); }
+
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: var(--accent);
+            font-size: 1.6em;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        .section h3 {
+            color: var(--accent2);
+            font-size: 1.2em;
+            margin: 25px 0 12px 0;
+        }
+        .section h4 {
+            color: var(--green);
+            font-size: 1.05em;
+            margin: 18px 0 8px 0;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison > div {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .comparison .before {
+            border-left: 4px solid var(--red);
+        }
+        .comparison .after {
+            border-left: 4px solid var(--green);
+        }
+        .comparison .label {
+            font-weight: bold;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .comparison .before .label { color: var(--red); }
+        .comparison .after .label { color: var(--green); }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .func { color: #dcdcaa; }
+        .code-block .number { color: #b5cea8; }
+
+        .callout {
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin: 15px 0;
+        }
+        .callout.improve {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--green);
+        }
+        .callout.issue {
+            background: rgba(239, 83, 80, 0.1);
+            border-left: 4px solid var(--red);
+        }
+        .callout.key {
+            background: rgba(66, 165, 245, 0.1);
+            border-left: 4px solid var(--blue);
+        }
+        .callout.arch {
+            background: rgba(171, 71, 188, 0.1);
+            border-left: 4px solid var(--purple);
+        }
+        .callout strong { display: block; margin-bottom: 5px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+        th {
+            background: var(--surface2);
+            color: var(--accent2);
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+        ul { margin: 10px 0 10px 24px; }
+        li { margin: 6px 0; }
+        li::marker { color: var(--accent); }
+
+        .diagram {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .priority-high { background: rgba(239,83,80,0.2); color: var(--red); }
+        .priority-medium { background: rgba(255,193,7,0.2); color: var(--accent2); }
+        .priority-low { background: rgba(66,165,245,0.2); color: var(--blue); }
+
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2em; }
+            .section { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>UTSAV — Architectural Redesign</h1>
+    <p class="subtitle">How to build the same platform from scratch — efficiently</p>
+</div>
+
+<div class="container">
+
+    <!-- TOC -->
+    <div class="toc">
+        <h2>Contents</h2>
+        <div class="toc-grid">
+            <a href="#current">1. Current Architecture — What Exists</a>
+            <a href="#problems">2. What's Wrong & What's Right</a>
+            <a href="#principles">3. Redesign Principles</a>
+            <a href="#directory">4. Directory Structure — Clean Module Architecture</a>
+            <a href="#database">5. Database — Same Schema, Cleaner Patterns</a>
+            <a href="#multi-tenancy">6. Multi-Tenancy — Simplified & Type-Safe</a>
+            <a href="#auth">7. Auth & RBAC — Single Source of Truth</a>
+            <a href="#services">8. Service Layer — No More Static Classes</a>
+            <a href="#actions">9. Server Actions — Uniform Contract</a>
+            <a href="#components">10. Components — Proper Boundaries</a>
+            <a href="#state">11. Data Fetching & Caching</a>
+            <a href="#testing">12. Testing — Built-In from Day 1</a>
+            <a href="#migration">13. Migration Strategy — If Refactoring</a>
+            <a href="#timeline">14. Build Timeline</a>
+        </div>
+    </div>
+
+    <!-- SECTION 1: Current Architecture -->
+    <div class="section" id="current">
+        <h2>1. Current Architecture — What Exists</h2>
+
+        <div class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                     UTSAV (Current)                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Browser ──► Next.js 14 (App Router)                        │
+│                │                                            │
+│    ┌───────────┴───────────┐                                │
+│    │                       │                                │
+│  Server Actions         Server Components                   │
+│  (src/actions/)         (src/app/[orgSlug]/dashboard/)     │
+│    │                       │                                │
+│    └───────┬───────────────┘                                │
+│            │                                                │
+│      Service Layer                                          │
+│      (src/modules/)                                         │
+│      Static classes with                                    │
+│      static methods                                         │
+│            │                                                │
+│      ┌─────┴──────┐                                         │
+│      │            │                                         │
+│  getTenantPrisma()   AuditService.record()                  │
+│  (Prisma Extension)  (Audit trail)                          │
+│      │                                                        │
+│  PostgreSQL                                                    │
+│  (12 models, 12 enums)                                       │
+└─────────────────────────────────────────────────────────────┘</div>
+
+        <h3>Current File Count</h3>
+        <table>
+            <tr><th>Layer</th><th>Files</th><th>Pattern</th></tr>
+            <tr><td>Server Actions</td><td>13 files, ~20 exported functions</td><td>Mixed return types</td></tr>
+            <tr><td>Services</td><td>15 files across 6 modules</td><td>Static-only classes</td></tr>
+            <tr><td>UI Components</td><td>~80+ component files</td><td>Server + Client mixed</td></tr>
+            <tr><td>Lib/Utils</td><td>16 files</td><td>Singleton + helpers</td></tr>
+            <tr><td>Tests</td><td>9 files</td><td>Vitest + RTL</td></tr>
+        </table>
+    </div>
+
+    <!-- SECTION 2: Problems & Strengths -->
+    <div class="section" id="problems">
+        <h2>2. What's Wrong & What's Right</h2>
+
+        <h3>What's Done Well (Keep These)</h3>
+        <div class="callout improve">
+            <strong>1. Tenant-Scoped Prisma Extension</strong>
+            <code>getTenantPrisma()</code> auto-injects <code>organizationId</code> into all queries. Prevents cross-tenant data leakage at the ORM level. Defense-in-depth.
+        </div>
+        <div class="callout improve">
+            <strong>2. Comprehensive Audit Logging</strong>
+            Before/after snapshots on every financial mutation. Full change history with <code>AuditService.record()</code>.
+        </div>
+        <div class="callout improve">
+            <strong>3. Zod Validation at Action Boundary</strong>
+            Every Server Action validates input with Zod before passing to services. Prevents invalid data from reaching business logic.
+        </div>
+        <div class="callout improve">
+            <strong>4. Error Hierarchy</strong>
+            <code>AppError</code> → <code>AuthenticationError</code> → <code>AuthorizationError</code> → etc. Structured error flow through <code>actionFailure()</code>.
+        </div>
+        <div class="callout improve">
+            <strong>5. Parallel Data Fetching</strong>
+            Server components use <code>Promise.all()</code> for concurrent DB queries. No waterfall delays.
+        </div>
+        <div class="callout improve">
+            <strong>6. Public Transparency Architecture</strong>
+            Separate <code>Public*Service</code> classes from authenticated services. Clean data access control for public pages.
+        </div>
+        <div class="callout improve">
+            <strong>7. Prasad Window System</strong>
+            Well-thought-out domain model for time-window-based bhog offering availability with proper date/timezone handling.
+        </div>
+
+        <h3>What Needs Fixing</h3>
+
+        <div class="callout issue">
+            <strong>1. Static-Only Service Classes — No Real OOP</strong>
+            Every service (OrganizationService, DonationService, etc.) uses only static methods. Classes are never instantiated. They're namespaces with extra syntax. In TypeScript, plain exported functions are cleaner.
+        </div>
+
+        <div class="callout issue">
+            <strong>2. Inconsistent Return Types Across Actions</strong>
+            Some actions use <code>actionSuccess()/actionFailure()</code>, others return raw <code>{success, error}</code> objects. Client consumers need different error-handling logic per action.
+        </div>
+
+        <div class="callout issue">
+            <strong>3. Duplicate Authorization Patterns</strong>
+            <code>validateAccess()</code> checks roles directly, <code>requirePermission()</code> uses the permission matrix. Both used interchangeably across services. Some actions manually query <code>organizationMember</code> to check ADMIN role instead of using the centralized system.
+        </div>
+
+        <div class="callout issue">
+            <strong>4. Task Logic Misplaced in Member Service</strong>
+            <code>MemberService</code> handles both member queries AND volunteer task CRUD. Task management should live in <code>modules/tasks/</code> (currently empty).
+        </div>
+
+        <div class="callout issue">
+            <strong>5. Redundant Organization Lookups</strong>
+            Dashboard layout resolves org via <code>getOrganizationBySlug()</code>, then child page does <code>prisma.organization.findUnique()</code> again. Same data fetched twice per page load.
+        </div>
+
+        <div class="callout issue">
+            <strong>6. Organization Type Branching in Components</strong>
+            Dashboard page has extensive <code>isFestival</code> conditionals with entirely different UI trees. Creates large, hard-to-read components.
+        </div>
+
+        <div class="callout issue">
+            <strong>7. Missing Loading/Error Boundaries</strong>
+            No <code>&lt;Suspense&gt;</code> boundaries or <code>error.tsx</code> files. A slow DB query blocks the entire dashboard render.
+        </div>
+
+        <div class="callout issue">
+            <strong>8. <code>as any</code> Cast Proliferation</strong>
+            Multiple <code>organization as any</code> casts suggest interface mismatches between service return types and component prop types.
+        </div>
+
+        <div class="callout issue">
+            <strong>9. Dead Code in FinancialService</strong>
+            FESTIVAL and CLUB branches compute identical formulas, making the conditional pointless.
+        </div>
+
+        <div class="callout issue">
+            <strong>10. No next.config.js</strong>
+            No image optimization, no custom webpack config, no redirect rules, no environment variable validation.
+        </div>
+    </div>
+
+    <!-- SECTION 3: Redesign Principles -->
+    <div class="section" id="principles">
+        <h2>3. Redesign Principles</h2>
+
+        <div class="callout key">
+            <strong>Principle 1: TypeScript-First Type Safety</strong>
+            No <code>as any</code>. Every service return type explicitly defined. Every component prop typed. Every action input/output typed. Compile-time guarantees.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 2: Single Authorization System</strong>
+            One function, one source of truth: <code>requirePermission(orgId, "permission")</code>. No role-checking, no manual admin queries, no bypassing.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 3: Functions Over Classes</strong>
+            Services as plain module exports. No static methods, no class instantiation. Tree-shakeable, testable, simple.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 4: Uniform Action Contract</strong>
+            Every Server Action returns <code>ActionResult&lt;T&gt;</code>. Client components have one error-handling pattern.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 5: Domain-Driven Module Boundaries</strong>
+            Each module owns its models, services, types, and tests. No cross-module logic leaks.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 6: Loading States & Error Boundaries by Default</strong>
+            Every route segment has <code>loading.tsx</code> and <code>error.tsx</code>. No blocked renders.
+        </div>
+
+        <div class="callout key">
+            <strong>Principle 7: Shared Data Layer via React Cache</strong>
+            One <code>getOrganization(slug)</code> call per request, memoized with <code>cache()</code>. Passed via context, never re-fetched.
+        </div>
+    </div>
+
+    <!-- SECTION 4: Directory Structure -->
+    <div class="section" id="directory">
+        <h2>4. Directory Structure — Clean Module Architecture</h2>
+
+        <h3>Current (Messy)</h3>
+        <div class="code-block">
+src/
+├── actions/          <span class="comment">// 13 files, mixed patterns</span>
+├── app/              <span class="comment">// Route segments</span>
+├── components/       <span class="comment">// ~80 files, deep nesting</span>
+├── lib/              <span class="comment">// 16 files, mixed concerns</span>
+├── modules/          <span class="comment">// 6 modules, static classes</span>
+│   ├── core/         <span class="comment">// Members + Tasks mixed</span>
+│   ├── finance/
+│   ├── festival/
+│   ├── events/
+│   ├── assistant/
+│   └── tasks/        <span class="comment">// EMPTY</span>
+└── types/            <span class="comment">// 1 file</span></div>
+
+        <h3>Proposed (Clean)</h3>
+        <div class="code-block">
+src/
+├── app/                          <span class="comment">// Route segments (App Router)</span>
+│   ├── layout.tsx
+│   ├── page.tsx                  <span class="comment">// Landing</span>
+│   ├── login/page.tsx
+│   ├── signup/page.tsx
+│   ├── accept-invite/page.tsx
+│   ├── dashboard/                <span class="comment">// User-level (org list, profile)</span>
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── create/page.tsx
+│   │   └── profile/page.tsx
+│   ├── [orgSlug]/                <span class="comment">// Tenant-scoped</span>
+│   │   ├── page.tsx              <span class="comment">// PUBLIC festival page</span>
+│   │   ├── transparency/page.tsx <span class="comment">// PUBLIC audit trail</span>
+│   │   └── dashboard/
+│   │       ├── layout.tsx        <span class="comment">// Provides org context</span>
+│   │       ├── loading.tsx       <span class="comment">// ★ NEW: Suspense boundary</span>
+│   │       ├── error.tsx         <span class="comment">// ★ NEW: Error boundary</span>
+│   │       ├── page.tsx          <span class="comment">// Overview</span>
+│   │       ├── donations/        <span class="comment">// Each page: loading.tsx + error.tsx</span>
+│   │       ├── expenses/
+│   │       ├── bhog/
+│   │       ├── events/
+│   │       ├── members/
+│   │       ├── volunteers/
+│   │       └── sponsorships/
+│   └── api/
+│       └── auth/[...nextauth]/   <span class="comment">// NextAuth only</span>
+│
+├── modules/                      <span class="comment">// Domain modules (co-located)</span>
+│   ├── core/
+│   │   ├── organization.service.ts
+│   │   ├── member.service.ts
+│   │   ├── invitation.service.ts
+│   │   ├── audit.service.ts
+│   │   ├── overview.service.ts
+│   │   ├── types.ts              <span class="comment">// ★ Module-specific types</span>
+│   │   └── __tests__/            <span class="comment">// ★ Tests co-located</span>
+│   ├── finance/
+│   │   ├── donation.service.ts
+│   │   ├── expense.service.ts
+│   │   ├── financial.service.ts
+│   │   ├── types.ts
+│   │   └── __tests__/
+│   ├── festival/
+│   │   ├── bhog.service.ts
+│   │   ├── public-bhog.service.ts
+│   │   ├── public-donation.service.ts
+│   │   ├── public-expense.service.ts
+│   │   ├── public-event.service.ts
+│   │   ├── public-financial.service.ts
+│   │   ├── public-transparency.service.ts
+│   │   ├── prasad-windows.ts
+│   │   ├── types.ts
+│   │   └── __tests__/
+│   ├── events/
+│   │   ├── event.service.ts
+│   │   ├── types.ts
+│   │   └── __tests__/
+│   ├── tasks/                    <span class="comment">// ★ NOW: Owns volunteer tasks</span>
+│   │   ├── task.service.ts       <span class="comment">// Moved from member.service.ts</span>
+│   │   ├── types.ts
+│   │   └── __tests__/
+│   └── assistant/
+│       ├── admin-assistant.service.ts
+│       ├── types.ts
+│       └── __tests__/
+│
+├── server/                       <span class="comment">// ★ NEW: All server-only code</span>
+│   ├── actions/                  <span class="comment">// Server Actions (thin validation layer)</span>
+│   │   ├── auth.actions.ts
+│   │   ├── organization.actions.ts
+│   │   ├── donation.actions.ts
+│   │   ├── expense.actions.ts
+│   │   ├── member.actions.ts
+│   │   ├── event.actions.ts
+│   │   │   ├── bhog.actions.ts
+│   │   │   ├── task.actions.ts   <span class="comment">// ★ Moved from volunteer.actions.ts</span>
+│   │   │   ├── admin-assistant.actions.ts
+│   │   │   ├── public-bhog.actions.ts
+│   │   │   └── registration.actions.ts
+│   │   └── __tests__/
+│   ├── auth.ts                   <span class="comment">// NextAuth config</span>
+│   ├── access-control.ts         <span class="comment">// RBAC + tenant scoping</span>
+│   ├── prisma.ts                 <span class="comment">// Singleton client</span>
+│   └── errors.ts                 <span class="comment">// Error hierarchy</span>
+│
+├── components/                   <span class="comment">// UI components (colocated by feature)</span>
+│   ├── dashboard/                <span class="comment">// Feature-specific components</span>
+│   │   ├── overview/
+│   │   ├── donations/
+│   │   ├── expenses/
+│   │   ├── bhog/
+│   │   ├── events/
+│   │   ├── members/
+│   │   ├── volunteers/
+│   │   ├── assistant/
+│   │   └── shared/               <span class="comment">// EmptyState, Pagination, Filters</span>
+│   ├── layout/                   <span class="comment">// Navbar, Sidebar, DashboardLayout</span>
+│   ├── landing/                  <span class="comment">// Landing page components</span>
+│   ├── public/                   <span class="comment">// Public page components</span>
+│   ├── providers/                <span class="comment">// SessionProvider</span>
+│   └── ui/                       <span class="comment">// shadcn/ui primitives</span>
+│
+├── lib/                          <span class="comment">// Shared utilities (pure functions only)</span>
+│   ├── utils.ts                  <span class="comment">// cn() helper</span>
+│   ├── date-time.ts
+│   ├── pagination.ts
+│   ├── email.ts
+│   └── gemini.ts
+│
+└── types/                        <span class="comment">// Global type augmentations</span>
+    └── next-auth.d.ts</div>
+    </div>
+
+    <!-- SECTION 5: Database -->
+    <div class="section" id="database">
+        <h2>5. Database — Same Schema, Cleaner Patterns</h2>
+
+        <h3>The current schema is actually solid. Minor improvements:</h3>
+
+        <div class="comparison">
+            <div class="before">
+                <div class="label">Current — Volunteer Model Redundancy</div>
+                <div class="code-block">
+<span class="comment">// Two ways to represent the same person</span>
+<span class="keyword">model</span> <span class="type">OrganizationMember</span> {
+  id       String           @id @default(cuid())
+  userId   String?
+  role     <span class="type">OrganizationRole</span> <span class="comment">// VOLUNTEER role exists</span>
+  ...
+}
+
+<span class="keyword">model</span> <span class="type">Volunteer</span> {
+  id             String  @id @default(cuid())
+  <span class="comment">// Separate model, no role link</span>
+  assignedTask   String? <span class="comment">// Loose string, not a relation</span>
+  ...
+}</div>
+            </div>
+            <div class="after">
+                <div class="label">Proposed — Unified Model</div>
+                <div class="code-block">
+<span class="comment">// One model, role-based capabilities</span>
+<span class="keyword">model</span> <span class="type">OrganizationMember</span> {
+  id       String           @id @default(cuid())
+  userId   String?
+  role     <span class="type">OrganizationRole</span> <span class="comment">// VOLUNTEER, COMMITTEE_MEMBER, etc.</span>
+  
+  <span class="comment">// Volunteer-specific fields (nullable)</span>
+  phone          String?
+  skills         String[]
+  availability   Json?
+  
+  <span class="comment">// Relations</span>
+  tasks          <span class="type">VolunteerTask</span>[]
+  assignments    <span class="type">EventAssignment</span>[]
+  
+  @@unique([userId, organizationId])
+}
+
+<span class="comment">// Delete Volunteer model entirely</span>
+<span class="comment">// VolunteerTask.assignedToId already points to OrganizationMember</span></div>
+            </div>
+        </div>
+
+        <div class="comparison">
+            <div class="before">
+                <div class="label">Current — Nullable userId Complexity</div>
+                <div class="code-block">
+<span class="comment">// userId is nullable for invitation flow</span>
+<span class="keyword">model</span> <span class="type">OrganizationMember</span> {
+  userId   String?  <span class="comment">// nullable</span>
+  email    String?
+  
+  <span class="comment">// Every query must handle two cases:</span>
+  <span class="comment">// - user exists: match by userId</span>
+  <span class="comment">// - user pending: match by email</span>
+}</div>
+            </div>
+            <div class="after">
+                <div class="label">Proposed — Invitation as Separate Concept</div>
+                <div class="code-block">
+<span class="keyword">model</span> <span class="type">OrganizationMember</span> {
+  userId   String    <span class="comment">// NOT nullable after acceptance</span>
+  user     <span class="type">User</span>     @relation(fields: [userId])
+  
+  @@unique([userId, organizationId])
+}
+
+<span class="keyword">model</span> <span class="type">Invitation</span> {
+  id             String   @id @default(cuid())
+  email          String
+  organizationId String
+  role           <span class="type">OrganizationRole</span>
+  invitedById    String
+  status         <span class="type">InvitationStatus</span> @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  
+  @@unique([email, organizationId])
+}
+
+<span class="comment">// When invitation accepted:</span>
+<span class="comment">// 1. Create OrganizationMember with userId</span>
+<span class="comment">// 2. Mark Invitation as ACCEPTED</span>
+<span class="comment">// Clean separation of concerns</span></div>
+            </div>
+        </div>
+
+        <h3>Schema Improvements Summary</h3>
+        <table>
+            <tr><th>Change</th><th>Why</th><th>Impact</th></tr>
+            <tr>
+                <td>Delete <code>Volunteer</code> model</td>
+                <td>Redundant with <code>OrganizationMember</code> at VOLUNTEER role</td>
+                <td>1 fewer model, simpler queries</td>
+            </tr>
+            <tr>
+                <td>Separate <code>Invitation</code> from <code>OrganizationMember</code></td>
+                <td>Current pattern requires nullable userId and dual-path queries</td>
+                <td>Cleaner member queries, explicit invitation lifecycle</td>
+            </tr>
+            <tr>
+                <td>Add <code>organizationId</code> index to all child models</td>
+                <td>Already mostly done, but verify completeness</td>
+                <td>Query performance</td>
+            </tr>
+            <tr>
+                <td>Add <code>@@map</code> for snake_case table names</td>
+                <td>PostgreSQL convention, Prisma defaults to camelCase</td>
+                <td>Better DBA experience</td>
+            </tr>
+            <tr>
+                <td>Add <code>@default(now()</code> to <code>createdAt</code></td>
+                <td>Explicit over implicit</td>
+                <td>Schema self-documentation</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- SECTION 6: Multi-Tenancy -->
+    <div class="section" id="multi-tenancy">
+        <h2>6. Multi-Tenancy — Simplified & Type-Safe</h2>
+
+        <h3>Current Approach</h3>
+        <div class="code-block">
+<span class="comment">// src/lib/access-control.ts (current)</span>
+<span class="keyword">export function</span> <span class="func">getTenantPrisma</span>(organizationId: <span class="type">string</span>) {
+  <span class="keyword">return</span> prisma.$extends({
+    name: <span class="string">"TenantScope"</span>,
+    query: {
+      donation: {
+        <span class="func">findMany</span>({ args, query }) {
+          args.where = { ...args.where, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="comment">// ... same pattern for findFirst, findUnique, update, delete, create</span>
+      },
+      <span class="comment">// ... repeated for EVERY model</span>
+    }
+  });
+}
+
+<span class="comment">// Problem: 200+ lines of boilerplate per model</span>
+<span class="comment">// Each model needs: findMany, findFirst, findUnique, create, createMany, update, updateMany, delete, deleteMany</span></div>
+
+        <h3>Proposed Approach — Generic Tenant Scope</h3>
+        <div class="code-block">
+<span class="comment">// src/server/tenant-prisma.ts</span>
+<span class="keyword">import</span> { Prisma } <span class="keyword">from</span> <span class="string">"@prisma/client"</span>;
+
+<span class="keyword">const</span> TENANT_MODELS = [
+  <span class="string">"donation"</span>, <span class="string">"expense"</span>, <span class="string">"organizationMember"</span>,
+  <span class="string">"bhogItem"</span>, <span class="string">"event"</span>, <span class="string">"volunteerTask"</span>,
+  <span class="string">"auditLog"</span>, <span class="string">"eventAssignment"</span>, <span class="string">"eventRegistration"</span>,
+] <span class="keyword">as const</span>;
+
+<span class="keyword">type</span> <span class="type">TenantModel</span> = <span class="keyword">typeof</span> TENANT_MODELS[number];
+
+<span class="keyword">function</span> <span class="func">createTenantExtension</span>(organizationId: <span class="type">string</span>): <span class="type">Prisma.Middleware</span>[] {
+  <span class="keyword">return</span> TENANT_MODELS.map(model => ({
+    name: <span class="string">`TenantScope:${model}`</span>,
+    query: {
+      [model]: {
+        <span class="comment">// Generic query interceptor</span>
+        <span class="func">findMany</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          args.where = { ...args.where, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="func">findFirst</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          args.where = { ...args.where, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="func">create</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          args.data = { ...args.data, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="func">createMany</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          <span class="keyword">if</span> (Array.isArray(args.data)) {
+            args.data = args.data.map((d: <span class="type">any</span>) => ({ ...d, organizationId }));
+          } <span class="keyword">else</span> {
+            args.data = { ...args.data, organizationId };
+          }
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="func">update</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          args.where = { ...args.where, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+        <span class="func">delete</span>({ args, query }: { args: <span class="type">any</span>; query: <span class="type">Function</span> }) {
+          args.where = { ...args.where, organizationId };
+          <span class="keyword">return</span> query(args);
+        },
+      }
+    }
+  }));
+}
+
+<span class="keyword">export function</span> <span class="func">getTenantPrisma</span>(organizationId: <span class="type">string</span>) {
+  <span class="keyword">return</span> prisma.$extends(...createTenantExtension(organizationId));
+}</div>
+
+        <div class="callout arch">
+            <strong>Key Improvement: Generic Model List</strong>
+            Instead of writing the same interceptor 200+ lines per model, define a list of tenant models and generate interceptors generically. Adding a new model = 1 line in the array.
+        </div>
+
+        <h3>Tenant Context Pattern</h3>
+        <div class="code-block">
+<span class="comment">// Instead of passing organizationId everywhere...</span>
+<span class="comment">// Use a request-scoped context</span>
+
+<span class="comment">// src/server/context.ts</span>
+<span class="keyword">import</span> { cache } <span class="keyword">from</span> <span class="string">"react"</span>;
+<span class="keyword">import</span> { auth } <span class="keyword">from</span> <span class="string">"@/server/auth"</span>;
+<span class="keyword">import</span> { prisma } <span class="keyword">from</span> <span class="string">"@/server/prisma"</span>;
+
+<span class="keyword">export interface</span> <span class="type">TenantContext</span> {
+  user: <span class="type">User</span>;
+  member: <span class="type">OrganizationMember</span>;
+  organization: <span class="type">Organization</span>;
+  prisma: <span class="type">ReturnType</span>&lt;<span class="keyword">typeof</span> getTenantPrisma&gt;;
+}
+
+<span class="keyword">export const</span> <span class="func">getTenantContext</span> = cache(<span class="keyword">async</span> (
+  orgSlug: <span class="type">string</span>
+): <span class="type">Promise</span>&lt;<span class="type">TenantContext</span>&gt; => {
+  <span class="keyword">const</span> session = <span class="keyword">await</span> auth();
+  <span class="keyword">if</span> (!session?.user) <span class="keyword">throw new</span> AuthenticationError();
+
+  <span class="keyword">const</span> organization = <span class="keyword">await</span> prisma.organization.findUnique({
+    where: { slug: orgSlug }
+  });
+  <span class="keyword">if</span> (!organization) <span class="keyword">throw new</span> NotFoundAppError(<span class="string">"Organization"</span>);
+
+  <span class="keyword">const</span> member = <span class="keyword">await</span> prisma.organizationMember.findFirst({
+    where: {
+      organizationId: organization.id,
+      OR: [
+        { userId: session.user.id },
+        { email: session.user.email }
+      ]
+    }
+  });
+  <span class="keyword">if</span> (!member) <span class="keyword">throw new</span> AuthorizationError();
+
+  <span class="keyword">return</span> {
+    user: session.user,
+    member,
+    organization,
+    prisma: getTenantPrisma(organization.id),
+  };
+});
+
+<span class="comment">// Usage in Server Actions:</span>
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(
+  orgSlug: <span class="type">string</span>,
+  input: <span class="type">z.infer</span>&lt;<span class="keyword">typeof</span> donationSchema&gt;
+): <span class="type">Promise</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">Donation</span>&gt;&gt; {
+  <span class="keyword">const</span> ctx = <span class="keyword">await</span> getTenantContext(orgSlug);
+  <span class="keyword">return</span> DonationService.create(ctx, input);
+}</div>
+    </div>
+
+    <!-- SECTION 7: Auth & RBAC -->
+    <div class="section" id="auth">
+        <h2>7. Auth & RBAC — Single Source of Truth</h2>
+
+        <h3>Current Problem — Three Authorization Systems</h3>
+        <div class="code-block">
+<span class="comment">// System 1: Role-based (some services)</span>
+<span class="keyword">const</span> { member } = <span class="keyword">await</span> <span class="func">validateAccess</span>(organizationId, [<span class="string">"ADMIN"</span>, <span class="string">"TREASURER"</span>]);
+
+<span class="comment">// System 2: Permission-based (other services)</span>
+<span class="keyword">await</span> <span class="func">requirePermission</span>(organizationId, <span class="string">"finance:create"</span>);
+
+<span class="comment">// System 3: Manual admin check (some actions)</span>
+<span class="keyword">const</span> member = <span class="keyword">await</span> prisma.organizationMember.findFirst({
+  where: { organizationId, userId, role: <span class="string">"ADMIN"</span> }
+});
+<span class="keyword">if</span> (!member) <span class="keyword">throw new</span> Error(<span class="string">"Only admins"</span>);</div>
+
+        <h3>Proposed — Single Permission System</h3>
+        <div class="code-block">
+<span class="comment">// src/server/auth.ts</span>
+
+<span class="keyword">export const</span> PERMISSIONS = {
+  ADMIN: [
+    <span class="string">"finance:read"</span>, <span class="string">"finance:create"</span>, <span class="string">"finance:approve"</span>,
+    <span class="string">"members:read"</span>, <span class="string">"members:invite"</span>, <span class="string">"members:manage"</span>,
+    <span class="string">"events:read"</span>, <span class="string">"events:manage"</span>,
+    <span class="string">"tasks:read"</span>, <span class="string">"tasks:manage"</span>,
+    <span class="string">"bhog:read"</span>, <span class="string">"bhog:manage"</span>,
+    <span class="string">"org:manage"</span>, <span class="string">"audit:read"</span>,
+  ],
+  TREASURER: [
+    <span class="string">"finance:read"</span>, <span class="string">"finance:create"</span>, <span class="string">"finance:approve"</span>,
+    <span class="string">"members:read"</span>,
+    <span class="string">"events:read"</span>,
+    <span class="string">"tasks:read"</span>, <span class="string">"tasks:updateOwn"</span>,
+    <span class="string">"bhog:read"</span>,
+    <span class="string">"audit:read"</span>,
+  ],
+  COMMITTEE_MEMBER: [
+    <span class="string">"finance:read"</span>, <span class="string">"finance:create"</span>,
+    <span class="string">"members:read"</span>,
+    <span class="string">"events:read"</span>, <span class="string">"events:manage"</span>,
+    <span class="string">"tasks:read"</span>, <span class="string">"tasks:manage"</span>,
+    <span class="string">"bhog:read"</span>,
+  ],
+  VOLUNTEER: [
+    <span class="string">"tasks:read"</span>, <span class="string">"tasks:updateOwn"</span>,
+    <span class="string">"events:read"</span>,
+  ],
+} <span class="keyword">as const</span>;
+
+<span class="keyword">export type</span> <span class="type">Permission</span> = <span class="keyword">typeof</span> PERMISSIONS[keyof <span class="keyword">typeof</span> PERMISSIONS][number];
+
+<span class="comment">// SINGLE function for ALL authorization</span>
+<span class="keyword">export async function</span> <span class="func">requirePermission</span>(
+  organizationId: <span class="type">string</span>,
+  permission: <span class="type">Permission</span>
+): <span class="type">Promise</span>&lt;<span class="type">TenantContext</span>&gt; {
+  <span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">getTenantContextById</span>(organizationId);
+  
+  <span class="keyword">const</span> allowed = PERMISSIONS[ctx.member.role];
+  <span class="keyword">if</span> (!allowed.includes(permission)) {
+    <span class="keyword">throw new</span> AuthorizationError(
+      <span class="string">`Required permission: ${permission}`</span>
+    );
+  }
+  
+  <span class="keyword">return</span> ctx;
+}
+
+<span class="comment">// No more validateAccess(), no more manual admin checks</span>
+<span class="comment">// Every service uses the same function</span></div>
+
+        <h3>Usage — Every Service, Same Pattern</h3>
+        <div class="code-block">
+<span class="comment">// DonationService</span>
+<span class="keyword">export async function</span> <span class="func">create</span>(ctx: <span class="type">TenantContext</span>, input: <span class="type">CreateDonation</span>) {
+  <span class="comment">// ctx already has user, member, organization, prisma</span>
+  <span class="comment">// Just verify the permission</span>
+  <span class="keyword">if</span> (!PERMISSIONS[ctx.member.role].includes(<span class="string">"finance:create"</span>)) {
+    <span class="keyword">throw new</span> AuthorizationError();
+  }
+  
+  <span class="keyword">const</span> donation = <span class="keyword">await</span> ctx.prisma.donation.create({
+    data: { ...input, addedById: ctx.member.id }
+  });
+  
+  <span class="keyword">await</span> AuditService.record(ctx, <span class="string">"DONATION_CREATED"</span>, donation);
+  <span class="keyword">return</span> donation;
+}
+
+<span class="comment">// EventService</span>
+<span class="keyword">export async function</span> <span class="func">create</span>(ctx: <span class="type">TenantContext</span>, input: <span class="type">CreateEvent</span>) {
+  <span class="keyword">if</span> (!PERMISSIONS[ctx.member.role].includes(<span class="string">"events:manage"</span>)) {
+    <span class="keyword">throw new</span> AuthorizationError();
+  }
+  <span class="comment">// ...</span>
+}</div>
+    </div>
+
+    <!-- SECTION 8: Service Layer -->
+    <div class="section" id="services">
+        <h2>8. Service Layer — No More Static Classes</h2>
+
+        <h3>Current Problem</h3>
+        <div class="code-block">
+<span class="comment">// Current: Static-only class (namespace with extra syntax)</span>
+<span class="keyword">export class</span> <span class="type">DonationService</span> {
+  <span class="keyword">static async</span> <span class="func">getDonationsByOrganization</span>(organizationId: <span class="type">string</span>) {
+    <span class="keyword">const</span> tenantPrisma = <span class="func">getTenantPrisma</span>(organizationId);
+    <span class="keyword">return</span> tenantPrisma.donation.findMany({
+      where: { isArchived: <span class="keyword">false</span> },
+      include: { addedBy: { include: { user: <span class="keyword">true</span> } } }
+    });
+  }
+  
+  <span class="keyword">static async</span> <span class="func">recordDonation</span>(organizationId: <span class="type">string</span>, input: <span class="type">any</span>) {
+    <span class="keyword">await</span> <span class="func">requirePermission</span>(organizationId, <span class="string">"finance:create"</span>);
+    <span class="comment">// ...</span>
+  }
+}
+
+<span class="comment">// Usage: DonationService.getDonationsByOrganization(orgId)</span>
+<span class="comment">// Problem: organizationId passed everywhere, no encapsulation</span></div>
+
+        <h3>Proposed — Plain Functions with Context</h3>
+        <div class="code-block">
+<span class="comment">// src/modules/finance/donation.service.ts</span>
+<span class="keyword">import</span> { <span class="type">TenantContext</span> } <span class="keyword">from</span> <span class="string">"@/server/context"</span>;
+<span class="keyword">import</span> { <span class="type">CreateDonation</span>, <span class="type">DonationResponse</span> } <span class="keyword">from</span> <span class="string">"./types"</span>;
+<span class="keyword">import</span> { AuthorizationError } <span class="keyword">from</span> <span class="string">"@/server/errors"</span>;
+<span class="keyword">import</span> { PERMISSIONS } <span class="keyword">from</span> <span class="string">"@/server/auth"</span>;
+<span class="keyword">import</span> { AuditService } <span class="keyword">from</span> <span class="string">"@/modules/core/audit.service"</span>;
+
+<span class="keyword">export async function</span> <span class="func">getDonations</span>(
+  ctx: <span class="type">TenantContext</span>
+): <span class="type">Promise</span>&lt;<span class="type">DonationResponse</span>[]&gt; {
+  <span class="keyword">return</span> ctx.prisma.donation.findMany({
+    where: { isArchived: <span class="keyword">false</span> },
+    include: {
+      addedBy: { include: { user: <span class="keyword">true</span> } },
+      event: <span class="keyword">true</span>,
+    },
+    orderBy: { createdAt: <span class="string">"desc"</span> },
+  });
+}
+
+<span class="keyword">export async function</span> <span class="func">create</span>(
+  ctx: <span class="type">TenantContext</span>,
+  input: <span class="type">CreateDonation</span>
+): <span class="type">Promise</span>&lt;<span class="type">DonationResponse</span>&gt; {
+  <span class="keyword">if</span> (!PERMISSIONS[ctx.member.role].includes(<span class="string">"finance:create"</span>)) {
+    <span class="keyword">throw new</span> AuthorizationError();
+  }
+
+  <span class="keyword">const</span> donation = <span class="keyword">await</span> ctx.prisma.donation.create({
+    data: {
+      amount: input.amount,
+      donorName: input.donorName,
+      category: input.category,
+      notes: input.notes,
+      eventId: input.eventId,
+      addedById: ctx.member.id,
+      organizationId: ctx.organization.id,
+    },
+    include: {
+      addedBy: { include: { user: <span class="keyword">true</span> } },
+    },
+  });
+
+  <span class="keyword">await</span> AuditService.record(ctx, {
+    action: <span class="string">"DONATION_CREATED"</span>,
+    entityType: <span class="string">"Donation"</span>,
+    entityId: donation.id,
+    after: donation,
+  });
+
+  <span class="keyword">return</span> donation;
+}
+
+<span class="keyword">export async function</span> <span class="func">update</span>(
+  ctx: <span class="type">TenantContext</span>,
+  donationId: <span class="type">string</span>,
+  input: <span class="type">Partial</span>&lt;<span class="type">CreateDonation</span>&gt;
+): <span class="type">Promise</span>&lt;<span class="type">DonationResponse</span>&gt; {
+  <span class="keyword">if</span> (!PERMISSIONS[ctx.member.role].includes(<span class="string">"finance:create"</span>)) {
+    <span class="keyword">throw new</span> AuthorizationError();
+  }
+
+  <span class="keyword">const</span> existing = <span class="keyword">await</span> ctx.prisma.donation.findUnique({
+    where: { id: donationId },
+  });
+
+  <span class="keyword">const</span> updated = <span class="keyword">await</span> ctx.prisma.donation.update({
+    where: { id: donationId },
+    data: input,
+  });
+
+  <span class="keyword">await</span> AuditService.record(ctx, {
+    action: <span class="string">"DONATION_UPDATED"</span>,
+    entityType: <span class="string">"Donation"</span>,
+    entityId: donationId,
+    before: existing,
+    after: updated,
+  });
+
+  <span class="keyword">return</span> updated;
+}
+
+<span class="keyword">export async function</span> <span class="func">archive</span>(
+  ctx: <span class="type">TenantContext</span>,
+  donationId: <span class="type">string</span>
+): <span class="type">Promise</span>&lt;<span class="keyword">void</span>&gt; {
+  <span class="keyword">if</span> (!PERMISSIONS[ctx.member.role].includes(<span class="string">"finance:create"</span>)) {
+    <span class="keyword">throw new</span> AuthorizationError();
+  }
+
+  <span class="keyword">await</span> ctx.prisma.donation.update({
+    where: { id: donationId },
+    data: { isArchived: <span class="keyword">true</span> },
+  });
+
+  <span class="keyword">await</span> AuditService.record(ctx, {
+    action: <span class="string">"DONATION_ARCHIVED"</span>,
+    entityType: <span class="string">"Donation"</span>,
+    entityId: donationId,
+  });
+}
+
+<span class="comment">// Advantages:</span>
+<span class="comment">// 1. No class syntax overhead</span>
+<span class="comment">// 2. TypeScript tree-shakeable</span>
+<span class="comment">// 3. ctx carries everything (user, member, org, prisma)</span>
+<span class="comment">// 4. Permission check is one line</span>
+<span class="comment">// 5. Audit logging is consistent</span>
+<span class="comment">// 6. Types are explicit (no `any`)</span></div>
+    </div>
+
+    <!-- SECTION 9: Server Actions -->
+    <div class="section" id="actions">
+        <h2>9. Server Actions — Uniform Contract</h2>
+
+        <h3>Current Problem — Mixed Return Types</h3>
+        <div class="code-block">
+<span class="comment">// Pattern 1: actionSuccess/actionFailure (donations, expenses)</span>
+<span class="keyword">return</span> <span class="func">actionSuccess</span>(donation);
+<span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="string">"Failed to record donation"</span>);
+
+<span class="comment">// Pattern 2: Raw objects (members, events, bhog)</span>
+<span class="keyword">return</span> { success: <span class="keyword">true</span> <span class="keyword">as const</span> };
+<span class="keyword">return</span> { error: <span class="string">"Failed to create event"</span> };
+
+<span class="comment">// Pattern 3: Custom shape (auth)</span>
+<span class="keyword">return</span> { success: <span class="keyword">true</span>, userId: user.id };
+<span class="keyword">return</span> { error: <span class="string">"Email already exists"</span> };</div>
+
+        <h3>Proposed — Single ActionResult Type</h3>
+        <div class="code-block">
+<span class="comment">// src/server/actions/types.ts</span>
+
+<span class="keyword">export type</span> <span class="type">ActionResult</span>&lt;<span class="type">T</span>&gt; =
+  | { success: <span class="keyword">true</span>; data: <span class="type">T</span> }
+  | { success: <span class="keyword">false</span>; error: <span class="type">string</span>; code?: <span class="type">string</span> };
+
+<span class="keyword">export function</span> <span class="func">actionSuccess</span>&lt;<span class="type">T</span>&gt;(data: <span class="type">T</span>): <span class="type">ActionResult</span>&lt;<span class="type">T</span>&gt; {
+  <span class="keyword">return</span> { success: <span class="keyword">true</span>, data };
+}
+
+<span class="keyword">export function</span> <span class="func">actionFailure</span>(
+  error: <span class="type">string</span>,
+  code?: <span class="type">string</span>
+): <span class="type">ActionResult</span>&lt;<span class="keyword">never</span>&gt; {
+  <span class="keyword">return</span> { success: <span class="keyword">false</span>, error, code };
+}</div>
+
+        <div class="comparison">
+            <div class="before">
+                <div class="label">Current — Inconsistent Actions</div>
+                <div class="code-block">
+<span class="comment">// donation.actions.ts</span>
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(
+  input: <span class="type">z.infer</span>&lt;<span class="keyword">typeof</span> donationSchema&gt;
+) {
+  <span class="keyword">const</span> parsed = donationSchema.safeParse(input);
+  <span class="keyword">if</span> (!parsed.success) {
+    <span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="string">"Invalid"</span>);
+  }
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> donation = <span class="keyword">await</span> DonationService.recordDonation(
+      parsed.data.organizationId,
+      parsed.data
+    );
+    revalidatePath(<span class="string">`/${orgSlug}/dashboard/donations`</span>);
+    <span class="keyword">return</span> <span class="func">actionSuccess</span>(donation);
+  } <span class="keyword">catch</span> (e) {
+    <span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="func">normalizeError</span>(e));
+  }
+}
+
+<span class="comment">// member.actions.ts</span>
+<span class="keyword">export async function</span> <span class="func">inviteMemberAction</span>(
+  input: <span class="type">z.infer</span>&lt;<span class="keyword">typeof</span> inviteSchema&gt;
+) {
+  <span class="comment">// ...</span>
+  <span class="keyword">return</span> { success: <span class="keyword">true</span> <span class="keyword">as const</span> };
+  <span class="comment">// OR</span>
+  <span class="keyword">return</span> { error: <span class="string">"Failed"</span> };
+}</div>
+            </div>
+            <div class="after">
+                <div class="label">Proposed — Uniform Actions</div>
+                <div class="code-block">
+<span class="comment">// src/server/actions/donation.actions.ts</span>
+<span class="keyword">"use server"</span>;
+
+<span class="keyword">import</span> { z } <span class="keyword">from</span> <span class="string">"zod"</span>;
+<span class="keyword">import</span> { <span class="func">actionSuccess</span>, <span class="func">actionFailure</span>, <span class="type">ActionResult</span> } <span class="keyword">from</span> <span class="string">"@/server/actions/types"</span>;
+<span class="keyword">import</span> { <span class="func">requirePermission</span> } <span class="keyword">from</span> <span class="string">"@/server/auth"</span>;
+<span class="keyword">import</span> * <span class="keyword">as</span> DonationService <span class="keyword">from</span> <span class="string">"@/modules/finance/donation.service"</span>;
+<span class="keyword">import</span> { normalizeError } <span class="keyword">from</span> <span class="string">"@/server/errors"</span>;
+<span class="keyword">import</span> { revalidatePath } <span class="keyword">from</span> <span class="string">"next/cache"</span>;
+
+<span class="keyword">const</span> donationSchema = z.object({
+  amount: z.number().positive(),
+  donorName: z.string().min(1),
+  category: z.enum([<span class="string">"CASH"</span>, <span class="string">"KIND"</span>, <span class="string">"ONLINE"</span>]),
+  notes: z.string().optional(),
+  eventId: z.string().optional(),
+});
+
+<span class="keyword">export async function</span> <span class="func">recordDonationAction</span>(
+  orgSlug: <span class="type">string</span>,
+  input: z.infer&lt;<span class="keyword">typeof</span> donationSchema&gt;
+): <span class="type">Promise</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">Donation</span>&gt;&gt; {
+  <span class="keyword">const</span> parsed = donationSchema.safeParse(input);
+  <span class="keyword">if</span> (!parsed.success) {
+    <span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="string">"Invalid input"</span>, <span class="string">"VALIDATION_ERROR"</span>);
+  }
+
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">requirePermission</span>(orgSlug, <span class="string">"finance:create"</span>);
+    <span class="keyword">const</span> donation = <span class="keyword">await</span> DonationService.create(ctx, parsed.data);
+    revalidatePath(<span class="string">`/${orgSlug}/dashboard/donations`</span>);
+    <span class="keyword">return</span> <span class="func">actionSuccess</span>(donation);
+  } <span class="keyword">catch</span> (e) {
+    <span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="func">normalizeError</span>(e));
+  }
+}
+
+<span class="comment">// Client component usage:</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> <span class="func">recordDonationAction</span>(orgSlug, data);
+<span class="keyword">if</span> (result.success) {
+  toast.success(<span class="string">"Donation recorded"</span>);
+} <span class="keyword">else</span> {
+  toast.error(result.error);
+}</div>
+            </div>
+        </div>
+
+        <h3>Action Wrapper Pattern</h3>
+        <div class="code-block">
+<span class="comment">// src/server/actions/wrapper.ts</span>
+<span class="comment">// Eliminates repetitive try/catch + revalidation</span>
+
+<span class="keyword">import</span> { revalidatePath } <span class="keyword">from</span> <span class="string">"next/cache"</span>;
+<span class="keyword">import</span> { <span class="type">ActionResult</span>, <span class="func">actionSuccess</span>, <span class="func">actionFailure</span> } <span class="keyword">from</span> <span class="string">"./types"</span>;
+<span class="keyword">import</span> { normalizeError } <span class="keyword">from</span> <span class="string">"@/server/errors"</span>;
+
+<span class="keyword">export function</span> <span class="func">withAction</span>&lt;<span class="type">T</span>, <span class="type">A</span> <span class="keyword">extends</span> <span class="type">any</span>[]&gt;(
+  fn: (...args: <span class="type">A</span>) =&gt; <span class="type">Promise</span>&lt;<span class="type">T</span>&gt;,
+  options?: { revalidate?: <span class="type">string</span> | <span class="type">string</span>[] }
+) {
+  <span class="keyword">return async</span> (...args: <span class="type">A</span>): <span class="type">Promise</span>&lt;<span class="type">ActionResult</span>&lt;<span class="type">T</span>&gt;&gt; => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> result = <span class="keyword">await</span> fn(...args);
+      
+      <span class="keyword">if</span> (options?.revalidate) {
+        <span class="keyword">const</span> paths = Array.isArray(options.revalidate)
+          ? options.revalidate
+          : [options.revalidate];
+        paths.forEach(<span class="func">revalidatePath</span>);
+      }
+      
+      <span class="keyword">return</span> <span class="func">actionSuccess</span>(result);
+    } <span class="keyword">catch</span> (e) {
+      <span class="keyword">return</span> <span class="func">actionFailure</span>(<span class="func">normalizeError</span>(e));
+    }
+  };
+}
+
+<span class="comment">// Usage:</span>
+<span class="keyword">export const</span> recordDonationAction = <span class="func">withAction</span>(
+  <span class="keyword">async</span> (orgSlug: <span class="type">string</span>, input: <span class="type">CreateDonation</span>) =&gt; {
+    <span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">requirePermission</span>(orgSlug, <span class="string">"finance:create"</span>);
+    <span class="keyword">return</span> DonationService.create(ctx, input);
+  },
+  { revalidate: (orgSlug: <span class="type">string</span>) =&gt; <span class="string">`/${orgSlug}/dashboard/donations`</span> }
+);</div>
+    </div>
+
+    <!-- SECTION 10: Components -->
+    <div class="section" id="components">
+        <h2>10. Components — Proper Boundaries</h2>
+
+        <h3>Current Problem — Organization Type Branching</h3>
+        <div class="code-block">
+<span class="comment">// src/app/[orgSlug]/dashboard/page.tsx (current)</span>
+<span class="comment">// 130+ lines of isFestival conditionals</span>
+
+<span class="keyword">if</span> (isFestivalOrganization(organization)) {
+  <span class="keyword">return</span> (
+    &lt;div&gt;
+      &lt;StatCard ... /&gt;
+      &lt;FinancialOverview ... /&gt;
+      &lt;FestivalSpecificWidget ... /&gt;
+    &lt;/div&gt;
+  );
+} <span class="keyword">else</span> {
+  <span class="keyword">return</span> (
+    &lt;div&gt;
+      &lt;StatCard ... /&gt;
+      &lt;ClubDashboard ... /&gt;
+    &lt;/div&gt;
+  );
+}</div>
+
+        <h3>Proposed — Strategy Pattern</h3>
+        <div class="code-block">
+<span class="comment">// src/app/[orgSlug]/dashboard/page.tsx</span>
+<span class="keyword">import</span> { <span class="func">getTenantContext</span> } <span class="keyword">from</span> <span class="string">"@/server/context"</span>;
+<span class="keyword">import</span> { <span class="func">isFestivalOrganization</span> } <span class="keyword">from</span> <span class="string">"@/lib/organization-mode"</span>;
+<span class="keyword">import</span> { FestivalOverview } <span class="keyword">from</span> <span class="string">"@/components/dashboard/overview/FestivalOverview"</span>;
+<span class="keyword">import</span> { ClubOverview } <span class="keyword">from</span> <span class="string">"@/components/dashboard/overview/ClubOverview"</span>;
+
+<span class="keyword">export default async function</span> <span class="func">DashboardPage</span>({ params }) {
+  <span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">getTenantContext</span>(params.orgSlug);
+  
+  <span class="keyword">if</span> (<span class="func">isFestivalOrganization</span>(ctx.organization)) {
+    <span class="keyword">return</span> &lt;<span class="type">FestivalOverview</span> org={ctx.organization} /&gt;;
+  }
+  
+  <span class="keyword">return</span> &lt;<span class="type">ClubOverview</span> org={ctx.organization} /&gt;;
+}
+
+<span class="comment">// Each overview component is self-contained</span>
+<span class="comment">// No mixing of festival/club logic</span></div>
+
+        <h3>Loading & Error Boundaries</h3>
+        <div class="code-block">
+<span class="comment">// src/app/[orgSlug]/dashboard/loading.tsx</span>
+<span class="keyword">export default function</span> <span class="func">DashboardLoading</span>() {
+  <span class="keyword">return</span> (
+    &lt;div className=<span class="string">"flex items-center justify-center h-64"</span>&gt;
+      &lt;<span class="type">Spinner</span> /&gt;
+      &lt;p className=<span class="string">"ml-3 text-muted-foreground"</span>&gt;Loading dashboard...&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+<span class="comment">// src/app/[orgSlug]/dashboard/error.tsx</span>
+<span class="string">"use client"</span>;
+
+<span class="keyword">export default function</span> <span class="func">DashboardError</span>({ error, reset }) {
+  <span class="keyword">return</span> (
+    &lt;div className=<span class="string">"flex flex-col items-center justify-center h-64"</span>&gt;
+      &lt;<span class="type">AlertCircle</span> className=<span class="string">"h-12 w-12 text-destructive"</span> /&gt;
+      &lt;h2 className=<span class="string">"mt-4 text-lg font-semibold"</span>&gt;Something went wrong&lt;/h2&gt;
+      &lt;p className=<span class="string">"text-muted-foreground"</span>&gt;{error.message}&lt;/p&gt;
+      &lt;<span class="type">Button</span> onClick={reset} className=<span class="string">"mt-4"</span>&gt;Try again&lt;/Button&gt;
+    &lt;/div&gt;
+  );
+}</div>
+    </div>
+
+        <h3>Server vs Client Component Rules</h3>
+        <table>
+            <tr><th>Component Type</th><th>Default</th><th>When to Use "use client"</th></tr>
+            <tr><td>Page components</td><td>Server</td><td>Never (fetch data server-side)</td></tr>
+            <tr><td>Layout components</td><td>Server</td><td>Only for interactive sidebar/navbar</td></tr>
+            <tr><td>Feature components</td><td>Server</td><td>When they need onClick, useState, useEffect</td></tr>
+            <tr><td>Form components</td><td>Client</td><td>Always (react-hook-form, onChange)</td></tr>
+            <tr><td>Modal/Dialog</td><td>Client</td><td>Always (open/close state)</td></tr>
+            <tr><td>Data display</td><td>Server</td><td>Only for interactive sorting/filtering</td></tr>
+        </table>
+    </div>
+
+    <!-- SECTION 11: Data Fetching -->
+    <div class="section" id="state">
+        <h2>11. Data Fetching & Caching</h2>
+
+        <h3>Current Problem — Redundant Fetches</h3>
+        <div class="code-block">
+<span class="comment">// Dashboard layout fetches org</span>
+<span class="keyword">const</span> organization = <span class="keyword">await</span> OrganizationService.getOrganizationBySlug(slug);
+
+<span class="comment">// Then page.tsx fetches the SAME org again</span>
+<span class="keyword">const</span> data = <span class="keyword">await</span> prisma.organization.findUnique({
+  where: { slug }
+});</div>
+
+        <h3>Proposed — React Cache + Context</h3>
+        <div class="code-block">
+<span class="comment">// src/server/context.ts</span>
+<span class="keyword">import</span> { cache } <span class="keyword">from</span> <span class="string">"react"</span>;
+
+<span class="comment">// cache() deduplicates within a single request</span>
+<span class="keyword">export const</span> <span class="func">getTenantContext</span> = cache(<span class="keyword">async</span> (orgSlug: <span class="type">string</span>) =&gt; {
+  <span class="comment">// This only runs ONCE per request, even if called 3 times</span>
+  <span class="keyword">const</span> session = <span class="keyword">await</span> auth();
+  <span class="keyword">const</span> organization = <span class="keyword">await</span> prisma.organization.findUnique({
+    where: { slug: orgSlug }
+  });
+  <span class="keyword">const</span> member = <span class="keyword">await</span> prisma.organizationMember.findFirst({
+    where: { organizationId: organization.id, userId: session.user.id }
+  });
+  
+  <span class="keyword">return</span> {
+    user: session.user,
+    member,
+    organization,
+    prisma: <span class="func">getTenantPrisma</span>(organization.id),
+  };
+});
+
+<span class="comment">// Layout calls it:</span>
+<span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">getTenantContext</span>(params.orgSlug);
+
+<span class="comment">// Page calls it again — same request, cached result:</span>
+<span class="keyword">const</span> ctx = <span class="keyword">await</span> <span class="func">getTenantContext</span>(params.orgSlug);
+
+<span class="comment">// Same ctx, same org, same member, same prisma instance</span>
+<span class="comment">// Zero redundant queries</span></div>
+
+        <h3>Data Fetching Strategy</h3>
+        <table>
+            <tr><th>Scenario</th><th>Approach</th><th>Example</th></tr>
+            <tr>
+                <td>Page data</td>
+                <td>Server Component + <code>cache()</code></td>
+                <td>Dashboard overview fetches stats</td>
+            </tr>
+            <tr>
+                <td>After mutation</td>
+                <td><code>revalidatePath()</code></td>
+                <td>After recording donation, revalidate donations page</td>
+            </tr>
+            <tr>
+                <td>Real-time updates</td>
+                <td>Polling with <code>SWR</code> or <code>revalidateTag()</code></td>
+                <td>Expense approval status updates</td>
+            </tr>
+            <tr>
+                <td>Public pages</td>
+                <td>Static generation + ISR</td>
+                <td>Festival transparency page (revalidate hourly)</td>
+            </tr>
+            <tr>
+                <td>Form submissions</td>
+                <td>Server Actions</td>
+                <td>All mutations go through Actions</td>
+            </tr>
+        </table>
+
+        <h3>Parallel Data Fetching Pattern</h3>
+        <div class="code-block">
+<span class="comment">// Current: Already good, but can be more explicit</span>
+<span class="keyword">const</span> [donations, expenses, events] = <span class="keyword">await</span> Promise.all([
+  DonationService.getDonations(organizationId),
+  ExpenseService.getExpenses(organizationId),
+  EventService.getEvents(organizationId),
+]);
+
+<span class="comment">// Proposed: Type-safe parallel fetching</span>
+<span class="keyword">const</span> [donations, expenses, events] = <span class="keyword">await</span> Promise.all([
+  <span class="func">requirePermission</span>(orgSlug, <span class="string">"finance:read"</span>).then(ctx =&gt;
+    DonationService.getDonations(ctx)
+  ),
+  <span class="func">requirePermission</span>(orgSlug, <span class="string">"finance:read"</span>).then(ctx =&gt;
+    ExpenseService.getExpenses(ctx)
+  ),
+  <span class="func">requirePermission</span>(orgSlug, <span class="string">"events:read"</span>).then(ctx =&gt;
+    EventService.getEvents(ctx)
+  ),
+]);</div>
+    </div>
+
+    <!-- SECTION 12: Testing -->
+    <div class="section" id="testing">
+        <h2>12. Testing — Built-In from Day 1</h2>
+
+        <h3>Current State</h3>
+        <div class="callout key">
+            <strong>9 test files exist</strong> across actions, services, and lib utilities. Using Vitest + React Testing Library. Good foundation, but:
+            <ul>
+                <li>No integration tests for multi-tenant isolation</li>
+                <li>No API contract tests</li>
+                <li>No end-to-end tests</li>
+                <li>Test files scattered (some in <code>__tests__/</code>, some co-located)</li>
+            </ul>
+        </div>
+
+        <h3>Proposed Testing Strategy</h3>
+        <div class="code-block">
+<span class="comment">// Test pyramid:</span>
+<span class="comment">//</span>
+<span class="comment">//        ╱╲</span>
+<span class="comment">//       ╱E2E╲          5% - Playwright/Cypress</span>
+<span class="comment">//      ╱──────╲</span>
+<span class="comment">//     ╱Integration╲    25% - API + DB tests</span>
+<span class="comment">//    ╱──────────────╲</span>
+<span class="comment">//   ╱    Unit Tests    ╲  70% - Pure function tests</span>
+<span class="comment">//  ╱────────────────────╲</span></div>
+
+        <h3>Unit Tests — Service Layer</h3>
+        <div class="code-block">
+<span class="comment">// src/modules/finance/__tests__/donation.service.test.ts</span>
+<span class="keyword">import</span> { describe, it, expect, beforeEach } <span class="keyword">from</span> <span class="string">"vitest"</span>;
+<span class="keyword">import</span> { <span class="func">create</span>, <span class="func">getDonations</span> } <span class="keyword">from</span> <span class="string">"@/modules/finance/donation.service"</span>;
+<span class="keyword">import</span> { <span class="func">createTestContext</span>, <span class="func">createTestPrisma</span> } <span class="keyword">from</span> <span class="string">"@/test-utils"</span>;
+
+<span class="func">describe</span>(<span class="string">"DonationService"</span>, () => {
+  <span class="keyword">let</span> ctx: <span class="type">TenantContext</span>;
+  <span class="keyword">let</span> mockPrisma: <span class="type">any</span>;
+
+  <span class="func">beforeEach</span>(<span class="keyword">async</span> () =&gt; {
+    mockPrisma = <span class="func">createTestPrisma</span>();
+    ctx = <span class="func">createTestContext</span>({
+      role: <span class="string">"ADMIN"</span>,
+      prisma: mockPrisma,
+    });
+  });
+
+  <span class="func">describe</span>(<span class="string">"create"</span>, () =&gt; {
+    <span class="func">it</span>(<span class="string">"should create donation with correct organizationId"</span>, <span class="keyword">async</span> () =&gt; {
+      mockPrisma.donation.create.mockResolvedValue({
+        id: <span class="string">"donation-1"</span>,
+        amount: 1000,
+        organizationId: ctx.organization.id,
+      });
+
+      <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="func">create</span>(ctx, {
+        amount: 1000,
+        donorName: <span class="string">"Test Donor"</span>,
+        category: <span class="string">"CASH"</span>,
+      });
+
+      expect(result.amount).toBe(1000);
+      expect(mockPrisma.donation.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          organizationId: ctx.organization.id,
+        }),
+      });
+    });
+
+    <span class="func">it</span>(<span class="string">"should reject if user lacks permission"</span>, <span class="keyword">async</span> () =&gt; {
+      <span class="keyword">const</span> volunteerCtx = <span class="func">createTestContext</span>({ role: <span class="string">"VOLUNTEER"</span> });
+      
+      <span class="keyword">await</span> expect(
+        <span class="func">create</span>(volunteerCtx, { amount: 1000, donorName: <span class="string">"Test"</span>, category: <span class="string">"CASH"</span> })
+      ).rejects.toThrow(<span class="string">"AuthorizationError"</span>);
+    });
+  });
+});</div>
+
+        <h3>Integration Tests — Multi-Tenant Isolation</h3>
+        <div class="code-block">
+<span class="comment">// src/__tests__/tenant-isolation.test.ts</span>
+<span class="keyword">import</span> { describe, it, expect } <span class="keyword">from</span> <span class="string">"vitest"</span>;
+<span class="keyword">import</span> { prisma } <span class="keyword">from</span> <span class="string">"@/server/prisma"</span>;
+<span class="keyword">import</span> { <span class="func">getTenantPrisma</span> } <span class="keyword">from</span> <span class="string">"@/server/tenant-prisma"</span>;
+
+<span class="func">describe</span>(<span class="string">"Tenant Isolation"</span>, () =&gt; {
+  <span class="func">it</span>(<span class="string">"should not leak data between organizations"</span>, <span class="keyword">async</span> () =&gt; {
+    <span class="comment">// Create two organizations</span>
+    <span class="keyword">const</span> org1 = <span class="keyword">await</span> prisma.organization.create({
+      data: { name: <span class="string">"Org 1"</span>, slug: <span class="string">"org-1"</span>, type: <span class="string">"FESTIVAL"</span> }
+    });
+    <span class="keyword">const</span> org2 = <span class="keyword">await</span> prisma.organization.create({
+      data: { name: <span class="string">"Org 2"</span>, slug: <span class="string">"org-2"</span>, type: <span class="string">"FESTIVAL"</span> }
+    });
+
+    <span class="comment">// Create donations in org1</span>
+    <span class="keyword">const</span> tenantPrisma1 = <span class="func">getTenantPrisma</span>(org1.id);
+    <span class="keyword">await</span> tenantPrisma1.donation.create({
+      data: { amount: 1000, donorName: <span class="string">"Org1 Donor"</span>, category: <span class="string">"CASH"</span> }
+    });
+
+    <span class="comment">// Query from org2 — should NOT see org1's donation</span>
+    <span class="keyword">const</span> tenantPrisma2 = <span class="func">getTenantPrisma</span>(org2.id);
+    <span class="keyword">const</span> donations = <span class="keyword">await</span> tenantPrisma2.donation.findMany();
+
+    expect(donations).toHaveLength(0);
+    expect(donations.some(d =&gt; d.donorName === <span class="string">"Org1 Donor"</span>)).toBe(<span class="keyword">false</span>);
+  });
+
+  <span class="func">it</span>(<span class="string">"should auto-inject organizationId on create"</span>, <span class="keyword">async</span> () =&gt; {
+    <span class="keyword">const</span> org = <span class="keyword">await</span> prisma.organization.create({
+      data: { name: <span class="string">"Test Org"</span>, slug: <span class="string">"test"</span>, type: <span class="string">"FESTIVAL"</span> }
+    });
+    <span class="keyword">const</span> tenantPrisma = <span class="func">getTenantPrisma</span>(org.id);
+
+    <span class="keyword">const</span> donation = <span class="keyword">await</span> tenantPrisma.donation.create({
+      data: { amount: 500, donorName: <span class="string">"Test"</span>, category: <span class="string">"CASH"</span> }
+    });
+
+    expect(donation.organizationId).toBe(org.id);
+  });
+});</div>
+
+        <h3>Test Utilities</h3>
+        <div class="code-block">
+<span class="comment">// src/test-utils.ts</span>
+<span class="keyword">import</span> { <span class="type">TenantContext</span> } <span class="keyword">from</span> <span class="string">"@/server/context"</span>;
+
+<span class="keyword">export function</span> <span class="func">createTestContext</span>(overrides?: {
+  role?: <span class="type">OrganizationRole</span>;
+  prisma?: <span class="type">any</span>;
+}): <span class="type">TenantContext</span> {
+  <span class="keyword">return</span> {
+    user: { id: <span class="string">"user-1"</span>, email: <span class="string">"test@test.com"</span> },
+    member: {
+      id: <span class="string">"member-1"</span>,
+      userId: <span class="string">"user-1"</span>,
+      role: overrides?.role ?? <span class="string">"ADMIN"</span>,
+      organizationId: <span class="string">"org-1"</span>,
+    },
+    organization: {
+      id: <span class="string">"org-1"</span>,
+      slug: <span class="string">"test-org"</span>,
+      type: <span class="string">"FESTIVAL"</span>,
+    },
+    prisma: overrides?.prisma ?? <span class="func">createTestPrisma</span>(),
+  };
+}
+
+<span class="keyword">export function</span> <span class="func">createTestPrisma</span>() {
+  <span class="keyword">return</span> {
+    donation: {
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
+    <span class="comment">// ... other models</span>
+  };
+}</div>
+    </div>
+
+    <!-- SECTION 13: Migration Strategy -->
+    <div class="section" id="migration">
+        <h2>13. Migration Strategy — If Refactoring</h2>
+
+        <h3>Option A: Rewrite from Scratch</h3>
+        <div class="callout arch">
+            <strong>When to Choose</strong>
+            If the current codebase is < 2000 lines of business logic and you have 2-3 weeks. The current code has enough good patterns that a rewrite captures the lessons learned.
+        </div>
+
+        <h4>Phase 1: Foundation (Days 1-3)</h4>
+        <ul>
+            <li>Set up new project with Next.js 14, TypeScript strict, ESLint, Prettier</li>
+            <li>Configure <code>next.config.js</code> with image optimization, env validation</li>
+            <li>Set up Prisma with improved schema (unified Volunteer, separate Invitation)</li>
+            <li>Implement <code>server/auth.ts</code> with single permission system</li>
+            <li>Implement <code>server/tenant-prisma.ts</code> with generic tenant scope</li>
+            <li>Implement <code>server/context.ts</code> with <code>cache()</code> memoization</li>
+        </ul>
+
+        <h4>Phase 2: Core Modules (Days 4-8)</h4>
+        <ul>
+            <li>Migrate core module (organization, member, invitation, audit)</li>
+            <li>Migrate finance module (donation, expense, financial)</li>
+            <li>Migrate events module</li>
+            <li>Implement task module (extracted from member.service.ts)</li>
+            <li>Each module: service + types + tests</li>
+        </ul>
+
+        <h4>Phase 3: Features (Days 9-14)</h4>
+        <ul>
+            <li>Migrate festival module (bhog, public pages)</li>
+            <li>Migrate assistant module (AI integration)</li>
+            <li>Build all UI components with proper Server/Client boundaries</li>
+            <li>Add loading.tsx and error.tsx to all route segments</li>
+        </ul>
+
+        <h4>Phase 4: Polish (Days 15-18)</h4>
+        <ul>
+            <li>Integration tests for multi-tenant isolation</li>
+            <li>Performance testing (parallel data fetching)</li>
+            <li>Accessibility audit</li>
+            <li>Documentation</li>
+        </ul>
+
+        <h3>Option B: Incremental Refactoring</h3>
+        <div class="callout arch">
+            <strong>When to Choose</strong>
+            If the current codebase is stable in production and you can't afford downtime. Refactor module by module over 4-6 weeks.
+        </div>
+
+        <h4>Week 1: Fix Authorization</h4>
+        <ul>
+            <li>Replace all <code>validateAccess()</code> calls with <code>requirePermission()</code></li>
+            <li>Remove all manual admin checks in actions</li>
+            <li>Single source of truth: <code>server/auth.ts</code></li>
+        </ul>
+
+        <h4>Week 2: Fix Actions</h4>
+        <ul>
+            <li>Convert all actions to return <code>ActionResult&lt;T&gt;</code></li>
+            <li>Add <code>withAction()</code> wrapper to eliminate try/catch boilerplate</li>
+            <li>Standardize Zod validation patterns</li>
+        </ul>
+
+        <h4>Week 3: Fix Services</h4>
+        <ul>
+            <li>Convert static classes to plain functions</li>
+            <li>Add <code>TenantContext</code> parameter to all service methods</li>
+            <li>Extract task logic from member.service.ts to tasks/task.service.ts</li>
+        </ul>
+
+        <h4>Week 4: Fix Components</h4>
+        <ul>
+            <li>Add loading.tsx and error.tsx to all route segments</li>
+            <li>Extract festival/club overview into separate components</li>
+            <li>Remove all <code>as any</code> casts by fixing type definitions</li>
+        </ul>
+
+        <h4>Week 5: Fix Database</h4>
+        <ul>
+            <li>Create Prisma migration to unify Volunteer into OrganizationMember</li>
+            <li>Separate Invitation from OrganizationMember</li>
+            <li>Update all queries to use new schema</li>
+        </ul>
+
+        <h4>Week 6: Testing</h4>
+        <ul>
+            <li>Add integration tests for tenant isolation</li>
+            <li>Add unit tests for all services</li>
+            <li>Add E2E tests for critical flows</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 14: Build Timeline -->
+    <div class="section" id="timeline">
+        <h2>14. Build Timeline — From Scratch</h2>
+
+        <h3>If Building UTSAV Today</h3>
+        <table>
+            <tr><th>Week</th><th>Focus</th><th>Deliverables</th></tr>
+            <tr>
+                <td><span class="priority-badge priority-high">Week 1</span></td>
+                <td>Foundation & Auth</td>
+                <td>Project setup, Prisma schema, auth, RBAC, tenant isolation</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-high">Week 2</span></td>
+                <td>Core Domain</td>
+                <td>Organization CRUD, member management, invitations, audit logging</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-high">Week 3</span></td>
+                <td>Finance</td>
+                <td>Donations, expenses with approval workflow, financial analytics</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-medium">Week 4</span></td>
+                <td>Events & Tasks</td>
+                <td>Event management, volunteer tasks, assignments</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-medium">Week 5</span></td>
+                <td>Festival Features</td>
+                <td>Bhog system, prasad windows, public transparency pages</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-medium">Week 6</span></td>
+                <td>AI & Notifications</td>
+                <td>Admin assistant, email invitations, real-time updates</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-low">Week 7</span></td>
+                <td>UI Polish</td>
+                <td>Responsive design, animations, loading states, error boundaries</td>
+            </tr>
+            <tr>
+                <td><span class="priority-badge priority-low">Week 8</span></td>
+                <td>Testing & Deployment</td>
+                <td>Integration tests, E2E tests, CI/CD, production deployment</td>
+            </tr>
+        </table>
+
+        <h3>Key Technical Decisions</h3>
+        <table>
+            <tr><th>Decision</th><th>Choice</th><th>Why</th></tr>
+            <tr>
+                <td>Framework</td>
+                <td>Next.js 14 (App Router)</td>
+                <td>Server Components, Server Actions, built-in routing</td>
+            </tr>
+            <tr>
+                <td>Database</td>
+                <td>PostgreSQL + Prisma</td>
+                <td>Relational data, type safety, migrations</td>
+            </tr>
+            <tr>
+                <td>Auth</td>
+                <td>NextAuth.js v4 (JWT)</td>
+                <td>Simple, no session storage needed</td>
+            </tr>
+            <tr>
+                <td>Multi-tenancy</td>
+                <td>Shared DB, tenant-scoped Prisma extension</td>
+                <td>Cost-effective, automatic isolation</td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td>Server Components + <code>cache()</code></td>
+                <td>No client state library needed</td>
+            </tr>
+            <tr>
+                <td>Forms</td>
+                <td>react-hook-form + Zod</td>
+                <td>Performance, validation, type safety</td>
+            </tr>
+            <tr>
+                <td>UI</td>
+                <td>shadcn/ui + Tailwind</td>
+                <td>Accessible, customizable, no runtime CSS-in-JS</td>
+            </tr>
+            <tr>
+                <td>AI</td>
+                <td>Google Gemini (read-only)</td>
+                <td>Admin assistant, intent classification</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>Resend</td>
+                <td>Simple, reliable, good DX</td>
+            </tr>
+            <tr>
+                <td>Testing</td>
+                <td>Vitest + React Testing Library</td>
+                <td>Fast, ESM-first, good DX</td>
+            </tr>
+        </table>
+
+        <h3>What Makes This Design Efficient</h3>
+        <div class="callout improve">
+            <strong>1. Single Authorization Function</strong>
+            No duplicate patterns, no manual checks, one source of truth. Audit every permission check by grepping for <code>requirePermission</code>.
+        </div>
+        <div class="callout improve">
+            <strong>2. TenantContext Carries Everything</strong>
+            No passing <code>organizationId</code> as a separate parameter. Context has user, member, org, and scoped prisma client.
+        </div>
+        <div class="callout improve">
+            <strong>3. Uniform Action Contract</strong>
+            Every action returns <code>ActionResult&lt;T&gt;</code>. Client components have one error-handling pattern.
+        </div>
+        <div class="callout improve">
+            <strong>4. Generic Tenant Scope</strong>
+            Adding a new model to tenant isolation = 1 line in an array. No 200-line boilerplate per model.
+        </div>
+        <div class="callout improve">
+            <strong>5. Co-located Tests</strong>
+            Tests live next to the code they test. Easy to find, easy to maintain.
+        </div>
+        <div class="callout improve">
+            <strong>6. Loading & Error Boundaries by Default</strong>
+            Every route segment has <code>loading.tsx</code> and <code>error.tsx</code>. No blocked renders.
+        </div>
+        <div class="callout improve">
+            <strong>7. Type-Safe Throughout</strong>
+            No <code>as any</code>. Compile-time guarantees catch errors before runtime.
+        </div>
+        <div class="callout improve">
+            <strong>8. Module Boundaries</strong>
+            Each module owns its models, services, types, and tests. No cross-module logic leaks.
+        </div>
+
+        <h3>Summary: Current vs Proposed</h3>
+        <table>
+            <tr><th>Aspect</th><th>Current</th><th>Proposed</th></tr>
+            <tr>
+                <td>Service Pattern</td>
+                <td>Static classes (namespaces)</td>
+                <td>Plain functions with TenantContext</td>
+            </tr>
+            <tr>
+                <td>Authorization</td>
+                <td>3 overlapping systems</td>
+                <td>Single <code>requirePermission()</code></td>
+            </tr>
+            <tr>
+                <td>Action Returns</td>
+                <td>Mixed patterns</td>
+                <td>Uniform <code>ActionResult&lt;T&gt;</code></td>
+            </tr>
+            <tr>
+                <td>Tenant Scope</td>
+                <td>200+ lines per model</td>
+                <td>Generic, 1 line per model</td>
+            </tr>
+            <tr>
+                <td>Type Safety</td>
+                <td><code>as any</code> casts</td>
+                <td>Strict TypeScript</td>
+            </tr>
+            <tr>
+                <td>Error Handling</td>
+                <td>No boundaries</td>
+                <td>loading.tsx + error.tsx everywhere</td>
+            </tr>
+            <tr>
+                <td>Tests</td>
+                <td>Scattered, 9 files</td>
+                <td>Co-located, comprehensive</td>
+            </tr>
+            <tr>
+                <td>Data Fetching</td>
+                <td>Redundant queries</td>
+                <td><code>cache()</code> memoization</td>
+            </tr>
+            <tr>
+                <td>Module Boundaries</td>
+                <td>Leaky (tasks in member service)</td>
+                <td>Clean (each module owns its logic)</td>
+            </tr>
+            <tr>
+                <td>Config</td>
+                <td>No next.config.js</td>
+                <td>Full configuration</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

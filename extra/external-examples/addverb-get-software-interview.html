@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addverb Technologies — GET (Software) Interview: End-to-End Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f0883e;
+    --accent2: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, #1a1f2e 0%, #262335 55%, #3a2b20 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 34px 30px;
+    margin-bottom: 28px;
+  }
+  header.hero h1 { font-size: 1.9rem; line-height: 1.2; margin-bottom: 8px; color: #fff; }
+  header.hero h1 span { color: var(--accent); }
+  header.hero p.sub { color: var(--muted); font-size: 1rem; margin-bottom: 14px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .badge {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 12px; font-size: .78rem; color: var(--accent2);
+  }
+  .warn {
+    background: rgba(210,153,34,.12); border: 1px solid var(--yellow);
+    border-left: 5px solid var(--yellow); border-radius: 10px; padding: 16px 18px; margin: 22px 0;
+  }
+  .warn h3 { color: var(--yellow); font-size: 1.05rem; margin-bottom: 6px; }
+  h2.section {
+    font-size: 1.35rem; margin: 42px 0 16px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent); color: #fff;
+  }
+  h3 { font-size: 1.05rem; color: var(--accent2); margin: 20px 0 10px; }
+  p, li { color: var(--text); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px; margin: 12px 0;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 12px 0; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface2); color: #fff; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+  .p-green { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.4); }
+  .p-red { background: rgba(248,81,73,.15); color: var(--red); border: 1px solid rgba(248,81,73,.4); }
+  .p-yellow { background: rgba(210,153,34,.15); color: var(--yellow); border: 1px solid rgba(210,153,34,.4); }
+  .p-blue { background: rgba(88,166,255,.15); color: var(--accent2); border: 1px solid rgba(88,166,255,.4); }
+  ul.tight li { margin-bottom: 6px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+  .step {
+    display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px dashed var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    flex: 0 0 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #c2661f); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  .step h4 { color: #fff; font-size: 1rem; margin-bottom: 4px; }
+  .step .meta { color: var(--muted); font-size: .8rem; margin-bottom: 6px; }
+  a { color: var(--accent2); text-decoration: none; word-break: break-all; }
+  a:hover { text-decoration: underline; }
+  code {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 5px;
+    padding: 1px 7px; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .85em; color: #ffa657;
+  }
+  .src { font-size: .8rem; color: var(--muted); margin-top: 6px; }
+  .src a { color: #8ea2c2; }
+  .toc {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin: 22px 0;
+  }
+  .toc a { display: inline-block; margin: 3px 14px 3px 0; color: var(--accent2); }
+  footer { margin-top: 50px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: .82rem; text-align: center; }
+  .big-num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+  .stat-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0; }
+  .stat {
+    flex: 1; min-width: 150px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+  }
+  .stat .label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .stat .value { font-size: 1.15rem; font-weight: 600; color: #fff; margin-top: 4px; }
+  .q-chip { margin: 5px 6px 5px 0; }
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0; margin: 10px 0; }
+  summary { cursor: pointer; padding: 14px 18px; font-weight: 600; color: #fff; list-style: none; position: relative; padding-right: 40px; }
+  summary::after { content: "▾"; position: absolute; right: 18px; color: var(--accent); }
+  details[open] summary::after { content: "▴"; }
+  details .inner { padding: 4px 18px 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <h1>Addverb Technologies — <span>GET (Software)</span> Interview<br>Complete End-to-End Guide</h1>
+  <p class="sub">Graduate Engineer Trainee · Software profile · On-campus recruitment — compiled from real candidate experiences, job portals, and company sources.</p>
+  <div class="badges">
+    <span class="badge">Noida HQ · Reliance-backed</span>
+    <span class="badge">Founded 2016</span>
+    <span class="badge">5 rounds (campus)</span>
+    <span class="badge">~3–4 day process</span>
+    <span class="badge">Salary ~₹8–10.5 LPA</span>
+    <span class="badge">Difficulty 3.09/5 (Glassdoor)</span>
+  </div>
+</header>
+
+<div class="warn">
+  <h3>⚠️ Spelling: "Adverb" = "Addverb"</h3>
+  <p>There is no company called "Adverb Technologies" in the hiring space. The company you mean is <strong>Addverb Technologies Ltd.</strong> — Noida-headquartered robotics &amp; warehouse-automation company. "GET" = <strong>Graduate Engineer Trainee</strong>, and <strong>"GET — Software"</strong> is their software-profile campus program. Do not confuse with Turkish "GET Software Co." (unrelated AI-ERP startup) or "Adverb Technology" (a Kolkata advertising agency).</p>
+</div>
+
+<div class="toc">
+  <strong>Contents:</strong><br>
+  <a href="#company">1. Company Overview</a>
+  <a href="#process">2. End-to-End Interview Process</a>
+  <a href="#experiences">3. Real Candidate Experiences</a>
+  <a href="#questions">4. Interview Question Bank</a>
+  <a href="#assessments">5. Assessments &amp; Test Formats</a>
+  <a href="#salary">6. Salary &amp; Compensation</a>
+  <a href="#tips">7. Tips &amp; Red Flags</a>
+  <a href="#sources">8. Source Library</a>
+</div>
+
+<!-- ============ 1. COMPANY ============ -->
+<h2 class="section" id="company">1. Company Overview</h2>
+
+<div class="stat-row">
+  <div class="stat"><div class="label">Location</div><div class="value">Noida, India</div></div>
+  <div class="stat"><div class="label">Status</div><div class="value">Reliance-controlled</div></div>
+  <div class="stat"><div class="label">Funding</div><div class="value">~$143M total</div></div>
+  <div class="stat"><div class="label">Employees</div><div class="value">~1,000–1,900</div></div>
+  <div class="stat"><div class="label">Glassdoor rating</div><div class="value">3.6/5</div></div>
+</div>
+
+<table>
+  <tr><th style="width:180px;">Attribute</th><th>Detail</th></tr>
+  <tr><td>Legal name</td><td>Addverb Technologies Limited (CIN U74999UP2016PLC122944)</td></tr>
+  <tr><td>Founded</td><td>June 2016 — by ex-Asian Paints engineers: Sangeet Kumar (CEO), Prateek Jain (COO), Bir Singh (CBO), Satish Shukla (CHRO) + team</td></tr>
+  <tr><td>What they do</td><td>Warehouse automation &amp; robotics: AMRs (Dynamo, Zippy sorter, Cruser, Quadron, Veloce), ASRS shuttles, cobots, quadruped robots (Trakr), and humanoids (Elixis-W wheeled humanoid, Feb 2026). Software: Legion (fleet mgmt), Mobinity (WCS), Optimus (WMS), Cincinity (WES); cloud microservices + IoT.</td></tr>
+  <tr><td>Backing</td><td>Reliance Retail Ventures acquired ~54–57% stake for <strong>$132M (Jan 2022)</strong>, post-money valuation ~$270M. Earlier: $10M Series A (2018, Jalaj Dani / Asian Paints). Raising $100M+ (2026).</td></tr>
+  <tr><td>Scale</td><td>350+ customers, 500+ warehouses automated, 2,000+ robots deployed across 25+ countries. Clients: Amazon, Flipkart, Reliance/JioMart, Adidas, Unilever, ITC, PepsiCo, Maersk, Lenskart, Siemens.</td></tr>
+  <tr><td>Global offices</td><td>India (Noida HQ, Greater Noida "Bot Verse", Delhi, Pune, Mumbai, Bengaluru, Ahmedabad) · USA · Netherlands · Singapore · Dubai · Australia</td></tr>
+  <tr><td>Reviews</td><td>AmbitionBox 3.5–3.6/5, Glassdoor ~3.6/5, Indeed 3.5/5, Blind 2.3/5 (small sample)</td></tr>
+</table>
+
+<h3>Why this matters for your interview</h3>
+<p>Addverb's interviewers consistently probe <strong>why you want to join a robotics company</strong>. Know the product line (Zippy, Dynamo, Cobots, humanoids), the software stack, and the Reliance connection. "Why Addverb?" was asked in <em>every</em> round reported by candidates.</p>
+
+<p class="src">Sources: <a href="https://addverb.com/us/about-us/">addverb.com/about-us</a> · <a href="https://inc42.com/company/addverb-technologies/">Inc42</a> · <a href="https://economictimes.indiatimes.com/tech/startups/reliance-industries-acquires-54-stake-in-robotics-firm-addverb-technologies/articleshow/88966660.cms">Economic Times</a> · <a href="https://aws.amazon.com/solutions/case-studies/addverb-technologies-case-study">AWS case study</a></p>
+
+<!-- ============ 2. PROCESS ============ -->
+<h2 class="section" id="process">2. End-to-End Interview Process</h2>
+
+<div class="card">
+  <p><strong>The classic GET–Software drive</strong> (Ishaan Bhola, batch 2024, Noida campus) ran like this:</p>
+  <div class="stat-row">
+    <div class="stat"><div class="label">Applicants</div><div class="value">~1,000</div></div>
+    <div class="stat"><div class="label">Shortlisted (CGPA+resume)</div><div class="value">~76</div></div>
+    <div class="stat"><div class="label">Selected — Software</div><div class="value">3</div></div>
+    <div class="stat"><div class="label">Selected — Robotics</div><div class="value">1</div></div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">0</div>
+  <div>
+    <h4>Profile Shortlisting — the real first filter</h4>
+    <div class="meta">CGPA cutoff ~8.0–8.5 (but 7.6 has cleared) + resume screening · Kills ~92% of applicants</div>
+    <p>Most campus drives have <strong>no online assessment</strong>. Your application/poll form, CGPA, positions of responsibility, projects, and extracurriculars do the filtering. Fill every field carefully.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">1</div>
+  <div>
+    <h4>Interview 1 — Technical</h4>
+    <div class="meta">~25–35 min · Online · 1 panelist</div>
+    <p>Resume deep-dive on projects &amp; internships + CS fundamentals (OOPs, DBMS, OS, SQL). Expect every CV line to be dissected.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div>
+    <h4>Interview 2 — Technical</h4>
+    <div class="meta">~30 min · DSA heavy</div>
+    <p>"Mainly DSA + CS fundamentals." Linked lists, arrays, strings, search/sort. Strong candidates can be <em>fast-tracked/skipped</em> straight to round 3 (Ishaan was).</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div>
+    <h4>Interview 3 — Technical + HR (conducted by the CIO)</h4>
+    <div class="meta">~30 min · STAR method</div>
+    <p>Behavioral questions answered with STAR + sorting algorithms, arrays, linked lists + "code a basic search algorithm" on the spot.</p>
+  </div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div>
+    <h4>Interview 4 — HR (conducted by a Co-founder)</h4>
+    <div class="meta">~10–15 min · Pure culture fit</div>
+    <p>Personality, motivation, fit. Interviewers "pay very much attention to you as a person — <strong>avoid any negative words</strong>."</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Process variations across drives</h3>
+  <table>
+    <tr><th>Drive</th><th>Rounds</th><th>Notes</th></tr>
+    <tr><td>GET–Software 2023–24 (Noida)</td><td>5 (shortlist + 4 interviews)</td><td>3–4 days, online, offers = Intern+FTE or Intern-only</td></tr>
+    <tr><td>Software "Digital Jedi" (SGSITS Indore, Dec 2024)</td><td>3 (Tech → HR+Tech → HR)</td><td><strong>Single day</strong>, no OA; shortlist via poll form; offline = resume-led, online = DSA + SQL</td></tr>
+    <tr><td>GET – Mobile Robotics (IIT KGP, 2024–25)</td><td>4 (2 Tech + 2 HR)</td><td>CV shortlist → interviews; prefers Math &amp; Computing, Mechanical, Physics</td></tr>
+    <tr><td>SDE on-campus (2024–25, TheJobOverflow)</td><td>4 (2 Tech + 2 HR)</td><td>6 selected out of ~70; no MCQ/OA, plus a subjective written test (~25 Qs: SQL, HTML/CSS, C programs, OOPs, SE, CN)</td></tr>
+    <tr><td>Off-campus internship (Pune, via DDRobocon)</td><td>4 (Tech, CodeChef challenge, resume/GitHub, HR)</td><td>75+ candidates invited in-person; offer on the spot after HR</td></tr>
+  </table>
+</div>
+
+<p class="src">Sources: <a href="https://medium.com/@b.ishaan10/addverb-get-software-2024-interview-experience-on-campus-d2df4f1c7eea">Medium — Ishaan Bhola</a> · <a href="https://prranjaljatav4678.medium.com/addverb-on-campus-software-digital-jedi-experience-december-2024-f8d123441fff">Medium — Pranjal Jatav</a> · <a href="https://medium.com/@swgiitkgp/foresight-2025-placement-at-addverb-technologies-lakshya-bamne-61edd4baf726">Medium — Lakshya Bamne</a></p>
+
+<!-- ============ 3. EXPERIENCES ============ -->
+<h2 class="section" id="experiences">3. Real Candidate Experiences</h2>
+
+<details>
+  <summary>Ishaan Bhola — GET-Software 2024 (Selected, Intern + FTE)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li><span class="pill p-blue">Result: Selected</span> <span class="pill p-green">Difficulty 5/10</span></li>
+      <li>Branch ENC, CGPA cutoff 8.5. ~1,000 applied → 76 shortlisted by CGPA + resume only. <strong>No online assessment.</strong></li>
+      <li>Rounds 1–4 over 3–4 days (all online except PPT). Round 2 (DSA) was skipped for him after a strong round 1 — direct promotion to the CIO round.</li>
+      <li>CIO round: resume + STAR behavioral + sorting/arrays/linked-lists + code a basic search algorithm.</li>
+      <li>Co-founder HR round: pure personality/fit, ~10–15 min.</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary>Pranjal Jatav — Software (Digital Jedi), SGSITS Indore, Dec 2024 (Selected)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li><strong>Single-day placement</strong> — offline PPT → interviews same day. No OA; shortlist from the poll form.</li>
+      <li>3 rounds same day: Tech → HR+Tech → HR.</li>
+      <li>Offline panels were resume-driven (his Flipkart GRID 6.0 and Myntra Hackathon projects were grilled). Online panels asked <strong>DSA + SQL primarily</strong>, then OOPs, DBMS, OS, SQL.</li>
+      <li>Sticky technical question: <em>"Create threads in Java"</em> and <em>"Two threads in one class — how do you synchronise them?"</em> — interviewer pressed hard.</li>
+      <li>Advice: "They pay very much attention to you as a person — avoid any negative words."</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary>Lakshya Bamne — GET Mobile Robotics, IIT KGP 2024–25 (Selected)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li>CV shortlist → 4 rounds (2 Tech + 2 HR). CGPA 7.64 — not a deciding factor.</li>
+      <li>Tech R1: medium-level string problem + CV basics + <strong>debug a C++ multithreading/parallelism code</strong> (couldn't finish it — still cleared).</li>
+      <li>Tech R2: CV-based + <strong>write linear regression from scratch</strong>.</li>
+      <li>Interviewers were especially attracted to C++ / parallelisation projects. Preferred backgrounds: Math &amp; Computing, Mechanical, Physics.</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary>Anonymous — Software Developer, on-campus (TheJobOverflow)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li>4 rounds (2 Tech + 2 HR). <strong>6 selected from ~70.</strong></li>
+      <li>No MCQ / no online coding test. Subjective written test ≈ <strong>25 questions</strong>: SQL queries, HTML/CSS, basic C programs, OOPs, Software Engineering, Computer Networks.</li>
+      <li>Tech R1: intro + <strong>"Detect and remove loop in a linked list"</strong> (tortoise &amp; hare).</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary>Anonymous — SWE fresher, "dream company" 16 LPA (r/leetcode, Sep 2025 — Rejected at final)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li>R1 resume shortlist (CGPA 8+). R2 <strong>machine-coding</strong>: implement a "money transfer" feature in a wallet app. R3 project + behavior. R4 final technical — all cleared.</li>
+      <li>R5 <strong>extra tie-breaker round with the co-founder</strong> → rejected. Confirms final-stage rejection is common.</li>
+    </ul>
+  </div>
+</details>
+
+<details>
+  <summary>Sahil Dhanwani — Off-campus internship, Pune (via DDRobocon, Feb 2024 — Selected)</summary>
+  <div class="inner">
+    <ul class="tight">
+      <li>75+ candidates invited in-person at Pune office.</li>
+      <li>R1 Tech: OOP + DSA (Stack, Queue, Linked Lists, <strong>virtual functions</strong>) — hard grilling. R2 CodeChef problem (stack-based DS) then explain approach. R3 resume + GitHub review (stumbled on some C++/Qt). R4 HR = availability/joining → <strong>offer on the spot</strong>.</li>
+    </ul>
+  </div>
+</details>
+
+<!-- ============ 4. QUESTIONS ============ -->
+<h2 class="section" id="questions">4. Interview Question Bank</h2>
+
+<h3>🧩 Coding / DSA</h3>
+<div class="card">
+  <span class="pill p-blue q-chip">Linked List</span> detect &amp; remove loop (tortoise-hare)
+  <span class="pill p-blue q-chip">Linked List</span> reverse in place
+  <span class="pill p-blue q-chip">Arrays</span> sorting &amp; searching
+  <span class="pill p-blue q-chip">Searching</span> code a basic search algorithm on the spot
+  <span class="pill p-blue q-chip">Strings</span> medium-level string problems
+  <span class="pill p-blue q-chip">Stacks/Queues</span> implement queue using stacks; stack-based problems
+  <span class="pill p-blue q-chip">Arrays</span> two-sum
+  <span class="pill p-blue q-chip">Strings</span> longest palindromic substring
+  <span class="pill p-blue q-chip">Trees</span> level-order traversal
+  <span class="pill p-blue q-chip">Detection</span> "detect and remove loop in a linked list"
+  <p style="margin-top:10px;">Always state <strong>time &amp; space complexity</strong> after every solution.</p>
+</div>
+
+<h3>💻 CS Fundamentals</h3>
+<div class="grid2">
+  <div class="card">
+    <strong>OOPs</strong>
+    <ul class="tight">
+      <li>Pillars of OOP (inheritance, polymorphism, encapsulation, abstraction)</li>
+      <li>Virtual functions (interview-favorite)</li>
+      <li>Abstraction vs encapsulation</li>
+    </ul>
+  </div>
+  <div class="card">
+    <strong>OS / Concurrency</strong>
+    <ul class="tight">
+      <li>Process vs thread</li>
+      <li>Create threads in Java</li>
+      <li>Synchronise two threads on one class</li>
+      <li>Debug C++ multithreading/parallelism code</li>
+      <li>Deadlock, paging / virtual memory</li>
+    </ul>
+  </div>
+  <div class="card">
+    <strong>DBMS / SQL</strong>
+    <ul class="tight">
+      <li>Primary vs foreign key</li>
+      <li>SQL basics — DDL/DML/DCL</li>
+      <li>SQL vs NoSQL</li>
+      <li>Indexing</li>
+      <li>SQL query writing (asked in every online panel)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <strong>Networks / SE / Other</strong>
+    <ul class="tight">
+      <li>OSI layers, TCP vs UDP</li>
+      <li>Software engineering concepts</li>
+      <li>C basics &amp; pointers/STL (C++)</li>
+      <li>HTML/CSS basics</li>
+      <li>Write linear regression from scratch (robotics track)</li>
+    </ul>
+  </div>
+</div>
+
+<h3>👤 Projects &amp; Resume Deep-Dive</h3>
+<div class="card">
+  <ul class="tight">
+    <li>Defend <em>every</em> line of your CV — projects/internships are the core of offline rounds.</li>
+    <li>Projects in <strong>C++ or parallelisation</strong> are explicitly rewarded.</li>
+    <li>"Tell me about a challenging bug / technical problem you solved."</li>
+    <li>Be ready to walk through code on your GitHub.</li>
+    <li>Hackathon projects get grilled (Flipkart GRID, Myntra Hackathon came up).</li>
+  </ul>
+</div>
+
+<h3>🤝 HR / Behavioral</h3>
+<div class="card">
+  <ul class="tight">
+    <li>Tell me about yourself</li>
+    <li><strong>Why Addverb? Why this role?</strong> — asked in every round</li>
+    <li>STAR-format stories: challenge solved, team under pressure, project owned end-to-end (CIO round)</li>
+    <li>Strengths &amp; weaknesses; salary expectations</li>
+    <li>Willingness to relocate (Noida); 3–5 year goals</li>
+    <li>Availability / joining timeline (internship round)</li>
+    <li><strong>"Do you have any questions for us?" — have one ready, even in tech rounds.</strong></li>
+    <li>Stay 100% positive — negative talk is explicitly penalised.</li>
+  </ul>
+</div>
+
+<!-- ============ 5. ASSESSMENTS ============ -->
+<h2 class="section" id="assessments">5. Assessments &amp; Test Formats</h2>
+<table>
+  <tr><th>Format</th><th>Where seen</th><th>Details</th></tr>
+  <tr><td><span class="pill p-green">No OA</span></td><td>Most campus drives 2023–2025</td><td>Shortlisting = CGPA + resume/poll form. Interviews start immediately.</td></tr>
+  <tr><td>Subjective written (~25 qs)</td><td>Some software drives</td><td>SQL queries, HTML/CSS, basic C programs, OOPs, Software Engineering, Computer Networks.</td></tr>
+  <tr><td>Machine-coding</td><td>SWE freshers</td><td>Implement a functional feature — e.g. wallet "money transfer".</td></tr>
+  <tr><td>Platform coding round</td><td>Off-campus / internship</td><td>CodeChef/HackerRank-style DS problem, then walk through approach.</td></tr>
+  <tr><td>Online panel live-coding</td><td>Mixed online/offline drives</td><td>DSA + SQL live, plus Java thread-sync tasks.</td></tr>
+</table>
+
+<!-- ============ 6. SALARY ============ -->
+<h2 class="section" id="salary">6. Salary &amp; Compensation</h2>
+<div class="grid2">
+  <div class="card">
+    <div class="big-num">₹8.1–9.9 LPA</div>
+    <p>GET (fresher) per <strong>AmbitionBox (48 reports)</strong>. Software Developer ₹8.1–10.8 LPA; Software Engineer ₹8.3–11 LPA.</p>
+  </div>
+  <div class="card">
+    <div class="big-num">~₹10.5 LPA</div>
+    <p>Secondary figure from a 2025 compilation: ~₹87,120/month gross, ~₹80,880 in-hand. Treat the bracket as <strong>₹8–10.5 LPA</strong>.</p>
+  </div>
+  <div class="card">
+    <div class="big-num">~15.9 LPA</div>
+    <p>Fresher SWE CTC reported in community compensation sheets (GetHiredRoadmap / LeetCode 300-companies list). Higher-end / other tracks.</p>
+  </div>
+  <div class="card">
+    <div class="big-num">₹25–43k/mo</div>
+    <p>Internship stipends (~₹25–30k/mo) and off-campus fresher postings (GET Bhopal ₹31k/mo, Data Analyst trainee Gurugram ₹43k/mo).</p>
+  </div>
+</div>
+
+<h3>Perks commonly cited</h3>
+<p>Unlimited leave (no buckets), flexible hours, no attendance-linked pay, creche, after-hours transport, 24/7 health centre, "One Policy For All", multi-country exposure, strong fresh-grad onboarding with awards (Rookie of the Year, Dream Team).</p>
+
+<!-- ============ 7. TIPS ============ -->
+<h2 class="section" id="tips">7. Tips &amp; Red Flags</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="color:var(--green);">✅ Do</h3>
+    <ul class="tight">
+      <li>Fill the application/poll form meticulously — it <em>is</em> the first filter.</li>
+      <li>Master DSA (arrays, graphs, DP, strings, linked lists) + C++ (pointers, STL, threads/parallelism).</li>
+      <li>Polish every resume line to interview depth; you <em>will</em> be grilled on it.</li>
+      <li>Practice live SQL queries and Java thread creation/synchronisation.</li>
+      <li>Prepare STAR stories for the CIO/co-founder rounds.</li>
+      <li>Research the company: Zippy sorter, Dynamo AMR, cobots, humanoids, Reliance deal.</li>
+      <li>Have a "questions for us?" prepped. Show approach + confidence even with partial answers.</li>
+      <li>Prepare the relocation answer (Noida).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="color:var(--red);">⚠️ Beware</h3>
+    <ul class="tight">
+      <li>Rejections concentrate at the <strong>final co-founder/CEO round</strong> (culture-fit / tie-breaker), even after clearing all technicals.</li>
+      <li>Inequality of panel depth between offline and online candidates is reported.</li>
+      <li>Glassdoor: difficulty 3.09/5, positive experience ~54.6% — a real but not brutal bar.</li>
+      <li>Work-life balance criticized (Blind 1.7/5; AmbitionBox Pune 1.7/5); 2023 layoff claims (~150).</li>
+      <li>Promotions/appraisals widely complained about; some report HR pressure during notice periods.</li>
+      <li>Reliance-controlled → decision timelines and headcount can move slowly.</li>
+      <li>Offers may be <strong>Intern + FTE (PPO)</strong> or <strong>Intern-only</strong> — check before committing.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 8. SOURCES ============ -->
+<h2 class="section" id="sources">8. Source Library</h2>
+
+<h3>Interview experiences (primary)</h3>
+<ul class="tight">
+  <li><a href="https://medium.com/@b.ishaan10/addverb-get-software-2024-interview-experience-on-campus-d2df4f1c7eea">Addverb GET-Software 2024 — Ishaan Bhola (Medium)</a></li>
+  <li><a href="https://unsaidtalks.com/interviews/ishaan-bholas-addverb-interview-experience/">Ishaan Bhola — UnsaidTalks version</a></li>
+  <li><a href="https://prranjaljatav4678.medium.com/addverb-on-campus-software-digital-jedi-experience-december-2024-f8d123441fff">Software "Digital Jedi" Dec 2024 — Pranjal Jatav (Medium)</a></li>
+  <li><a href="https://medium.com/@swgiitkgp/foresight-2025-placement-at-addverb-technologies-lakshya-bamne-61edd4baf726">GET Mobile Robotics, IIT KGP 2025 — Lakshya Bamne (Medium)</a></li>
+  <li><a href="https://thejoboverflow.com/p/p2624/">SDE on-campus breakdown (TheJobOverflow)</a></li>
+  <li><a href="https://www.reddit.com/r/leetcode/comments/1hjvzqm/overcoming_one_more_failuredream_company_16lpa/">SWE 16 LPA rejected at final — r/leetcode</a></li>
+  <li><a href="https://www.linkedin.com/posts/sahildhanwani_ddrobocon-addverbtechnologies-interviewexperience-activity-7195070376563863552-6cSL">Off-campus Pune internship — Sahil Dhanwani (LinkedIn)</a></li>
+</ul>
+
+<h3>Company profile, funding, products</h3>
+<ul class="tight">
+  <li><a href="https://addverb.com/us/about-us/">Addverb — About Us</a> · <a href="https://addverb.ai/">Addverb.ai</a> · <a href="https://careers.addverb.com/">Careers portal</a></li>
+  <li><a href="https://inc42.com/company/addverb-technologies/">Inc42 company profile</a> · <a href="https://www.cbinsights.com/company/addverb-technologies">CB Insights</a> · <a href="https://platform.tracxn.com/a/d/company/584d302fe4b01c1af3f9803e/addverb">Tracxn</a></li>
+  <li><a href="https://economictimes.indiatimes.com/tech/startups/reliance-industries-acquires-54-stake-in-robotics-firm-addverb-technologies/articleshow/88966660.cms">Economic Times — Reliance 54% stake $132M</a></li>
+  <li><a href="https://addverb.com/press-release/reliance-acquires-54-stake-in-addverb-technologies-for-132-million/">Addverb press release — Reliance deal</a></li>
+  <li><a href="https://www.cnbctv18.com/business/startup/reliance-backed-addverb-raises-100-million-to-take-on-tesla-china-in-robot-race-ws-l-19922793.htm">CNBC-TV18 — $100M+ raise, 2026</a></li>
+  <li><a href="https://aws.amazon.com/solutions/case-studies/addverb-technologies-case-study">AWS — Addverb case study (LTA 2024)</a></li>
+  <li><a href="https://github.com/HumanoidAddverb">Addverb public GitHub (Syncro, Trakr SLAM, humanoid)</a></li>
+</ul>
+
+<h3>Reviews, salaries, ratings</h3>
+<ul class="tight">
+  <li><a href="https://www.ambitionbox.com/overview/addverb-technologies-pvt-limited-overview">AmbitionBox — overview &amp; salaries</a> · <a href="https://www.ambitionbox.com/interviews/addverb-technologies-pvt-limited-interview-questions">AmbitionBox — interview Q&amp;A</a></li>
+  <li><a href="https://www.glassdoor.com/Interview/Addverb-Technologies-Interview-Questions-E1547582.htm">Glassdoor — 161 interview reports</a></li>
+  <li><a href="https://in.indeed.com/cmp/Addverb-Technologies-Pvt.-Ltd./reviews">Indeed — reviews</a> · <a href="https://www.teamblind.com/company/Addverb/reviews">Blind</a> · <a href="https://levels.fyi/companies/addverb/salaries">Levels.fyi salaries</a></li>
+  <li><a href="https://myinternships.in/interview-prep/addverb-technologies">MyInternships — interview prep</a> · <a href="https://takluu.com/job-interviews/addverb-technologies/">Takluu — interview FAQ</a></li>
+  <li><a href="https://www.naukri.com/code360/interview-experiences/addverb-technologies/addverb-technologies-interview-experience-on-campus-oct-2021">Naukri Code360 — SDE-1 on-campus Oct 2021</a></li>
+  <li><a href="https://www.hrkatha.com/features/how-addverb-technologies-hires-right">HRKatha — "How Addverb hires right"</a></li>
+</ul>
+
+<h3>Disambiguation (not the same companies)</h3>
+<ul class="tight">
+  <li><a href="https://linkedin.com/company/adverb-technology">Adverb Technology (Kolkata advertising — unrelated)</a></li>
+  <li><a href="https://getsoftwarecompany.com/">GET Software Co. (Turkey — unrelated AI-ERP startup)</a></li>
+  <li>adverb.io / Adverbcoin.io (crypto/NFT project — unrelated, treat with caution)</li>
+</ul>
+
+<footer>
+  Compiled from public web sources · Sep 2026 · Research by 4 parallel web agents · Verify live openings at <a href="https://careers.addverb.com/">careers.addverb.com</a>
+</footer>
+
+</div>
+</body>
+</html>

@@ -125,10 +125,17 @@ export async function assignMemberToEvent(organizationId: string, eventId: strin
 
     const tenantPrisma = getTenantPrisma(organizationId);
 
+    const [event, member] = await Promise.all([
+        tenantPrisma.event.findFirst({ where: { id: eventId, isArchived: false }, select: { id: true } }),
+        tenantPrisma.organizationMember.findFirst({ where: { id: memberId, isArchived: false }, select: { id: true } }),
+    ]);
+    if (!event || !member) throw new Error("Event or member does not belong to this organization.");
+
     return await tenantPrisma.eventAssignment.create({
         data: {
             eventId,
-            organizationMemberId: memberId
+            organizationMemberId: memberId,
+            organizationId,
         }
     });
 }
@@ -145,12 +152,9 @@ export async function removeMemberFromEvent(organizationId: string, eventId: str
 
     const tenantPrisma = getTenantPrisma(organizationId);
 
-    return await tenantPrisma.eventAssignment.delete({
-        where: {
-            eventId_organizationMemberId: {
-                eventId,
-                organizationMemberId: memberId
-            }
-        }
+    const deleted = await tenantPrisma.eventAssignment.deleteMany({
+        where: { eventId, organizationMemberId: memberId, organizationId },
     });
+    if (deleted.count === 0) throw new Error("This event assignment could not be found.");
+    return deleted;
 }

@@ -223,7 +223,8 @@ async function acceptInviteAction(token: string) {
             update: {},
             create: {
                 eventId: invite.eventId,
-                organizationMemberId: targetMemberId
+                organizationMemberId: targetMemberId,
+                organizationId: invite.organizationId,
             }
         });
     }

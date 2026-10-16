@@ -24,6 +24,7 @@ export default function RecordDonationModal({
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
     const router = useRouter();
 
     // Simplified categories for Clubs
@@ -46,12 +47,14 @@ export default function RecordDonationModal({
             receivedAt: toIsoDateTime(formData.get("receivedAt") as string),
             eventId,
             notes: formData.get("notes") as string,
+            idempotencyKey,
         };
 
         const result = await recordDonationAction(data);
 
         if (result.success) {
             setIsOpen(false);
+            setIdempotencyKey(crypto.randomUUID());
             setIsLoading(false);
             router.refresh();
         } else {

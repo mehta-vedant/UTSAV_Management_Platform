@@ -21,7 +21,8 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
     FileSearch,
-    BarChart3
+    BarChart3,
+    BrainCircuit
 } from "lucide-react";
 import { OrganizationRole } from "@prisma/client";
 import { cn } from "@/lib/utils";
@@ -82,7 +83,8 @@ export default function ResponsiveDashboardLayout({
         },
         { name: "Expenses", href: `/${orgSlug}/dashboard/expenses`, icon: Activity },
         ...((role === OrganizationRole.ADMIN || role === OrganizationRole.TREASURER || role === OrganizationRole.COMMITTEE_MEMBER) ? [
-            { name: "Reports", href: `/${orgSlug}/dashboard/reports`, icon: BarChart3 }
+            { name: "Reports", href: `/${orgSlug}/dashboard/reports`, icon: BarChart3 },
+            { name: "Budget Health", href: `/${orgSlug}/dashboard/budget-health`, icon: BrainCircuit }
         ] : []),
         ...(organization.type === "FESTIVAL" ? [
             { name: "Bhog", href: `/${orgSlug}/dashboard/bhog`, icon: Utensils }

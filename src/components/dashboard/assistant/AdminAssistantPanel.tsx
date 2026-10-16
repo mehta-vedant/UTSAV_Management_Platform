@@ -9,6 +9,7 @@ type ChatMessage = {
     id: string;
     role: "user" | "assistant";
     content: string;
+    citations?: { label: string; href?: string }[];
 };
 
 const STARTERS = [
@@ -16,6 +17,7 @@ const STARTERS = [
     "How much have we collected?",
     "What expenses are pending?",
     "Which event used the most budget?",
+    "What budget risks should I review?",
     "Summarize recent financial activity.",
 ];
 
@@ -59,7 +61,7 @@ export default function AdminAssistantPanel({
                 : "";
             setMessages((current) => [
                 ...current,
-                { id: crypto.randomUUID(), role: "assistant", content: `${result.data.answer}${cards}` },
+                { id: crypto.randomUUID(), role: "assistant", content: `${result.data.answer}${cards}`, citations: result.data.citations },
             ]);
         } else {
             setMessages((current) => [
@@ -132,6 +134,11 @@ export default function AdminAssistantPanel({
                                     )}
                                 >
                                     {message.content}
+                                    {message.role === "assistant" && message.citations?.length ? (
+                                        <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-2">
+                                            {message.citations.map((citation) => citation.href ? <a key={citation.href} href={citation.href} className="rounded-full bg-saffron-50 px-2 py-1 text-[10px] font-black text-saffron-700 hover:underline">Source: {citation.label}</a> : <span key={citation.label}>{citation.label}</span>)}
+                                        </div>
+                                    ) : null}
                                 </div>
                             ))}
                             {isLoading && (
@@ -163,7 +170,7 @@ export default function AdminAssistantPanel({
                                     value={question}
                                     onChange={(event) => setQuestion(event.target.value)}
                                     maxLength={500}
-                                    placeholder="Ask about spending, donations, events..."
+                                    placeholder="Ask about spending, events, or budget risks..."
                                     className="h-12 min-w-0 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-medium outline-none transition-colors focus:border-saffron-400 focus:bg-white"
                                 />
                                 <button

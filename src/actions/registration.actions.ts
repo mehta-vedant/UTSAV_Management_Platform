@@ -21,11 +21,14 @@ export async function toggleAttendanceAction(
         ]);
 
         const tenantPrisma = getTenantPrisma(organizationId);
+        const event = await tenantPrisma.event.findFirst({ where: { id: eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new Error("This event could not be found for this organization.");
 
-        await tenantPrisma.eventRegistration.update({
-            where: { id: registrationId, eventId },
+        const updated = await tenantPrisma.eventRegistration.updateMany({
+            where: { id: registrationId, eventId, organizationId },
             data: { attended }
         });
+        if (updated.count === 0) throw new Error("Registration could not be found for this organization.");
 
         revalidatePath(`/${orgSlug}/dashboard/events/${eventId}`);
         return { success: true };
@@ -51,11 +54,14 @@ export async function addManualRegistrationAction(
         ]);
 
         const tenantPrisma = getTenantPrisma(organizationId);
+        const event = await tenantPrisma.event.findFirst({ where: { id: eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new Error("This event could not be found for this organization.");
 
         await tenantPrisma.eventRegistration.create({
             data: {
                 ...input,
-                eventId
+                eventId,
+                organizationId,
             }
         });
 

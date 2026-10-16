@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createExpense, approveExpense, rejectExpense, updateExpense, archiveExpense } from "@/modules/finance/expense.service";
 import { ExpenseCategory, ExpenseStatus, PaymentMode } from "@prisma/client";
 import { withActionNoReturn } from "@/lib/action";
+import { runIdempotent } from "@/lib/idempotency";
 
 const CreateExpenseSchema = z.object({
     organizationId: z.string(),
@@ -14,15 +15,17 @@ const CreateExpenseSchema = z.object({
     requestedAt: z.string().datetime("Expense date and time are required."),
     notes: z.string().optional(),
     eventId: z.string().optional(),
+    idempotencyKey: z.string().uuid(),
 });
 
 export async function createExpenseAction(data: z.infer<typeof CreateExpenseSchema>) {
     return withActionNoReturn(async () => {
         const validated = CreateExpenseSchema.parse(data);
-        await createExpense(validated.organizationId, {
-            ...validated,
-            requestedAt: new Date(validated.requestedAt),
-        });
+        const { idempotencyKey, ...expense } = validated;
+        await runIdempotent({ organizationId: validated.organizationId, key: idempotencyKey, operation: "create-expense", payload: expense, execute: () => createExpense(validated.organizationId, {
+            ...expense,
+            requestedAt: new Date(expense.requestedAt),
+        }) });
     }, { paths: [{ path: "/[orgSlug]/dashboard/expenses", type: "page" }, { path: "/", type: "layout" }] });
 }
 

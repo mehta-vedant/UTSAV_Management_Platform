@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createDonation, updateDonation, archiveDonation } from "@/modules/finance/donation.service";
 import { DonationCategory, PaymentMode } from "@prisma/client";
 import { withActionNoReturn } from "@/lib/action";
+import { runIdempotent } from "@/lib/idempotency";
 
 const RecordDonationSchema = z.object({
     organizationId: z.string(),
@@ -14,15 +15,17 @@ const RecordDonationSchema = z.object({
     receivedAt: z.string().datetime("Date and time received are required."),
     notes: z.string().optional(),
     eventId: z.string().optional(),
+    idempotencyKey: z.string().uuid(),
 });
 
 export async function recordDonationAction(data: z.infer<typeof RecordDonationSchema>) {
     return withActionNoReturn(async () => {
         const validated = RecordDonationSchema.parse(data);
-        await createDonation(validated.organizationId, {
-            ...validated,
-            receivedAt: new Date(validated.receivedAt),
-        });
+        const { idempotencyKey, ...donation } = validated;
+        await runIdempotent({ organizationId: validated.organizationId, key: idempotencyKey, operation: "create-donation", payload: donation, execute: () => createDonation(validated.organizationId, {
+            ...donation,
+            receivedAt: new Date(donation.receivedAt),
+        }) });
     }, { paths: [{ path: "/[orgSlug]/dashboard/donations", type: "page" }, { path: "/", type: "layout" }] });
 }
 

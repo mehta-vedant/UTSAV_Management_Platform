@@ -20,6 +20,7 @@ export default function AddExpenseModal({
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
     const router = useRouter();
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -37,12 +38,14 @@ export default function AddExpenseModal({
             paymentMode: (formData.get("paymentMode") as PaymentMode) || PaymentMode.CASH,
             requestedAt: toIsoDateTime(formData.get("requestedAt") as string),
             notes: formData.get("notes") as string,
+            idempotencyKey,
         };
 
         const result = await createExpenseAction(data);
 
         if (result.success) {
             setIsOpen(false);
+            setIdempotencyKey(crypto.randomUUID());
             setIsLoading(false);
             router.refresh();
         } else {

@@ -13,6 +13,7 @@ describe("donation actions", () => {
     it("returns a structured validation error for invalid amounts", async () => {
         const result = await recordDonationAction({
             organizationId: "org_1",
+            idempotencyKey: "11111111-1111-4111-8111-111111111111",
             donorName: "Asha",
             amount: 0,
             category: "GENERAL",

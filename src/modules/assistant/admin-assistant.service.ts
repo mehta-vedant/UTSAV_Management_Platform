@@ -5,6 +5,9 @@ import { getExpenseSummary } from "@/modules/finance/expense.service";
 import { getDonationSummary } from "@/modules/finance/donation.service";
 import { getOrganizationSummary } from "@/modules/festival/organization-financial.service";
 import { generateGeminiText } from "@/lib/gemini";
+import { getBudgetHealthReport } from "@/modules/finance/budget-health.service";
+import { consumeAiRequest } from "@/lib/ai-rate-limit";
+import { prisma } from "@/lib/prisma";
 
 export type AssistantIntent =
     | "FINANCIAL_OVERVIEW"
@@ -13,6 +16,7 @@ export type AssistantIntent =
     | "PENDING_EXPENSES"
     | "EVENT_FINANCIALS"
     | "RECENT_ACTIVITY"
+    | "BUDGET_HEALTH"
     | "GENERAL_HELP"
     | "UNSUPPORTED_MUTATION";
 
@@ -24,7 +28,8 @@ export type AssistantCard = {
 
 export type AssistantCitation = {
     label: string;
-    source: "donations" | "expenses" | "events" | "audit" | "overview";
+    source: "donations" | "expenses" | "events" | "audit" | "overview" | "budget-health";
+    href?: string;
 };
 
 export type AssistantAnswer = {
@@ -61,6 +66,7 @@ const ASSISTANT_INTENTS: AssistantIntent[] = [
     "PENDING_EXPENSES",
     "EVENT_FINANCIALS",
     "RECENT_ACTIVITY",
+    "BUDGET_HEALTH",
     "GENERAL_HELP",
     "UNSUPPORTED_MUTATION",
 ];
@@ -86,6 +92,7 @@ async function classifyAssistantIntentWithGemini(question: string): Promise<Assi
         "PENDING_EXPENSES: expenses waiting for review or approval.",
         "EVENT_FINANCIALS: event-wise budget, spending, donations, or financial performance.",
         "RECENT_ACTIVITY: latest changes, recent records, audit-style activity.",
+        "BUDGET_HEALTH: budget scenario, forecast, spending pace, runway, or budget risk.",
         "GENERAL_HELP: normal help, capability, navigation, or unsupported but harmless admin questions.",
         "UNSUPPORTED_MUTATION: any action-changing request.",
         "",
@@ -142,6 +149,10 @@ export function classifyAssistantIntentFallback(question: string): AssistantInte
         return "RECENT_ACTIVITY";
     }
 
+    if (hasAny(text, ["forecast", "scenario", "runway", "budget health", "budget risk", "plan ahead"])) {
+        return "BUDGET_HEALTH";
+    }
+
     if (hasAny(text, ["overview", "summary", "balance", "remaining", "liquidity", "financial", "finance", "health", "status"])) {
         return "FINANCIAL_OVERVIEW";
     }
@@ -158,10 +169,14 @@ function hasAny(text: string, needles: string[]) {
 }
 
 export async function answerAdminAssistantQuestion(organizationId: string, question: string): Promise<AssistantAnswer> {
+    const access = await validateAccess(organizationId);
+    if (question.trim().length > 700) {
+        return { intent: "GENERAL_HELP", cards: [], citations: [], answer: "Please keep the question under 700 characters so I can answer it safely." };
+    }
+    await consumeAiRequest(access.member.id, "assistant");
     const intent = await classifyAssistantIntent(question);
 
     if (intent === "UNSUPPORTED_MUTATION") {
-        await validateAccess(organizationId);
         return {
             intent,
             cards: [],
@@ -171,12 +186,11 @@ export async function answerAdminAssistantQuestion(organizationId: string, quest
     }
 
     if (intent === "GENERAL_HELP") {
-        await validateAccess(organizationId);
         return {
             intent,
             cards: [],
             citations: [],
-            answer: "I can help summarize financial health, expense breakdowns, donations, pending approvals, event budgets, and recent activity for this organization. Try asking: \"Where is our money spent?\" or \"What expenses are pending?\"",
+            answer: "I can help summarize financial health, expense breakdowns, donations, pending approvals, event budgets, recent activity, and budget scenarios for this organization. Try asking: \"Where is our money spent?\" or \"What budget risks should I review?\"",
         };
     }
 
@@ -187,21 +201,32 @@ export async function answerAdminAssistantQuestion(organizationId: string, quest
 
     try {
         const aiAnswer = await generateGeminiText(prompt);
-        return {
+        return withCitationLinks(organizationId, {
             intent,
             answer: aiAnswer || fallbackAnswer,
             cards: context.cards,
             citations: context.citations,
-        };
+        });
     } catch (error) {
         console.error("Gemini assistant failed:", error);
-        return {
+        return withCitationLinks(organizationId, {
             intent,
             answer: fallbackAnswer,
             cards: context.cards,
             citations: context.citations,
-        };
+        });
     }
+}
+
+async function withCitationLinks(organizationId: string, answer: AssistantAnswer) {
+    if (!answer.citations.length) return answer;
+    const organization = await prisma.organization.findUnique({ where: { id: organizationId }, select: { slug: true } });
+    if (!organization) return answer;
+    const destinations: Record<AssistantCitation["source"], string> = {
+        overview: "dashboard", donations: "dashboard/donations", expenses: "dashboard/expenses",
+        events: "dashboard/events", audit: "dashboard/audit-trail", "budget-health": "dashboard/budget-health",
+    };
+    return { ...answer, citations: answer.citations.map((citation) => ({ ...citation, href: `/${organization.slug}/${destinations[citation.source]}` })) };
 }
 
 type AssistantContext = {
@@ -223,10 +248,26 @@ async function buildAssistantContext(organizationId: string, intent: AssistantIn
             return getEventFinancialsContext(organizationId);
         case "RECENT_ACTIVITY":
             return getRecentActivityContext(organizationId);
+        case "BUDGET_HEALTH":
+            return getBudgetHealthContext(organizationId);
         case "FINANCIAL_OVERVIEW":
         default:
             return getFinancialOverviewContext(organizationId);
     }
+}
+
+async function getBudgetHealthContext(organizationId: string): Promise<AssistantContext> {
+    const report = await getBudgetHealthReport(organizationId);
+    return {
+        intent: "BUDGET_HEALTH",
+        facts: report as unknown as Record<string, unknown>,
+        cards: [
+            moneyCard("Available Balance", report.availableBalance),
+            moneyCard("Pending Commitments", report.pendingCommitments),
+            { title: "Cautious Scenario", value: formatMoney(report.scenarios[0]?.projectedBalance || 0) },
+        ],
+        citations: [{ label: "Budget health report", source: "budget-health" }],
+    };
 }
 
 async function getFinancialOverviewContext(organizationId: string): Promise<AssistantContext> {
@@ -501,6 +542,12 @@ function buildDeterministicAnswer(intent: AssistantIntent, context: AssistantCon
         const activity = facts.activity || [];
         if (activity.length === 0) return "There is no recent activity to summarize yet.";
         return `Recent activity includes: ${activity.map((item: any) => item.title).join(", ")}.`;
+    }
+
+    if (intent === "BUDGET_HEALTH") {
+        const scenarios = facts.scenarios || [];
+        const expected = scenarios.find((scenario: any) => scenario.name === "Expected");
+        return `Available balance is ${formatMoney(facts.availableBalance)} and pending commitments are ${formatMoney(facts.pendingCommitments)}. The expected scenario leaves ${formatMoney(expected?.projectedBalance || 0)}. This is a transparent scenario from recorded data, not a prediction or financial advice.`;
     }
 
     return `Available liquidity is ${formatMoney(facts.totalLiquidity)}, approved expenses are ${formatMoney(facts.totalExpenses)}, and remaining balance is ${formatMoney(facts.remainingBalance)}. Utilization is ${Number(facts.utilizationRate || 0).toFixed(1)}%.`;

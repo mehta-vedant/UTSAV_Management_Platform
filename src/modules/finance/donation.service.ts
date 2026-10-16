@@ -38,6 +38,10 @@ export async function createDonation(
 
     // 3. Get isolated Prisma client
     const tenantPrisma = getTenantPrisma(organizationId);
+    if (data.eventId) {
+        const event = await tenantPrisma.event.findFirst({ where: { id: data.eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new ValidationAppError("Choose an active event in this organization.");
+    }
 
     // 4. Create record 
     // Note: organizationId is automatically injected by getTenantPrisma extension
@@ -248,6 +252,11 @@ export async function updateDonation(
     const { member } = await requirePermission(organizationId, "finance:update");
 
     const tenantPrisma = getTenantPrisma(organizationId);
+
+    if (data.eventId) {
+        const event = await tenantPrisma.event.findFirst({ where: { id: data.eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new ValidationAppError("Choose an active event in this organization.");
+    }
 
     const before = await tenantPrisma.donation.findUnique({ where: { id: donationId } });
     const donation = await tenantPrisma.donation.update({

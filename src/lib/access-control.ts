@@ -191,6 +191,7 @@ export const getTenantPrisma = (organizationId: string) => {
                         "Event",
                         "VolunteerTask",
                         "AuditLog",
+                        "ExpenseReceipt",
                         "EventAssignment",
                         "EventRegistration",
                     ];

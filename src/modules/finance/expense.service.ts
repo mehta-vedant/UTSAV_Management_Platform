@@ -39,6 +39,10 @@ export async function createExpense(
 
     // 3. SECURE WRITE: organizationId is auto-injected by tenantPrisma extension
     const tenantPrisma = getTenantPrisma(organizationId);
+    if (data.eventId) {
+        const event = await tenantPrisma.event.findFirst({ where: { id: data.eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new ValidationAppError("Choose an active event in this organization.");
+    }
 
     const expense = await tenantPrisma.expense.create({
         data: {
@@ -191,7 +195,11 @@ export async function getPaginatedExpenses(organizationId: string, query: PageQu
                 },
                 event: {
                     select: { title: true, status: true }
-                }
+                },
+                receipts: {
+                    select: { id: true, originalFileName: true, status: true, extractionStatus: true },
+                    orderBy: { createdAt: "desc" },
+                },
             },
             orderBy: { requestedAt: "desc" },
         }),
@@ -219,6 +227,11 @@ export async function updateExpense(
     const { member } = await requirePermission(organizationId, "finance:update");
 
     const tenantPrisma = getTenantPrisma(organizationId);
+
+    if (data.eventId) {
+        const event = await tenantPrisma.event.findFirst({ where: { id: data.eventId, isArchived: false }, select: { id: true } });
+        if (!event) throw new ValidationAppError("Choose an active event in this organization.");
+    }
 
     const before = await tenantPrisma.expense.findUnique({ where: { id: expenseId } });
     const expense = await tenantPrisma.expense.update({

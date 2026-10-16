@@ -8,6 +8,7 @@ import { PaginationControls } from "@/components/dashboard/shared/PaginationCont
 import AddExpenseModal from "@/components/dashboard/expenses/AddExpenseModal";
 import EditExpenseModal from "@/components/dashboard/expenses/EditExpenseModal";
 import ExpenseApprovalActions from "@/components/dashboard/expenses/ExpenseApprovalActions";
+import ReceiptEvidenceManager from "@/components/dashboard/expenses/ReceiptEvidenceManager";
 import PaymentModeSummary from "@/components/dashboard/shared/PaymentModeSummary";
 import ExportActions from "@/components/dashboard/shared/ExportActions";
 import { getPaginatedExpenses, getExpensePaymentModeSummary, getExpensesForExport } from "@/modules/finance/expense.service";
@@ -103,6 +104,7 @@ export default async function ExpensesPage({
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Payment</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Operational Context</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
+                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Evidence</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
                                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Requested By</th>
                                 {isTreasurer && <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Actions</th>}
@@ -146,6 +148,14 @@ export default async function ExpensesPage({
                                         )}
                                     </td>
                                     <td className="px-8 py-6 font-black text-slate-900">Rs {Number(expense.amount).toLocaleString()}</td>
+                                    <td className="px-8 py-6">
+                                        <ReceiptEvidenceManager
+                                            organizationId={organization.id}
+                                            expense={{ id: expense.id, title: expense.title, amount: Number(expense.amount), category: expense.category, notes: expense.notes }}
+                                            receipts={expense.receipts}
+                                            canManage={canAdd && (expense.addedById === member.id || isTreasurer)}
+                                        />
+                                    </td>
                                     <td className="px-8 py-6">
                                         <StatusBadge status={expense.status} />
                                     </td>

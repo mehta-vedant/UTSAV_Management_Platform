@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { ExpenseCategory, ExpenseStatus, ReceiptExtractionStatus, ReceiptUploadStatus } from "@prisma/client";
+import { ExpenseCategory, ExpenseStatus, Prisma, ReceiptExtractionStatus, ReceiptUploadStatus } from "@prisma/client";
 import { z } from "zod";
 import { hasPermission, getTenantPrisma, requirePermission } from "@/lib/access-control";
 import { ConflictAppError, NotFoundAppError, ValidationAppError } from "@/lib/errors";
@@ -85,22 +85,43 @@ export async function startReceiptUpload(input: {
         where: { expenseId, status: ReceiptUploadStatus.PENDING_UPLOAD, uploadExpiresAt: { lt: new Date() } },
         data: { status: ReceiptUploadStatus.FAILED, failedAt: new Date(), failureReason: "Upload window expired. Retry the attachment." },
     });
-    const receiptId = randomUUID();
-    const objectKey = `organizations/${organizationId}/expenses/${expenseId}/receipts/${receiptId}-${safeFileName(input.fileName)}`;
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    const receipt = await tenantPrisma.expenseReceipt.create({
-        data: {
-            id: receiptId,
-            organizationId,
+    const activeReceipt = await tenantPrisma.expenseReceipt.findFirst({
+        where: {
             expenseId,
-            uploadedById: member.id,
-            objectKey,
-            originalFileName: safeFileName(input.fileName),
-            contentType: input.contentType,
-            byteSize: input.byteSize,
-            uploadExpiresAt: expiresAt,
+            deletedAt: null,
+            status: { in: [ReceiptUploadStatus.PENDING_UPLOAD, ReceiptUploadStatus.UPLOADED] },
         },
+        select: { id: true },
     });
+    if (activeReceipt) {
+        throw new ConflictAppError("This expense already has a receipt. Remove it before attaching a different one.");
+    }
+    const receiptId = randomUUID();
+    const objectKey = `organizations/${organizationId}/expenses/${expenseId}/receipt/${receiptId}-${safeFileName(input.fileName)}`;
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    let receipt;
+    try {
+        receipt = await tenantPrisma.expenseReceipt.create({
+            data: {
+                id: receiptId,
+                organizationId,
+                expenseId,
+                uploadedById: member.id,
+                objectKey,
+                originalFileName: safeFileName(input.fileName),
+                contentType: input.contentType,
+                byteSize: input.byteSize,
+                uploadExpiresAt: expiresAt,
+            },
+        });
+    } catch (error) {
+        // The partial unique index is the final protection against two tabs
+        // passing the pre-check at the same moment.
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            throw new ConflictAppError("This expense already has a receipt. Refresh the page before trying again.");
+        }
+        throw error;
+    }
 
     if (!isReceiptStorageConfigured()) {
         await tenantPrisma.expenseReceipt.update({
@@ -170,10 +191,18 @@ export async function confirmReceiptUpload(input: {
         const extraction = input.useAiExtraction ? await extractReceiptSuggestions(input.organizationId, receipt.id) : null;
         return { receipt: updated, extraction };
     } catch (error) {
-        await tenantPrisma.expenseReceipt.update({
-            where: { id: receipt.id },
+        // Only an unclaimed upload may become failed. Once status is UPLOADED,
+        // later errors (for example an audit write) must not hide real S3 evidence.
+        const failed = await tenantPrisma.expenseReceipt.updateMany({
+            where: { id: receipt.id, status: ReceiptUploadStatus.PENDING_UPLOAD, deletedAt: null },
             data: { status: ReceiptUploadStatus.FAILED, failedAt: new Date(), failureReason: "Upload confirmation failed." },
         });
+        if (failed.count === 0) {
+            const current = await tenantPrisma.expenseReceipt.findFirst({ where: { id: receipt.id, deletedAt: null } });
+            if (current?.status === ReceiptUploadStatus.UPLOADED) {
+                return { receipt: current, extraction: current.extraction };
+            }
+        }
         if (error instanceof ValidationAppError) throw error;
         throw new ConflictAppError("The receipt could not be confirmed. Your expense is still saved; retry the upload.");
     }

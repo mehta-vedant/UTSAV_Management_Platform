@@ -154,6 +154,7 @@ export default async function ExpensesPage({
                                             expense={{ id: expense.id, title: expense.title, amount: Number(expense.amount), category: expense.category, notes: expense.notes }}
                                             receipts={expense.receipts}
                                             canManage={canAdd && (isTreasurer || (expense.addedById === member.id && expense.status === ExpenseStatus.PENDING))}
+                                            canApplyAiSuggestions={isTreasurer}
                                         />
                                     </td>
                                     <td className="px-8 py-6">

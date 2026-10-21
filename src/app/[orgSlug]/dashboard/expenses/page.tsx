@@ -153,7 +153,7 @@ export default async function ExpensesPage({
                                             organizationId={organization.id}
                                             expense={{ id: expense.id, title: expense.title, amount: Number(expense.amount), category: expense.category, notes: expense.notes }}
                                             receipts={expense.receipts}
-                                            canManage={canAdd && (expense.addedById === member.id || isTreasurer)}
+                                            canManage={canAdd && (isTreasurer || (expense.addedById === member.id && expense.status === ExpenseStatus.PENDING))}
                                         />
                                     </td>
                                     <td className="px-8 py-6">

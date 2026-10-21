@@ -197,7 +197,7 @@ export async function getPaginatedExpenses(organizationId: string, query: PageQu
                     select: { title: true, status: true }
                 },
                 receipts: {
-                    where: { status: { not: ReceiptUploadStatus.FAILED } },
+                    where: { status: { not: ReceiptUploadStatus.FAILED }, deletedAt: null },
                     select: { id: true, originalFileName: true, status: true, extractionStatus: true },
                     orderBy: { createdAt: "desc" },
                 },

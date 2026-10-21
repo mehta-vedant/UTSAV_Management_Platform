@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
-import { ExpenseCategory, ReceiptExtractionStatus, ReceiptUploadStatus } from "@prisma/client";
+import { ExpenseCategory, ExpenseStatus, ReceiptExtractionStatus, ReceiptUploadStatus } from "@prisma/client";
 import { z } from "zod";
 import { hasPermission, getTenantPrisma, requirePermission } from "@/lib/access-control";
 import { ConflictAppError, NotFoundAppError, ValidationAppError } from "@/lib/errors";
 import {
     createReceiptDownloadUrl,
+    deleteReceiptObject,
     createReceiptUploadPost,
     inspectReceiptObject,
     hasExpectedReceiptSignature,
@@ -39,7 +40,7 @@ async function getManageableExpense(organizationId: string, expenseId: string) {
     const tenantPrisma = getTenantPrisma(organizationId);
     const expense = await tenantPrisma.expense.findFirst({
         where: { id: expenseId, isArchived: false },
-        select: { id: true, addedById: true },
+        select: { id: true, addedById: true, status: true },
     });
     if (!expense) throw new NotFoundAppError("This expense could not be found.");
     const canManageOthers = hasPermission(access.member.role, "finance:update");
@@ -47,6 +48,17 @@ async function getManageableExpense(organizationId: string, expenseId: string) {
         throw new ValidationAppError("You can attach receipts only to your own expense requests.");
     }
     return { ...access, tenantPrisma, expense };
+}
+
+function canManageExistingReceipt(input: {
+    memberId: string;
+    role: Parameters<typeof hasPermission>[0];
+    expense: { addedById: string | null; status: ExpenseStatus };
+    receipt: { uploadedById: string };
+}) {
+    if (hasPermission(input.role, "finance:update")) return true;
+    const ownsEvidence = input.receipt.uploadedById === input.memberId || input.expense.addedById === input.memberId;
+    return ownsEvidence && input.expense.status === ExpenseStatus.PENDING;
 }
 
 export async function startReceiptUpload(input: {
@@ -57,7 +69,10 @@ export async function startReceiptUpload(input: {
     byteSize: number;
 }) {
     const { organizationId, expenseId } = input;
-    const { member, tenantPrisma } = await getManageableExpense(organizationId, expenseId);
+    const { member, tenantPrisma, expense } = await getManageableExpense(organizationId, expenseId);
+    if (expense.status !== ExpenseStatus.PENDING && !hasPermission(member.role, "finance:update")) {
+        throw new ValidationAppError("Only Treasurer or Admin can add evidence after an expense is approved or rejected.");
+    }
     if (!isReceiptContentType(input.contentType)) throw new ValidationAppError("Upload a JPG, PNG, WEBP, or PDF receipt.");
     if (!Number.isInteger(input.byteSize) || input.byteSize < 1 || input.byteSize > RECEIPT_MAX_BYTES) {
         throw new ValidationAppError("Receipt files must be between 1 byte and 10 MB.");
@@ -113,7 +128,7 @@ export async function confirmReceiptUpload(input: {
     useAiExtraction: boolean;
 }) {
     const { member, tenantPrisma } = await getManageableExpense(input.organizationId, input.expenseId);
-    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: input.receiptId, expenseId: input.expenseId } });
+    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: input.receiptId, expenseId: input.expenseId, deletedAt: null } });
     if (!receipt) throw new NotFoundAppError("This receipt could not be found.");
     if (receipt.status === ReceiptUploadStatus.UPLOADED) return { receipt, extraction: receipt.extraction };
 
@@ -165,7 +180,7 @@ export async function confirmReceiptUpload(input: {
 
 export async function extractReceiptSuggestions(organizationId: string, receiptId: string): Promise<ReceiptExtraction | null> {
     const { member, tenantPrisma } = await requirePermission(organizationId, "finance:read").then((access) => ({ ...access, tenantPrisma: getTenantPrisma(organizationId) }));
-    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: receiptId, status: ReceiptUploadStatus.UPLOADED, extractionStatus: ReceiptExtractionStatus.PENDING } });
+    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: receiptId, status: ReceiptUploadStatus.UPLOADED, extractionStatus: ReceiptExtractionStatus.PENDING, deletedAt: null } });
     if (!receipt) throw new NotFoundAppError("This uploaded receipt could not be found.");
     if (!receipt.extractionConsentAt) throw new ValidationAppError("AI extraction needs the uploader's consent.");
 
@@ -174,15 +189,16 @@ export async function extractReceiptSuggestions(organizationId: string, receiptI
         const bytes = await readReceiptBytes(receipt.objectKey);
         const response = await generateGeminiReceiptJson({ bytes, contentType: receipt.contentType });
         const extraction = ReceiptExtractionSchema.parse(response);
-        await tenantPrisma.expenseReceipt.update({
-            where: { id: receipt.id },
+        const completed = await tenantPrisma.expenseReceipt.updateMany({
+            where: { id: receipt.id, deletedAt: null },
             data: { extractionStatus: ReceiptExtractionStatus.COMPLETED, extraction: extraction as object },
         });
+        if (completed.count !== 1) return null;
         await recordAudit({ organizationId, actorMemberId: member.id, entityType: "ExpenseReceipt", entityId: receipt.id, action: "ai_extraction_completed" });
         return extraction;
     } catch {
-        await tenantPrisma.expenseReceipt.update({
-            where: { id: receipt.id },
+        await tenantPrisma.expenseReceipt.updateMany({
+            where: { id: receipt.id, deletedAt: null },
             data: { extractionStatus: ReceiptExtractionStatus.FAILED },
         });
         await recordAudit({ organizationId, actorMemberId: member.id, entityType: "ExpenseReceipt", entityId: receipt.id, action: "ai_extraction_failed" });
@@ -193,7 +209,7 @@ export async function extractReceiptSuggestions(organizationId: string, receiptI
 export async function getReceiptDownloadUrl(organizationId: string, receiptId: string) {
     const { member, tenantPrisma } = await requirePermission(organizationId, "finance:create").then((access) => ({ ...access, tenantPrisma: getTenantPrisma(organizationId) }));
     const receipt = await tenantPrisma.expenseReceipt.findFirst({
-        where: { id: receiptId, status: ReceiptUploadStatus.UPLOADED },
+        where: { id: receiptId, status: ReceiptUploadStatus.UPLOADED, deletedAt: null },
         include: { expense: { select: { addedById: true } } },
     });
     if (!receipt) throw new NotFoundAppError("This receipt could not be found.");
@@ -202,6 +218,46 @@ export async function getReceiptDownloadUrl(organizationId: string, receiptId: s
         throw new ValidationAppError("You do not have permission to view this receipt.");
     }
     return { url: await createReceiptDownloadUrl(receipt.objectKey), fileName: receipt.originalFileName };
+}
+
+export async function deleteReceipt(input: { organizationId: string; expenseId: string; receiptId: string }) {
+    const { member, tenantPrisma, expense } = await getManageableExpense(input.organizationId, input.expenseId);
+    const receipt = await tenantPrisma.expenseReceipt.findFirst({
+        where: { id: input.receiptId, expenseId: input.expenseId, deletedAt: null },
+        select: { id: true, objectKey: true, uploadedById: true, originalFileName: true },
+    });
+    if (!receipt) throw new NotFoundAppError("This receipt could not be found.");
+    if (!canManageExistingReceipt({ memberId: member.id, role: member.role, expense, receipt })) {
+        throw new ValidationAppError("Only the uploader can remove evidence from a pending expense. Treasurer or Admin can manage all receipts.");
+    }
+
+    const deletedAt = new Date();
+    // Hide it first, then remove the private object. If S3 rejects the deletion,
+    // restore the receipt so the user never sees a missing attachment as removed.
+    const hidden = await tenantPrisma.expenseReceipt.updateMany({
+        where: { id: receipt.id, deletedAt: null },
+        data: { deletedAt, deletedById: member.id },
+    });
+    if (hidden.count !== 1) throw new ConflictAppError("This receipt was already changed. Refresh and try again.");
+
+    try {
+        await deleteReceiptObject(receipt.objectKey);
+    } catch {
+        await tenantPrisma.expenseReceipt.updateMany({
+            where: { id: receipt.id, deletedAt },
+            data: { deletedAt: null, deletedById: null },
+        });
+        throw new ConflictAppError("The receipt could not be removed from private storage. Please retry.");
+    }
+
+    await recordAudit({
+        organizationId: input.organizationId,
+        actorMemberId: member.id,
+        entityType: "ExpenseReceipt",
+        entityId: receipt.id,
+        action: "delete",
+        before: { fileName: receipt.originalFileName, expenseId: input.expenseId },
+    });
 }
 
 export async function applyReceiptSuggestion(input: {
@@ -214,10 +270,15 @@ export async function applyReceiptSuggestion(input: {
 }) {
     const { member } = await requirePermission(input.organizationId, "finance:update");
     const tenantPrisma = getTenantPrisma(input.organizationId);
-    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: input.receiptId, status: ReceiptUploadStatus.UPLOADED, extractionStatus: ReceiptExtractionStatus.COMPLETED } });
+    const receipt = await tenantPrisma.expenseReceipt.findFirst({ where: { id: input.receiptId, status: ReceiptUploadStatus.UPLOADED, extractionStatus: ReceiptExtractionStatus.COMPLETED, deletedAt: null } });
     if (!receipt || !receipt.extraction) throw new NotFoundAppError("There is no completed receipt suggestion to review.");
-    await tenantPrisma.$transaction([
-        tenantPrisma.expense.update({
+    await tenantPrisma.$transaction(async (tx) => {
+        const claimed = await tx.expenseReceipt.updateMany({
+            where: { id: receipt.id, deletedAt: null, extractionStatus: ReceiptExtractionStatus.COMPLETED },
+            data: { extractionStatus: ReceiptExtractionStatus.REVIEWED, extractionReviewedAt: new Date() },
+        });
+        if (claimed.count !== 1) throw new ConflictAppError("This receipt suggestion is no longer available. Refresh and try again.");
+        await tx.expense.update({
             where: { id: receipt.expenseId },
             data: {
                 title: input.title?.trim() || undefined,
@@ -225,12 +286,8 @@ export async function applyReceiptSuggestion(input: {
                 category: input.category,
                 notes: input.notes?.trim() || undefined,
             },
-        }),
-        tenantPrisma.expenseReceipt.update({
-            where: { id: receipt.id },
-            data: { extractionStatus: ReceiptExtractionStatus.REVIEWED, extractionReviewedAt: new Date() },
-        }),
-    ]);
+        });
+    });
     await recordAudit({ organizationId: input.organizationId, actorMemberId: member.id, entityType: "ExpenseReceipt", entityId: receipt.id, action: "ai_suggestion_reviewed" });
 }
 

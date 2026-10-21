@@ -107,15 +107,21 @@ const s = StyleSheet.create({
     },
     headerCell: {
         fontFamily: PDF_HEADING_FONT,
-        fontSize: 7,
+        fontSize: 6.5,
         color: PDF_COLORS.slate500,
         textTransform: "uppercase",
         letterSpacing: 0.4,
+        flexGrow: 0,
+        flexShrink: 0,
+        paddingRight: 5,
     },
     cell: {
         fontFamily: PDF_BODY_FONT,
         fontSize: 8,
         color: PDF_COLORS.slate700,
+        flexGrow: 0,
+        flexShrink: 0,
+        paddingRight: 5,
     },
     tableWrap: {
         borderWidth: 1,
@@ -199,7 +205,7 @@ export function PdfTable({ columns, rows }: PdfTableProps) {
         <View style={s.tableWrap}>
             <View style={s.tableHeaderRow}>
                 {columns.map((col) => (
-                    <Text key={col.key} style={[s.headerCell, { width: col.width || `${100 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
+                    <Text key={col.key} style={[s.headerCell, { width: col.width || `${96 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
                         {col.header}
                     </Text>
                 ))}
@@ -207,7 +213,7 @@ export function PdfTable({ columns, rows }: PdfTableProps) {
             {rows.map((row, i) => (
                 <View key={i} style={s.tableRow}>
                     {columns.map((col) => (
-                        <Text key={col.key} style={[s.cell, { width: col.width || `${100 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
+                        <Text key={col.key} style={[s.cell, { width: col.width || `${96 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
                             {row[col.key]}
                         </Text>
                     ))}

@@ -34,13 +34,13 @@ export interface AuditTrailPdfProps {
 
 export default function AuditTrailDocument({ organizationName, incomeLabel, generatedAt, totals, entries }: AuditTrailPdfProps) {
     const columns = [
-        { header: "Date", key: "date", width: "13%" },
-        { header: "Description", key: "title", width: "28%" },
-        { header: "Category", key: "category", width: "13%" },
-        { header: "Payment", key: "paymentMode", width: "11%" },
-        { header: "Amount", key: "amount", width: "14%", align: "right" as const },
-        { header: "Status", key: "status", width: "10%" },
-        { header: "Activity By", key: "activityBy", width: "11%" },
+        { header: "Date", key: "date", width: "12%" },
+        { header: "Description", key: "title", width: "27%" },
+        { header: "Category", key: "category", width: "12%" },
+        { header: "Payment", key: "paymentMode", width: "10%" },
+        { header: "Amount", key: "amount", width: "15%", align: "right" as const },
+        { header: "Status", key: "status", width: "9%" },
+        { header: "Activity By", key: "activityBy", width: "10%" },
     ];
 
     const half = Math.ceil(entries.length / 2);

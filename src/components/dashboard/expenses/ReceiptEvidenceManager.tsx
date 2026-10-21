@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Loader2, Paperclip, RefreshCw, ShieldCheck, Sparkles, Trash2, UploadCloud } from "lucide-react";
+import { FileText, HelpCircle, Loader2, Paperclip, RefreshCw, ShieldCheck, Sparkles, Trash2, UploadCloud } from "lucide-react";
 import { ExpenseCategory } from "@prisma/client";
 import { toast } from "sonner";
 import { getVisibleReceipts, type ReceiptListItem } from "./receipt-visibility";
@@ -161,24 +161,23 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     return (
         <div className="space-y-2">
             {canManage && (
-                <div className="rounded-lg border border-violet-100 bg-violet-50/70 p-2">
-                    <label className="flex cursor-pointer items-start gap-2 text-[9px] text-violet-950">
+                <div className="flex items-center gap-1.5">
+                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-violet-100 bg-violet-50/70 px-2 py-1.5 text-[9px] font-black uppercase tracking-wide text-violet-900">
                         <input
                             type="checkbox"
                             checked={useAi}
                             disabled={isLoading}
                             onChange={(event) => setUseAi(event.target.checked)}
-                            className="mt-0.5"
+                            className="h-3 w-3"
                         />
-                        <span>
-                            <span className="flex items-center gap-1 font-black uppercase tracking-wide">
-                                <Sparkles className="h-3 w-3 text-violet-600" /> Optional AI bill suggestions
-                            </span>
-                            <span className="mt-0.5 block leading-relaxed text-violet-700">
-                                Turn this on before attaching this receipt. Gemini suggests details; you review them before anything changes.
-                            </span>
-                        </span>
+                        <Sparkles className="h-3 w-3 text-violet-600" /> AI suggestions
                     </label>
+                    <span className="group relative inline-flex">
+                        <HelpCircle className="h-3.5 w-3.5 cursor-help text-slate-400 hover:text-violet-600" aria-label="How AI bill suggestions work" tabIndex={0} />
+                        <span role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-30 mb-2 hidden w-56 rounded-lg bg-slate-900 p-2 text-[10px] font-medium normal-case leading-relaxed tracking-normal text-white shadow-lg group-hover:block group-focus-within:block">
+                            Optional. Turn this on before attaching this receipt. Gemini only suggests bill details; you review them before anything changes. It turns off after each upload.
+                        </span>
+                    </span>
                 </div>
             )}
             <div className="flex flex-wrap items-center gap-2">

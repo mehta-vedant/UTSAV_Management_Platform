@@ -2,11 +2,13 @@ import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, S3Client } fr
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { InvariantError } from "@/lib/errors";
+import {
+    RECEIPT_ALLOWED_CONTENT_TYPES,
+    RECEIPT_MAX_BYTES,
+    type ReceiptContentType,
+} from "@/lib/receipt-constraints";
 
-export const RECEIPT_MAX_BYTES = 10 * 1024 * 1024;
-export const RECEIPT_ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"] as const;
-
-export type ReceiptContentType = (typeof RECEIPT_ALLOWED_CONTENT_TYPES)[number];
+export { RECEIPT_ALLOWED_CONTENT_TYPES, RECEIPT_MAX_BYTES, type ReceiptContentType } from "@/lib/receipt-constraints";
 
 function getReceiptBucket() {
     const bucket = process.env.S3_RECEIPTS_BUCKET;

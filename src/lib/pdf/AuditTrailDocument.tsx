@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     page: pdfPageStyle,
 });
 
-const fmtRupee = (value: number) => `₹${Math.round(value).toLocaleString("en-IN")}`;
+const fmtRupee = (value: number) => `INR ${Math.round(value).toLocaleString("en-IN")}`;
 
 export interface AuditTrailEntryPdf {
     date: string;
@@ -34,13 +34,13 @@ export interface AuditTrailPdfProps {
 
 export default function AuditTrailDocument({ organizationName, incomeLabel, generatedAt, totals, entries }: AuditTrailPdfProps) {
     const columns = [
-        { header: "Date", key: "date" },
-        { header: "Description", key: "title" },
-        { header: "Category", key: "category" },
-        { header: "Payment", key: "paymentMode" },
-        { header: "Amount", key: "amount", align: "right" as const },
-        { header: "Status", key: "status" },
-        { header: "Activity By", key: "activityBy" },
+        { header: "Date", key: "date", width: "13%" },
+        { header: "Description", key: "title", width: "28%" },
+        { header: "Category", key: "category", width: "13%" },
+        { header: "Payment", key: "paymentMode", width: "11%" },
+        { header: "Amount", key: "amount", width: "14%", align: "right" as const },
+        { header: "Status", key: "status", width: "10%" },
+        { header: "Activity By", key: "activityBy", width: "11%" },
     ];
 
     const half = Math.ceil(entries.length / 2);
@@ -50,7 +50,7 @@ export default function AuditTrailDocument({ organizationName, incomeLabel, gene
 
     return (
         <Document title={`${organizationName} — Audit Trail`} author="UTSAV" producer="UTSAV">
-            <Page size="A4" style={styles.page}>
+            <Page size="A4" orientation="landscape" style={styles.page}>
                 <PdfHeader organizationName={organizationName} title="Audit Trail Ledger" docType="Financial Ledger" generatedAt={generatedAt} />
 
                 <PdfSectionTitle title="Summary" subtitle="Total ledger balances" />
@@ -91,7 +91,7 @@ export default function AuditTrailDocument({ organizationName, incomeLabel, gene
             </Page>
 
             {hasTooMany && (
-                    <Page size="A4" style={styles.page}>
+                    <Page size="A4" orientation="landscape" style={styles.page}>
                         <PdfHeader organizationName={organizationName} title="Audit Trail Ledger" docType="Financial Ledger · Continued" generatedAt={generatedAt} />
                         <PdfSectionTitle title="Transactions (continued)" subtitle={`${entries.length} record(s)`} />
                         <PdfTable

@@ -18,6 +18,7 @@ import {
 import { record as recordAudit } from "@/modules/core/audit.service";
 import { generateGeminiReceiptJson } from "@/lib/gemini";
 import { consumeAiRequest } from "@/lib/ai-rate-limit";
+import { RECEIPT_MAX_SIZE_LABEL } from "@/lib/receipt-constraints";
 
 const ReceiptExtractionSchema = z.object({
     vendor: z.string().trim().max(200).nullable().optional(),
@@ -75,7 +76,7 @@ export async function startReceiptUpload(input: {
     }
     if (!isReceiptContentType(input.contentType)) throw new ValidationAppError("Upload a JPG, PNG, WEBP, or PDF receipt.");
     if (!Number.isInteger(input.byteSize) || input.byteSize < 1 || input.byteSize > RECEIPT_MAX_BYTES) {
-        throw new ValidationAppError("Receipt files must be between 1 byte and 10 MB.");
+        throw new ValidationAppError(`Receipt files must be between 1 byte and ${RECEIPT_MAX_SIZE_LABEL}.`);
     }
 
     // Expired browser upload windows must be visible as retryable failures,

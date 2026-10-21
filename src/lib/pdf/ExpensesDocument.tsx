@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const fmtRupee = (value: number) => `₹${Math.round(value).toLocaleString("en-IN")}`;
+const fmtRupee = (value: number) => `INR ${Math.round(value).toLocaleString("en-IN")}`;
 const fmtDate = (date: Date) =>
     date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
@@ -59,14 +59,14 @@ export default function ExpensesDocument({ organizationName, generatedAt, data }
     );
 
     const columns = [
-        { header: "Date", key: "date" },
-        { header: "Expense", key: "title" },
-        { header: "Category", key: "category" },
-        { header: "Payment", key: "paymentMode" },
-        { header: "Amount", key: "amount", align: "right" as const },
-        { header: "Status", key: "status" },
-        { header: "Event", key: "event" },
-        { header: "Requested By", key: "requestedBy" },
+        { header: "Date", key: "date", width: "12%" },
+        { header: "Expense", key: "title", width: "19%" },
+        { header: "Category", key: "category", width: "12%" },
+        { header: "Payment", key: "paymentMode", width: "11%" },
+        { header: "Amount", key: "amount", width: "13%", align: "right" as const },
+        { header: "Status", key: "status", width: "11%" },
+        { header: "Event", key: "event", width: "9%" },
+        { header: "Requested By", key: "requestedBy", width: "13%" },
     ];
 
     const pageSize = 20;
@@ -89,7 +89,7 @@ export default function ExpensesDocument({ organizationName, generatedAt, data }
                 const pageRows = rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
                 const isFirstPage = pageIndex === 0;
                 return (
-                    <Page key={pageIndex} size="A4" style={styles.page}>
+                    <Page key={pageIndex} size="A4" orientation="landscape" style={styles.page}>
                         <PdfHeader
                             organizationName={organizationName}
                             title={`Expense Register — ${isFirstPage ? "" : " · Continued"}`}

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const fmtRupee = (value: number) => `₹${Math.round(value).toLocaleString("en-IN")}`;
+const fmtRupee = (value: number) => `INR ${Math.round(value).toLocaleString("en-IN")}`;
 const fmtDate = (date: Date) =>
     date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 const fmtDateTime = (date: Date) =>
@@ -53,13 +53,13 @@ export default function DonationsDocument({ organizationName, incomeLabel, gener
     const maxPayment = Math.max(1, ...summary.byPaymentMode.map((p) => p.amount));
 
     const columns = [
-        { header: "Date", key: "date" },
-        { header: "Donor", key: "donor" },
-        { header: "Category", key: "category" },
-        { header: "Payment", key: "paymentMode" },
-        { header: "Amount", key: "amount", align: "right" as const },
-        { header: "Event", key: "event" },
-        { header: "Recorded By", key: "recordedBy" },
+        { header: "Date", key: "date", width: "13%" },
+        { header: "Donor", key: "donor", width: "21%" },
+        { header: "Category", key: "category", width: "13%" },
+        { header: "Payment", key: "paymentMode", width: "12%" },
+        { header: "Amount", key: "amount", width: "13%", align: "right" as const },
+        { header: "Event", key: "event", width: "10%" },
+        { header: "Recorded By", key: "recordedBy", width: "18%" },
     ];
 
     const pageSize = 22;
@@ -81,7 +81,7 @@ export default function DonationsDocument({ organizationName, incomeLabel, gener
                 const pageRows = rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
                 const isFirstPage = pageIndex === 0;
                 return (
-                    <Page key={pageIndex} size="A4" style={styles.page}>
+                    <Page key={pageIndex} size="A4" orientation="landscape" style={styles.page}>
                         <PdfHeader
                             organizationName={organizationName}
                             title={`${incomeLabel} — ${isFirstPage ? "Register" : "Register · Continued"}`}

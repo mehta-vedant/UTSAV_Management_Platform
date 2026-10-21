@@ -1,11 +1,11 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, HelpCircle, Loader2, Paperclip, RefreshCw, ShieldCheck, Sparkles, Trash2, UploadCloud } from "lucide-react";
+import { FileText, HelpCircle, Loader2, Paperclip, ShieldCheck, Sparkles, Trash2, UploadCloud } from "lucide-react";
 import { ExpenseCategory } from "@prisma/client";
 import { toast } from "sonner";
-import { getVisibleReceipts, type ReceiptListItem } from "./receipt-visibility";
+import { getActiveReceipt, type ReceiptListItem } from "./receipt-visibility";
 import { RECEIPT_MAX_BYTES, RECEIPT_MAX_SIZE_LABEL } from "@/lib/receipt-constraints";
 import {
     applyReceiptSuggestionAction,
@@ -27,18 +27,25 @@ interface ReceiptEvidenceManagerProps {
     };
     receipts: ReceiptListItem[];
     canManage: boolean;
+    canApplyAiSuggestions: boolean;
 }
 
-export default function ReceiptEvidenceManager({ organizationId, expense, receipts, canManage }: ReceiptEvidenceManagerProps) {
+export default function ReceiptEvidenceManager({ organizationId, expense, receipts, canManage, canApplyAiSuggestions }: ReceiptEvidenceManagerProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [useAi, setUseAi] = useState(false);
     const [suggestion, setSuggestion] = useState<Record<string, unknown> | null>(null);
     const [suggestionReceiptId, setSuggestionReceiptId] = useState<string | null>(null);
-    const [replacementReceiptId, setReplacementReceiptId] = useState<string | null>(null);
+    const [hasConfirmedSuggestionReview, setHasConfirmedSuggestionReview] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const activeReceipt = useMemo(() => getActiveReceipt(receipts), [receipts]);
+    const storedSuggestion = activeReceipt?.extractionStatus === "COMPLETED" && activeReceipt.extraction && typeof activeReceipt.extraction === "object"
+        ? activeReceipt.extraction as Record<string, unknown>
+        : null;
+    const reviewSuggestion = suggestion || storedSuggestion;
+    const reviewReceiptId = suggestionReceiptId || (storedSuggestion ? activeReceipt?.id || null : null);
 
-    async function upload(file: File, receiptIdToReplace?: string | null) {
+    async function upload(file: File) {
         if (!canManage) return;
         if (file.size > RECEIPT_MAX_BYTES) {
             toast.error(`Choose a receipt smaller than ${RECEIPT_MAX_SIZE_LABEL}.`, { duration: 5000 });
@@ -50,6 +57,7 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
         setIsLoading(true);
         setSuggestion(null);
         setSuggestionReceiptId(null);
+        setHasConfirmedSuggestionReview(false);
         const started = await startReceiptUploadAction({
             organizationId,
             expenseId: expense.id,
@@ -89,11 +97,6 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 setSuggestion((confirmed.data.extraction as Record<string, unknown> | null) || null);
                 setSuggestionReceiptId(started.data.receiptId);
                 toast.success(shouldUseAi ? "Receipt saved. Review the AI suggestions below." : "Receipt saved privately.", { duration: 5000 });
-                if (receiptIdToReplace) {
-                    const removed = await deleteReceiptAction({ organizationId, expenseId: expense.id, receiptId: receiptIdToReplace });
-                    if (removed.success) toast.success("Previous receipt replaced.", { duration: 5000 });
-                    else toast.error(`New receipt saved, but the previous file remains: ${removed.error || "retry removal."}`, { duration: 5000 });
-                }
                 router.refresh();
             }
         } catch (error) {
@@ -109,13 +112,10 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
         event.target.value = "";
-        const receiptIdToReplace = replacementReceiptId;
-        setReplacementReceiptId(null);
-        if (file) await upload(file, receiptIdToReplace);
+        if (file) await upload(file);
     }
 
-    function chooseFile(receiptIdToReplace?: string) {
-        setReplacementReceiptId(receiptIdToReplace || null);
+    function chooseFile() {
         fileInputRef.current?.click();
     }
 
@@ -139,28 +139,29 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     }
 
     async function applySuggestion() {
-        if (!suggestion) return;
+        if (!reviewSuggestion || !reviewReceiptId) return;
         setIsLoading(true);
         const result = await applyReceiptSuggestionAction({
             organizationId,
-            receiptId: suggestionReceiptId || "",
-            title: typeof suggestion.vendor === "string" && suggestion.vendor ? suggestion.vendor : expense.title,
-            amount: typeof suggestion.amount === "number" && suggestion.amount > 0 ? suggestion.amount : expense.amount,
-            category: Object.values(ExpenseCategory).includes(suggestion.category as ExpenseCategory) ? suggestion.category as ExpenseCategory : expense.category,
-            notes: [expense.notes, typeof suggestion.receiptNumber === "string" ? `Receipt: ${suggestion.receiptNumber}` : ""].filter(Boolean).join("\n"),
+            receiptId: reviewReceiptId,
+            title: typeof reviewSuggestion.vendor === "string" && reviewSuggestion.vendor ? reviewSuggestion.vendor : expense.title,
+            amount: typeof reviewSuggestion.amount === "number" && reviewSuggestion.amount > 0 ? reviewSuggestion.amount : expense.amount,
+            category: Object.values(ExpenseCategory).includes(reviewSuggestion.category as ExpenseCategory) ? reviewSuggestion.category as ExpenseCategory : expense.category,
+            notes: [expense.notes, typeof reviewSuggestion.receiptNumber === "string" ? `Receipt: ${reviewSuggestion.receiptNumber}` : ""].filter(Boolean).join("\n"),
         });
         if (result.success) toast.success("Suggestions applied after your review.", { duration: 5000 });
         else toast.error(result.error || "Could not apply suggestions.", { duration: 5000 });
         if (result.success) {
             setSuggestion(null);
             setSuggestionReceiptId(null);
+            setHasConfirmedSuggestionReview(false);
         }
         setIsLoading(false);
     }
 
     return (
         <div className="space-y-2">
-            {canManage && (
+            {canManage && !activeReceipt && (
                 <div className="flex items-center gap-1.5">
                     <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-violet-100 bg-violet-50/70 px-2 py-1.5 text-[9px] font-black uppercase tracking-wide text-violet-900">
                         <input
@@ -181,18 +182,17 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 </div>
             )}
             <div className="flex flex-wrap items-center gap-2">
-                {getVisibleReceipts(receipts).map((receipt) => (
-                    <div key={receipt.id} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
-                        <button type="button" onClick={() => receipt.status === "UPLOADED" && openReceipt(receipt.id)} className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[9px] font-black uppercase tracking-wide text-slate-600 hover:bg-white disabled:cursor-default" disabled={receipt.status !== "UPLOADED"}>
-                            <FileText className="h-3 w-3" /> {receipt.status === "UPLOADED" ? "View" : "Pending"}
+                {activeReceipt && (
+                    <div key={activeReceipt.id} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+                        <button type="button" onClick={() => activeReceipt.status === "UPLOADED" && openReceipt(activeReceipt.id)} className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[9px] font-black uppercase tracking-wide text-slate-600 hover:bg-white disabled:cursor-default" disabled={activeReceipt.status !== "UPLOADED"}>
+                            <FileText className="h-3 w-3" /> {activeReceipt.status === "UPLOADED" ? "View receipt" : "Uploading"}
                         </button>
-                        {canManage && receipt.status === "UPLOADED" && <>
-                            <button type="button" onClick={() => chooseFile(receipt.id)} disabled={isLoading} title="Replace receipt" className="rounded-md p-1 text-slate-500 hover:bg-white hover:text-saffron-700"><RefreshCw className="h-3 w-3" /></button>
-                            <button type="button" onClick={() => removeReceipt(receipt.id)} disabled={isLoading} title="Remove receipt" className="rounded-md p-1 text-slate-500 hover:bg-white hover:text-red-600"><Trash2 className="h-3 w-3" /></button>
-                        </>}
+                        {canManage && (
+                            <button type="button" onClick={() => removeReceipt(activeReceipt.id)} disabled={isLoading} title={activeReceipt.status === "UPLOADED" ? "Remove receipt" : "Cancel upload"} className="rounded-md p-1 text-slate-500 hover:bg-white hover:text-red-600"><Trash2 className="h-3 w-3" /></button>
+                        )}
                     </div>
-                ))}
-                {canManage && (
+                )}
+                {canManage && !activeReceipt && (
                     <button type="button" onClick={() => chooseFile()} disabled={isLoading} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-saffron-300 bg-saffron-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-saffron-700 hover:bg-saffron-100 disabled:cursor-not-allowed disabled:opacity-60">
                         {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Paperclip className="h-3 w-3" />}
                         {useAi ? "Attach bill for AI review" : "Attach bill"}
@@ -200,12 +200,29 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 )}
                 <input ref={fileInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={isLoading || !canManage} onChange={handleFileChange} />
             </div>
-            {canManage && <p className="text-[9px] font-medium text-slate-400">JPG, PNG, WEBP, or PDF · maximum {RECEIPT_MAX_SIZE_LABEL}</p>}
-            {suggestion && (
+            {canManage && !activeReceipt && <p className="text-[9px] font-medium text-slate-400">JPG, PNG, WEBP, or PDF · maximum {RECEIPT_MAX_SIZE_LABEL}</p>}
+            {reviewSuggestion && reviewReceiptId && (
                 <div className="rounded-xl border border-violet-100 bg-violet-50 p-3 text-[10px] text-violet-950">
-                    <div className="mb-1 flex items-center gap-1 font-black uppercase tracking-wide"><ShieldCheck className="h-3.5 w-3.5" /> AI suggestions — review before applying</div>
-                    <p>{typeof suggestion.vendor === "string" ? suggestion.vendor : "Vendor unclear"}{typeof suggestion.amount === "number" ? ` · Rs ${suggestion.amount}` : ""}{typeof suggestion.date === "string" ? ` · ${suggestion.date}` : ""}</p>
-                    <button type="button" onClick={applySuggestion} disabled={isLoading} className="mt-2 inline-flex items-center gap-1 rounded-lg bg-violet-700 px-2 py-1 font-black uppercase tracking-wide text-white"><UploadCloud className="h-3 w-3" /> Apply reviewed suggestions</button>
+                    <div className="mb-1 flex items-center gap-1 font-black uppercase tracking-wide"><ShieldCheck className="h-3.5 w-3.5" /> Review AI suggestions</div>
+                    <dl className="space-y-1 leading-relaxed text-violet-800">
+                        <div><dt className="inline font-black">Vendor:</dt> <dd className="inline">{typeof reviewSuggestion.vendor === "string" ? reviewSuggestion.vendor : "Not found"}</dd></div>
+                        <div><dt className="inline font-black">Amount:</dt> <dd className="inline">{typeof reviewSuggestion.amount === "number" ? `INR ${reviewSuggestion.amount.toLocaleString("en-IN")}` : "Not found"}</dd></div>
+                        <div><dt className="inline font-black">Date:</dt> <dd className="inline">{typeof reviewSuggestion.date === "string" ? reviewSuggestion.date : "Not found"}</dd></div>
+                        <div><dt className="inline font-black">Category:</dt> <dd className="inline">{typeof reviewSuggestion.category === "string" ? reviewSuggestion.category.replace("_", " ") : "Not found"}</dd></div>
+                        {typeof reviewSuggestion.receiptNumber === "string" && <div><dt className="inline font-black">Receipt no.:</dt> <dd className="inline">{reviewSuggestion.receiptNumber}</dd></div>}
+                        {typeof reviewSuggestion.summary === "string" && <div><dt className="inline font-black">Summary:</dt> <dd className="inline">{reviewSuggestion.summary}</dd></div>}
+                    </dl>
+                    {canApplyAiSuggestions ? (
+                        <>
+                            <label className="mt-2 flex cursor-pointer items-start gap-1.5 text-violet-800">
+                                <input type="checkbox" checked={hasConfirmedSuggestionReview} onChange={(event) => setHasConfirmedSuggestionReview(event.target.checked)} disabled={isLoading} className="mt-0.5" />
+                                <span>I reviewed these suggestions against the bill.</span>
+                            </label>
+                            <button type="button" onClick={applySuggestion} disabled={isLoading || !hasConfirmedSuggestionReview} className="mt-2 inline-flex items-center gap-1 rounded-lg bg-violet-700 px-2 py-1 font-black uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-50"><UploadCloud className="h-3 w-3" /> Confirm and apply</button>
+                        </>
+                    ) : (
+                        <p className="mt-2 font-medium text-violet-700">A Treasurer or Admin can apply these suggestions after reviewing them.</p>
+                    )}
                 </div>
             )}
         </div>

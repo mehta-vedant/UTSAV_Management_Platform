@@ -1,13 +1,15 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
-import { FileText, Loader2, Paperclip, ShieldCheck, Sparkles, UploadCloud } from "lucide-react";
+import { ChangeEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FileText, Loader2, Paperclip, RefreshCw, ShieldCheck, Sparkles, Trash2, UploadCloud } from "lucide-react";
 import { ExpenseCategory } from "@prisma/client";
 import { toast } from "sonner";
 import { getVisibleReceipts, type ReceiptListItem } from "./receipt-visibility";
 import {
     applyReceiptSuggestionAction,
     confirmReceiptUploadAction,
+    deleteReceiptAction,
     getReceiptDownloadUrlAction,
     markReceiptUploadFailedAction,
     startReceiptUploadAction,
@@ -31,8 +33,11 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     const [useAi, setUseAi] = useState(false);
     const [suggestion, setSuggestion] = useState<Record<string, unknown> | null>(null);
     const [suggestionReceiptId, setSuggestionReceiptId] = useState<string | null>(null);
+    const [replacementReceiptId, setReplacementReceiptId] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
 
-    async function upload(file: File) {
+    async function upload(file: File, receiptIdToReplace?: string | null) {
         if (!canManage) return;
         setIsLoading(true);
         setSuggestion(null);
@@ -76,6 +81,12 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 setSuggestion((confirmed.data.extraction as Record<string, unknown> | null) || null);
                 setSuggestionReceiptId(started.data.receiptId);
                 toast.success(useAi ? "Receipt saved. Review the AI suggestions below." : "Receipt saved privately.", { duration: 5000 });
+                if (receiptIdToReplace) {
+                    const removed = await deleteReceiptAction({ organizationId, expenseId: expense.id, receiptId: receiptIdToReplace });
+                    if (removed.success) toast.success("Previous receipt replaced.", { duration: 5000 });
+                    else toast.error(`New receipt saved, but the previous file remains: ${removed.error || "retry removal."}`, { duration: 5000 });
+                }
+                router.refresh();
             }
         } catch (error) {
             await markReceiptUploadFailedAction({ organizationId, expenseId: expense.id, receiptId: started.data.receiptId });
@@ -89,13 +100,33 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
         event.target.value = "";
-        if (file) await upload(file);
+        const receiptIdToReplace = replacementReceiptId;
+        setReplacementReceiptId(null);
+        if (file) await upload(file, receiptIdToReplace);
+    }
+
+    function chooseFile(receiptIdToReplace?: string) {
+        setReplacementReceiptId(receiptIdToReplace || null);
+        fileInputRef.current?.click();
     }
 
     async function openReceipt(receiptId: string) {
         const result = await getReceiptDownloadUrlAction(organizationId, receiptId);
         if (result.success && result.data?.url) window.open(result.data.url, "_blank", "noopener,noreferrer");
         else toast.error(result.error || "Could not open this receipt.", { duration: 5000 });
+    }
+
+    async function removeReceipt(receiptId: string) {
+        if (!window.confirm("Remove this private receipt? This is recorded in the audit trail.")) return;
+        setIsLoading(true);
+        const result = await deleteReceiptAction({ organizationId, expenseId: expense.id, receiptId });
+        if (result.success) {
+            toast.success("Receipt removed.", { duration: 5000 });
+            router.refresh();
+        } else {
+            toast.error(result.error || "Could not remove this receipt.", { duration: 5000 });
+        }
+        setIsLoading(false);
     }
 
     async function applySuggestion() {
@@ -122,17 +153,23 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
         <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
                 {getVisibleReceipts(receipts).map((receipt) => (
-                    <button key={receipt.id} type="button" onClick={() => receipt.status === "UPLOADED" && openReceipt(receipt.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-slate-600 hover:border-saffron-300 disabled:cursor-default" disabled={receipt.status !== "UPLOADED"}>
-                        <FileText className="h-3 w-3" /> {receipt.status === "UPLOADED" ? "Receipt" : "Receipt pending"}
-                    </button>
+                    <div key={receipt.id} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
+                        <button type="button" onClick={() => receipt.status === "UPLOADED" && openReceipt(receipt.id)} className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[9px] font-black uppercase tracking-wide text-slate-600 hover:bg-white disabled:cursor-default" disabled={receipt.status !== "UPLOADED"}>
+                            <FileText className="h-3 w-3" /> {receipt.status === "UPLOADED" ? "View" : "Pending"}
+                        </button>
+                        {canManage && receipt.status === "UPLOADED" && <>
+                            <button type="button" onClick={() => chooseFile(receipt.id)} disabled={isLoading} title="Replace receipt" className="rounded-md p-1 text-slate-500 hover:bg-white hover:text-saffron-700"><RefreshCw className="h-3 w-3" /></button>
+                            <button type="button" onClick={() => removeReceipt(receipt.id)} disabled={isLoading} title="Remove receipt" className="rounded-md p-1 text-slate-500 hover:bg-white hover:text-red-600"><Trash2 className="h-3 w-3" /></button>
+                        </>}
+                    </div>
                 ))}
                 {canManage && (
-                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-saffron-300 bg-saffron-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-saffron-700 hover:bg-saffron-100">
+                    <button type="button" onClick={() => chooseFile()} disabled={isLoading} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-saffron-300 bg-saffron-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-saffron-700 hover:bg-saffron-100 disabled:cursor-not-allowed disabled:opacity-60">
                         {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Paperclip className="h-3 w-3" />}
                         Attach bill
-                        <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={isLoading} onChange={handleFileChange} />
-                    </label>
+                    </button>
                 )}
+                <input ref={fileInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={isLoading || !canManage} onChange={handleFileChange} />
             </div>
             {canManage && (
                 <label title="Allow Gemini to read this receipt only to suggest bill details. You review every suggestion before applying it." className="inline-flex cursor-pointer items-center gap-1.5 text-[9px] font-bold text-slate-500">

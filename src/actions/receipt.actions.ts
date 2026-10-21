@@ -6,6 +6,7 @@ import { withAction } from "@/lib/action";
 import {
     applyReceiptSuggestion,
     confirmReceiptUpload,
+    deleteReceipt,
     getReceiptDownloadUrl,
     markReceiptUploadFailed,
     startReceiptUpload,
@@ -35,6 +36,13 @@ export async function startReceiptUploadAction(input: z.infer<typeof StartReceip
 const FailedUploadSchema = ConfirmReceiptSchema.omit({ useAiExtraction: true });
 export async function markReceiptUploadFailedAction(input: z.infer<typeof FailedUploadSchema>) {
     return withAction(() => markReceiptUploadFailed(FailedUploadSchema.parse(input)), {
+        paths: [{ path: "/[orgSlug]/dashboard/expenses", type: "page" }],
+    });
+}
+
+const DeleteReceiptSchema = FailedUploadSchema;
+export async function deleteReceiptAction(input: z.infer<typeof DeleteReceiptSchema>) {
+    return withAction(() => deleteReceipt(DeleteReceiptSchema.parse(input)), {
         paths: [{ path: "/[orgSlug]/dashboard/expenses", type: "page" }],
     });
 }

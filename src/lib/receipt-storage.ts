@@ -1,4 +1,4 @@
-import { GetObjectCommand, HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { InvariantError } from "@/lib/errors";
@@ -68,6 +68,13 @@ export async function createReceiptDownloadUrl(objectKey: string) {
         new GetObjectCommand({ Bucket: getReceiptBucket(), Key: objectKey }),
         { expiresIn: 120 }
     );
+}
+
+export async function deleteReceiptObject(objectKey: string) {
+    await getS3Client().send(new DeleteObjectCommand({
+        Bucket: getReceiptBucket(),
+        Key: objectKey,
+    }));
 }
 
 export async function readReceiptBytes(objectKey: string) {

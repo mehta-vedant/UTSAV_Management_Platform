@@ -59,14 +59,14 @@ export default function ExpensesDocument({ organizationName, generatedAt, data }
     );
 
     const columns = [
-        { header: "Date", key: "date", width: "12%" },
-        { header: "Expense", key: "title", width: "19%" },
-        { header: "Category", key: "category", width: "12%" },
-        { header: "Payment", key: "paymentMode", width: "11%" },
-        { header: "Amount", key: "amount", width: "13%", align: "right" as const },
-        { header: "Status", key: "status", width: "11%" },
-        { header: "Event", key: "event", width: "9%" },
-        { header: "Requested By", key: "requestedBy", width: "13%" },
+        { header: "Date", key: "date", width: "11%" },
+        { header: "Expense", key: "title", width: "18%" },
+        { header: "Category", key: "category", width: "11%" },
+        { header: "Payment", key: "paymentMode", width: "10%" },
+        { header: "Amount", key: "amount", width: "14%", align: "right" as const },
+        { header: "Status", key: "status", width: "10%" },
+        { header: "Event", key: "event", width: "8%" },
+        { header: "Requested By", key: "requestedBy", width: "12%" },
     ];
 
     const pageSize = 20;

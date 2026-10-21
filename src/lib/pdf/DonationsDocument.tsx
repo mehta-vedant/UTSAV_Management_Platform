@@ -53,13 +53,13 @@ export default function DonationsDocument({ organizationName, incomeLabel, gener
     const maxPayment = Math.max(1, ...summary.byPaymentMode.map((p) => p.amount));
 
     const columns = [
-        { header: "Date", key: "date", width: "13%" },
-        { header: "Donor", key: "donor", width: "21%" },
-        { header: "Category", key: "category", width: "13%" },
-        { header: "Payment", key: "paymentMode", width: "12%" },
-        { header: "Amount", key: "amount", width: "13%", align: "right" as const },
-        { header: "Event", key: "event", width: "10%" },
-        { header: "Recorded By", key: "recordedBy", width: "18%" },
+        { header: "Date", key: "date", width: "12%" },
+        { header: "Donor", key: "donor", width: "20%" },
+        { header: "Category", key: "category", width: "12%" },
+        { header: "Payment", key: "paymentMode", width: "11%" },
+        { header: "Amount", key: "amount", width: "14%", align: "right" as const },
+        { header: "Event", key: "event", width: "9%" },
+        { header: "Recorded By", key: "recordedBy", width: "16%" },
     ];
 
     const pageSize = 22;

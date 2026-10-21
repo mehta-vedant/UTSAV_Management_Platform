@@ -6,6 +6,7 @@ import { FileText, Loader2, Paperclip, RefreshCw, ShieldCheck, Sparkles, Trash2,
 import { ExpenseCategory } from "@prisma/client";
 import { toast } from "sonner";
 import { getVisibleReceipts, type ReceiptListItem } from "./receipt-visibility";
+import { RECEIPT_MAX_BYTES, RECEIPT_MAX_SIZE_LABEL } from "@/lib/receipt-constraints";
 import {
     applyReceiptSuggestionAction,
     confirmReceiptUploadAction,
@@ -39,6 +40,13 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
 
     async function upload(file: File, receiptIdToReplace?: string | null) {
         if (!canManage) return;
+        if (file.size > RECEIPT_MAX_BYTES) {
+            toast.error(`Choose a receipt smaller than ${RECEIPT_MAX_SIZE_LABEL}.`, { duration: 5000 });
+            return;
+        }
+        // Consent belongs to this one file. Reset it after the attempt so the
+        // next receipt always needs an intentional choice from the user.
+        const shouldUseAi = useAi;
         setIsLoading(true);
         setSuggestion(null);
         setSuggestionReceiptId(null);
@@ -73,14 +81,14 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 organizationId,
                 expenseId: expense.id,
                 receiptId: started.data.receiptId,
-                useAiExtraction: useAi,
+                useAiExtraction: shouldUseAi,
             });
             if (!confirmed.success || !confirmed.data) {
                 toast.error(confirmed.error || "The receipt was uploaded but could not be confirmed. Retry later.", { duration: 5000 });
             } else {
                 setSuggestion((confirmed.data.extraction as Record<string, unknown> | null) || null);
                 setSuggestionReceiptId(started.data.receiptId);
-                toast.success(useAi ? "Receipt saved. Review the AI suggestions below." : "Receipt saved privately.", { duration: 5000 });
+                toast.success(shouldUseAi ? "Receipt saved. Review the AI suggestions below." : "Receipt saved privately.", { duration: 5000 });
                 if (receiptIdToReplace) {
                     const removed = await deleteReceiptAction({ organizationId, expenseId: expense.id, receiptId: receiptIdToReplace });
                     if (removed.success) toast.success("Previous receipt replaced.", { duration: 5000 });
@@ -94,6 +102,7 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
             toast.error(`${detail} The expense remains saved; retry after checking S3 setup.`, { duration: 5000 });
         } finally {
             setIsLoading(false);
+            setUseAi(false);
         }
     }
 
@@ -151,6 +160,27 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
 
     return (
         <div className="space-y-2">
+            {canManage && (
+                <div className="rounded-lg border border-violet-100 bg-violet-50/70 p-2">
+                    <label className="flex cursor-pointer items-start gap-2 text-[9px] text-violet-950">
+                        <input
+                            type="checkbox"
+                            checked={useAi}
+                            disabled={isLoading}
+                            onChange={(event) => setUseAi(event.target.checked)}
+                            className="mt-0.5"
+                        />
+                        <span>
+                            <span className="flex items-center gap-1 font-black uppercase tracking-wide">
+                                <Sparkles className="h-3 w-3 text-violet-600" /> Optional AI bill suggestions
+                            </span>
+                            <span className="mt-0.5 block leading-relaxed text-violet-700">
+                                Turn this on before attaching this receipt. Gemini suggests details; you review them before anything changes.
+                            </span>
+                        </span>
+                    </label>
+                </div>
+            )}
             <div className="flex flex-wrap items-center gap-2">
                 {getVisibleReceipts(receipts).map((receipt) => (
                     <div key={receipt.id} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
@@ -166,17 +196,12 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 {canManage && (
                     <button type="button" onClick={() => chooseFile()} disabled={isLoading} className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-saffron-300 bg-saffron-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-saffron-700 hover:bg-saffron-100 disabled:cursor-not-allowed disabled:opacity-60">
                         {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Paperclip className="h-3 w-3" />}
-                        Attach bill
+                        {useAi ? "Attach bill for AI review" : "Attach bill"}
                     </button>
                 )}
                 <input ref={fileInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={isLoading || !canManage} onChange={handleFileChange} />
             </div>
-            {canManage && (
-                <label title="Allow Gemini to read this receipt only to suggest bill details. You review every suggestion before applying it." className="inline-flex cursor-pointer items-center gap-1.5 text-[9px] font-bold text-slate-500">
-                    <input type="checkbox" checked={useAi} onChange={(event) => setUseAi(event.target.checked)} />
-                    <Sparkles className="h-3 w-3 text-saffron-500" /> Use AI suggestions
-                </label>
-            )}
+            {canManage && <p className="text-[9px] font-medium text-slate-400">JPG, PNG, WEBP, or PDF · maximum {RECEIPT_MAX_SIZE_LABEL}</p>}
             {suggestion && (
                 <div className="rounded-xl border border-violet-100 bg-violet-50 p-3 text-[10px] text-violet-950">
                     <div className="mb-1 flex items-center gap-1 font-black uppercase tracking-wide"><ShieldCheck className="h-3.5 w-3.5" /> AI suggestions — review before applying</div>

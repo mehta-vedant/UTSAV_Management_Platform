@@ -45,7 +45,18 @@ const COLORS = [
 ];
 
 function fmt(value: number) {
-    return `₹${Math.round(value).toLocaleString("en-IN")}`;
+    return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+    }).format(Math.round(value));
+}
+
+function fmtAxis(value: number) {
+    const absoluteValue = Math.abs(value);
+    if (absoluteValue >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
+    if (absoluteValue >= 1000) return `₹${(value / 1000).toFixed(0)}K`;
+    return fmt(value);
 }
 
 export default function ReportsDashboard({ data, orgSlug, organizationName, currentBucket, isFestival }: ReportsDashboardProps) {
@@ -305,7 +316,7 @@ function CashFlowChart({ data }: { data: ReportsData["cashFlow"] }) {
     if (data.length === 0) return <EmptyMessage>No financial activity recorded yet.</EmptyMessage>;
     return (
         <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 18, left: 12, bottom: 4 }}>
                 <defs>
                     <linearGradient id="incomeFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
@@ -317,9 +328,9 @@ function CashFlowChart({ data }: { data: ReportsData["cashFlow"] }) {
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={{ fontSize: 10, fontWeight: 700 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fontWeight: 700 }} tickLine={false} axisLine={false} />
-                <Tooltip formatter={(value) => fmt(Number(value))} />
+                <XAxis dataKey="chartLabel" minTickGap={28} tick={{ fontSize: 10, fontWeight: 700 }} tickLine={false} axisLine={false} />
+                <YAxis width={58} tickFormatter={fmtAxis} tick={{ fontSize: 10, fontWeight: 700 }} tickLine={false} axisLine={false} />
+                <Tooltip labelFormatter={(_, payload) => payload[0]?.payload?.label || ""} formatter={(value) => fmt(Number(value))} />
                 <Legend wrapperStyle={{ fontSize: 11, fontWeight: 800 }} />
                 <Area type="monotone" dataKey="income" name="Income" stroke="#10b981" strokeWidth={2} fill="url(#incomeFill)" />
                 <Area type="monotone" dataKey="expense" name="Expense" stroke="#f43f5e" strokeWidth={2} fill="url(#expenseFill)" />

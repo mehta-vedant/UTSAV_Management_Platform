@@ -190,7 +190,7 @@ export function PdfSummaryCards({ cards }: { cards: { label: string; value: stri
 }
 
 interface PdfTableProps {
-    columns: { header: string; key: string; align?: "left" | "right" }[];
+    columns: { header: string; key: string; align?: "left" | "right"; width?: string }[];
     rows: Record<string, string | number>[];
 }
 
@@ -199,7 +199,7 @@ export function PdfTable({ columns, rows }: PdfTableProps) {
         <View style={s.tableWrap}>
             <View style={s.tableHeaderRow}>
                 {columns.map((col) => (
-                    <Text key={col.key} style={[s.headerCell, col.align === "right" ? { textAlign: "right", flex: 1 } : { flex: 1 }]}>
+                    <Text key={col.key} style={[s.headerCell, { width: col.width || `${100 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
                         {col.header}
                     </Text>
                 ))}
@@ -207,7 +207,7 @@ export function PdfTable({ columns, rows }: PdfTableProps) {
             {rows.map((row, i) => (
                 <View key={i} style={s.tableRow}>
                     {columns.map((col) => (
-                        <Text key={col.key} style={[s.cell, col.align === "right" ? { textAlign: "right", flex: 1 } : { flex: 1 }]}>
+                        <Text key={col.key} style={[s.cell, { width: col.width || `${100 / columns.length}%` }, col.align === "right" ? { textAlign: "right" } : undefined]}>
                             {row[col.key]}
                         </Text>
                     ))}
@@ -234,7 +234,7 @@ export function PdfBarList({
                         <View style={[s.barFill, { backgroundColor: item.color, width: `${item.pct}%` }]} />
                     </View>
                     <Text style={{ width: 48, textAlign: "right", fontFamily: PDF_HEADING_FONT, fontSize: 8, color: PDF_COLORS.slate900 }}>
-                        {item.amount.toLocaleString("en-IN")}
+                        INR {Math.round(item.amount).toLocaleString("en-IN")}
                     </Text>
                 </View>
             ))}

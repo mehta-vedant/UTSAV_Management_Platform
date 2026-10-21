@@ -4,7 +4,10 @@ import { DonationCategory, ExpenseCategory, ExpenseStatus, PaymentMode, Prisma }
 export type TimeBucket = "daily" | "weekly" | "monthly";
 
 export interface CashFlowPoint {
+    /** ISO-style key used only to preserve chronological order. */
+    sortKey: string;
     label: string;
+    chartLabel: string;
     income: number;
     expense: number;
     balance: number;
@@ -175,7 +178,7 @@ export async function getReportsData(
     };
 }
 
-function buildCashFlow(
+export function buildCashFlow(
     donations: { amount: unknown; receivedAt: Date }[],
     expenses: { amount: unknown; requestedAt: Date }[],
     bucket: TimeBucket
@@ -183,27 +186,44 @@ function buildCashFlow(
     const map = new Map<string, CashFlowPoint>();
 
     const keyOf = (date: Date) => {
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth();
+        const day = date.getUTCDate();
         if (bucket === "monthly") {
-            return date.toLocaleDateString("en-IN", { year: "numeric", month: "short" });
+            const bucketDate = new Date(Date.UTC(year, month, 1));
+            return {
+                sortKey: `${year}-${String(month + 1).padStart(2, "0")}`,
+                label: bucketDate.toLocaleDateString("en-IN", { timeZone: "UTC", year: "numeric", month: "short" }),
+                chartLabel: bucketDate.toLocaleDateString("en-IN", { timeZone: "UTC", month: "short" }),
+            };
         }
         if (bucket === "weekly") {
-            const week = Math.ceil((date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7);
-            return date.toLocaleDateString("en-IN", { month: "short" }) + ` W${week}`;
+            const utcDate = new Date(Date.UTC(year, month, day));
+            const mondayOffset = (utcDate.getUTCDay() + 6) % 7;
+            utcDate.setUTCDate(utcDate.getUTCDate() - mondayOffset);
+            const weekStart = utcDate.toISOString().slice(0, 10);
+            const weekLabel = utcDate.toLocaleDateString("en-IN", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
+            return { sortKey: weekStart, label: `Week of ${weekLabel}`, chartLabel: weekLabel };
         }
-        return date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        const bucketDate = new Date(Date.UTC(year, month, day));
+        return {
+            sortKey: bucketDate.toISOString().slice(0, 10),
+            label: bucketDate.toLocaleDateString("en-IN", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" }),
+            chartLabel: bucketDate.toLocaleDateString("en-IN", { timeZone: "UTC", day: "numeric", month: "short" }),
+        };
     };
 
     for (const d of donations) {
-        const key = keyOf(d.receivedAt);
-        const point = map.get(key) || { label: key, income: 0, expense: 0, balance: 0 };
+        const period = keyOf(d.receivedAt);
+        const point = map.get(period.sortKey) || { ...period, income: 0, expense: 0, balance: 0 };
         point.income += Number(d.amount);
-        map.set(key, point);
+        map.set(period.sortKey, point);
     }
     for (const e of expenses) {
-        const key = keyOf(e.requestedAt);
-        const point = map.get(key) || { label: key, income: 0, expense: 0, balance: 0 };
+        const period = keyOf(e.requestedAt);
+        const point = map.get(period.sortKey) || { ...period, income: 0, expense: 0, balance: 0 };
         point.expense += Number(e.amount);
-        map.set(key, point);
+        map.set(period.sortKey, point);
     }
 
     const points = Array.from(map.values()).map((p) => ({
@@ -211,7 +231,7 @@ function buildCashFlow(
         balance: Math.round(p.income - p.expense),
     }));
 
-    points.sort((a, b) => a.label.localeCompare(b.label, "en-IN"));
+    points.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
     return points;
 }
 

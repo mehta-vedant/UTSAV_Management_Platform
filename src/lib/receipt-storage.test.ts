@@ -9,7 +9,7 @@ describe("receipt storage input boundaries", () => {
         expect(isReceiptContentType("application/octet-stream")).toBe(false);
     });
 
-    it("keeps the file-size limit at 10 MB", () => {
-        expect(RECEIPT_MAX_BYTES).toBe(10 * 1024 * 1024);
+    it("keeps the file-size limit at 1 MB", () => {
+        expect(RECEIPT_MAX_BYTES).toBe(1 * 1024 * 1024);
     });
 });

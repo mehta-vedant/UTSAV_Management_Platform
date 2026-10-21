@@ -7,7 +7,9 @@ const styles = StyleSheet.create({
     page: pdfPageStyle,
 });
 
-const fmtRupee = (value: number) => `₹${Math.round(value).toLocaleString("en-IN")}`;
+// Built-in PDF fonts do not reliably contain the Indian rupee glyph. INR is
+// unambiguous and renders correctly in every generated PDF.
+const fmtRupee = (value: number) => `INR ${Math.round(value).toLocaleString("en-IN")}`;
 
 export interface ReportsPdfProps {
     organizationName: string;
@@ -133,11 +135,11 @@ export default function ReportsDocument({ organizationName, incomeLabel, bucketL
                 ) : (
                     <PdfTable
                         columns={[
-                            { header: "Event", key: "event" },
-                            { header: "Budget", key: "budget", align: "right" },
-                            { header: "Spent", key: "spent", align: "right" },
-                            { header: "Remaining", key: "remaining", align: "right" },
-                            { header: "Utilization", key: "utilization", align: "right" },
+                            { header: "Event", key: "event", width: "36%" },
+                            { header: "Budget", key: "budget", width: "16%", align: "right" },
+                            { header: "Spent", key: "spent", width: "16%", align: "right" },
+                            { header: "Remaining", key: "remaining", width: "20%", align: "right" },
+                            { header: "Utilization", key: "utilization", width: "12%", align: "right" },
                         ]}
                         rows={data.eventBudgets.map((e) => ({
                             event: e.title,

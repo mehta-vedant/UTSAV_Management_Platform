@@ -1,5 +1,5 @@
 import { getTenantPrisma, requirePermission } from "@/lib/access-control";
-import { ExpenseCategory, ExpenseStatus, PaymentMode, Prisma } from "@prisma/client";
+import { ExpenseCategory, ExpenseStatus, PaymentMode, Prisma, ReceiptUploadStatus } from "@prisma/client";
 import { record as recordAudit } from "@/modules/core/audit.service";
 import { ConflictAppError, ValidationAppError } from "@/lib/errors";
 import { PageQuery, getPaginationArgs, paginate } from "@/lib/pagination";
@@ -197,6 +197,7 @@ export async function getPaginatedExpenses(organizationId: string, query: PageQu
                     select: { title: true, status: true }
                 },
                 receipts: {
+                    where: { status: { not: ReceiptUploadStatus.FAILED } },
                     select: { id: true, originalFileName: true, status: true, extractionStatus: true },
                     orderBy: { createdAt: "desc" },
                 },

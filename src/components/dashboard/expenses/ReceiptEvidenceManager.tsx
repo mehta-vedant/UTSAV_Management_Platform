@@ -3,6 +3,8 @@
 import { ChangeEvent, useState } from "react";
 import { FileText, Loader2, Paperclip, ShieldCheck, Sparkles, UploadCloud } from "lucide-react";
 import { ExpenseCategory } from "@prisma/client";
+import { toast } from "sonner";
+import { getVisibleReceipts, type ReceiptListItem } from "./receipt-visibility";
 import {
     applyReceiptSuggestionAction,
     confirmReceiptUploadAction,
@@ -10,13 +12,6 @@ import {
     markReceiptUploadFailedAction,
     startReceiptUploadAction,
 } from "@/actions/receipt.actions";
-
-interface ReceiptItem {
-    id: string;
-    originalFileName: string;
-    status: "PENDING_UPLOAD" | "UPLOADED" | "FAILED";
-    extractionStatus: string;
-}
 
 interface ReceiptEvidenceManagerProps {
     organizationId: string;
@@ -27,13 +22,12 @@ interface ReceiptEvidenceManagerProps {
         category: ExpenseCategory;
         notes?: string | null;
     };
-    receipts: ReceiptItem[];
+    receipts: ReceiptListItem[];
     canManage: boolean;
 }
 
 export default function ReceiptEvidenceManager({ organizationId, expense, receipts, canManage }: ReceiptEvidenceManagerProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState<string | null>(null);
     const [useAi, setUseAi] = useState(false);
     const [suggestion, setSuggestion] = useState<Record<string, unknown> | null>(null);
     const [suggestionReceiptId, setSuggestionReceiptId] = useState<string | null>(null);
@@ -41,7 +35,6 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     async function upload(file: File) {
         if (!canManage) return;
         setIsLoading(true);
-        setMessage(null);
         setSuggestion(null);
         setSuggestionReceiptId(null);
         const started = await startReceiptUploadAction({
@@ -53,12 +46,12 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
         });
 
         if (!started.success || !started.data) {
-            setMessage(started.error || "Could not start the receipt upload.");
+            toast.error(started.error || "Could not start the receipt upload.", { duration: 5000 });
             setIsLoading(false);
             return;
         }
         if (started.data.status === "FAILED" || !("post" in started.data)) {
-            setMessage(started.data.message || "Receipt upload is pending. Retry once storage is available.");
+            toast.error(started.data.message || "Receipt upload could not start. Check storage setup and retry.", { duration: 5000 });
             setIsLoading(false);
             return;
         }
@@ -68,7 +61,9 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
             Object.entries(started.data.post.fields).forEach(([key, value]) => form.append(key, value));
             form.append("file", file);
             const response = await fetch(started.data.post.url, { method: "POST", body: form });
-            if (!response.ok && response.status !== 201 && response.status !== 204) throw new Error("S3 upload failed");
+            if (!response.ok && response.status !== 201 && response.status !== 204) {
+                throw new Error(`S3 rejected the upload (HTTP ${response.status}).`);
+            }
             const confirmed = await confirmReceiptUploadAction({
                 organizationId,
                 expenseId: expense.id,
@@ -76,15 +71,16 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 useAiExtraction: useAi,
             });
             if (!confirmed.success || !confirmed.data) {
-                setMessage(confirmed.error || "The receipt was uploaded but could not be confirmed. Retry later.");
+                toast.error(confirmed.error || "The receipt was uploaded but could not be confirmed. Retry later.", { duration: 5000 });
             } else {
                 setSuggestion((confirmed.data.extraction as Record<string, unknown> | null) || null);
                 setSuggestionReceiptId(started.data.receiptId);
-                setMessage(useAi ? "Receipt saved. Review the AI suggestions below before applying anything." : "Receipt saved privately.");
+                toast.success(useAi ? "Receipt saved. Review the AI suggestions below." : "Receipt saved privately.", { duration: 5000 });
             }
-        } catch {
+        } catch (error) {
             await markReceiptUploadFailedAction({ organizationId, expenseId: expense.id, receiptId: started.data.receiptId });
-            setMessage("Upload failed. The expense remains saved and the receipt can be retried.");
+            const detail = error instanceof Error ? error.message : "Upload failed.";
+            toast.error(`${detail} The expense remains saved; retry after checking S3 setup.`, { duration: 5000 });
         } finally {
             setIsLoading(false);
         }
@@ -99,7 +95,7 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     async function openReceipt(receiptId: string) {
         const result = await getReceiptDownloadUrlAction(organizationId, receiptId);
         if (result.success && result.data?.url) window.open(result.data.url, "_blank", "noopener,noreferrer");
-        else setMessage(result.error || "Could not open this receipt.");
+        else toast.error(result.error || "Could not open this receipt.", { duration: 5000 });
     }
 
     async function applySuggestion() {
@@ -113,7 +109,8 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
             category: Object.values(ExpenseCategory).includes(suggestion.category as ExpenseCategory) ? suggestion.category as ExpenseCategory : expense.category,
             notes: [expense.notes, typeof suggestion.receiptNumber === "string" ? `Receipt: ${suggestion.receiptNumber}` : ""].filter(Boolean).join("\n"),
         });
-        setMessage(result.success ? "Suggestions applied after your review." : result.error || "Could not apply suggestions.");
+        if (result.success) toast.success("Suggestions applied after your review.", { duration: 5000 });
+        else toast.error(result.error || "Could not apply suggestions.", { duration: 5000 });
         if (result.success) {
             setSuggestion(null);
             setSuggestionReceiptId(null);
@@ -124,9 +121,9 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-                {receipts.map((receipt) => (
+                {getVisibleReceipts(receipts).map((receipt) => (
                     <button key={receipt.id} type="button" onClick={() => receipt.status === "UPLOADED" && openReceipt(receipt.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-slate-600 hover:border-saffron-300 disabled:cursor-default" disabled={receipt.status !== "UPLOADED"}>
-                        <FileText className="h-3 w-3" /> {receipt.status === "UPLOADED" ? "Receipt" : receipt.status === "FAILED" ? "Upload failed" : "Receipt pending"}
+                        <FileText className="h-3 w-3" /> {receipt.status === "UPLOADED" ? "Receipt" : "Receipt pending"}
                     </button>
                 ))}
                 {canManage && (
@@ -138,9 +135,9 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                 )}
             </div>
             {canManage && (
-                <label className="flex items-start gap-2 text-[9px] font-medium text-slate-500">
-                    <input type="checkbox" checked={useAi} onChange={(event) => setUseAi(event.target.checked)} className="mt-0.5" />
-                    <span><Sparkles className="mr-1 inline h-3 w-3 text-saffron-500" />I consent to Gemini reading this file only to suggest bill details. I will review them before use.</span>
+                <label title="Allow Gemini to read this receipt only to suggest bill details. You review every suggestion before applying it." className="inline-flex cursor-pointer items-center gap-1.5 text-[9px] font-bold text-slate-500">
+                    <input type="checkbox" checked={useAi} onChange={(event) => setUseAi(event.target.checked)} />
+                    <Sparkles className="h-3 w-3 text-saffron-500" /> Use AI suggestions
                 </label>
             )}
             {suggestion && (
@@ -150,7 +147,6 @@ export default function ReceiptEvidenceManager({ organizationId, expense, receip
                     <button type="button" onClick={applySuggestion} disabled={isLoading} className="mt-2 inline-flex items-center gap-1 rounded-lg bg-violet-700 px-2 py-1 font-black uppercase tracking-wide text-white"><UploadCloud className="h-3 w-3" /> Apply reviewed suggestions</button>
                 </div>
             )}
-            {message && <p className="text-[10px] font-medium text-slate-500">{message}</p>}
         </div>
     );
 }
